@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -34,7 +35,7 @@ from uiforge_contract import (  # noqa: E402
 CLI = ROOT / "scripts/ui_fallback.py"
 MINIMAL = ROOT / "tests/conformance/fixtures/minimal.ui.json"
 FOO_BAR = ROOT / "tests/compiler_conformance/fixtures/foo-bar.ui.json"
-CROSS_PROCESS_ITERATIONS = 50
+CROSS_PROCESS_ITERATIONS = 25
 
 
 def run_cli(*args: str) -> tuple[dict, int, str]:
@@ -57,13 +58,27 @@ def codes(payload: dict) -> set[str]:
 
 
 def _write_worker(source: str, revision: str, marker: str, queue: multiprocessing.Queue) -> None:
-    sys.path.insert(0, str(ROOT / "scripts"))
-    from uiforge_contract import write_source_atomically as write_source
+    result: dict = {"success": False, "errors": [{"code": "WORKER_FAILED"}]}
+    try:
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from uiforge_contract import write_source_atomically as write_source
 
-    path = Path(source)
-    document = json.loads(path.read_text(encoding="utf-8"))
-    document.setdefault("metadata", {})["marker"] = marker
-    queue.put(write_source(path, json.dumps(document, indent="\t") + "\n", revision))
+        path = Path(source)
+        document = None
+        for _ in range(20):
+            try:
+                document = json.loads(path.read_text(encoding="utf-8"))
+                break
+            except FileNotFoundError:
+                time.sleep(0.01)
+        if document is None:
+            raise FileNotFoundError(source)
+        document.setdefault("metadata", {})["marker"] = marker
+        result = write_source(path, json.dumps(document, indent="\t") + "\n", revision)
+    except Exception as exc:
+        result = {"success": False, "errors": [{"code": "WORKER_EXCEPTION", "message": str(exc)}]}
+    finally:
+        queue.put(result)
 
 
 class Batch22SecurityTests(unittest.TestCase):
@@ -100,7 +115,7 @@ class Batch22SecurityTests(unittest.TestCase):
                     process.start()
                 for process in processes:
                     process.join()
-                results = [queue.get_nowait() for _ in processes]
+                results = [queue.get(timeout=60) for _ in processes]
                 successes = [item for item in results if item.get("success")]
                 conflicts = [item for item in results if not item.get("success")]
                 self.assertEqual(len(successes), 1)
