@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from uiforge_contract import (  # noqa: E402
+    LOCK_STALE_SECONDS,
     _file_text_hash,
     _lock_dir,
     _read_lock_meta,
