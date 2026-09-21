@@ -1,7 +1,7 @@
 {
 	"package_id": "zeal_ui_atlas",
 	"display_name": "Zeal UI Atlas",
-	"schema": "aether_ui_document_v1",
+	"schema": "uiforge_document_v1",
 	"install_root": "client/content/ui/zeal_ui_atlas",
 	"runtime_scene_contract": "Generated scenes are ordinary Godot scenes with stable aether_id metadata.",
 	"interfaces": [

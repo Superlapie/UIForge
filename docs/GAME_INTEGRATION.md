@@ -9,7 +9,7 @@ Assume `examples/scenes/inventory.tscn` was built from `examples/specs/inventory
 ```gdscript
 extends Control
 
-const UIForgeRuntime = preload("res://addons/aether_ui/core/aether_runtime.gd")
+const UIForgeRuntime = preload("res://addons/uiforge/core/uiforge_runtime.gd")
 const INVENTORY_SCENE = preload("res://examples/scenes/inventory.tscn")
 
 func open_inventory() -> void:

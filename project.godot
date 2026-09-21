@@ -24,7 +24,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/aether_ui/plugin.cfg")
+enabled=PackedStringArray("res://addons/uiforge/plugin.cfg")
 
 [gui]
 

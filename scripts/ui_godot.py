@@ -49,7 +49,7 @@ def main(argv: list[str]) -> int:
         "--path",
         str(project_dir),
         "--script",
-        "res://addons/aether_ui/cli/cli_main.gd",
+        "res://addons/uiforge/cli/cli_main.gd",
         "--",
         *argv[1:],
     ])

@@ -5,13 +5,13 @@ UIForge has one source of truth:
 ```text
 *.ui.json
     ↓
-AetherSerializer / AetherDocument
+UIForgeSerializer / UIForgeDocument
     ↓
-AetherTheme + component resolver
+UIForgeTheme + component resolver
     ↓
-AetherValidator
+UIForgeValidator
     ↓                 ↘
-editor canvas          AetherCompiler
+editor canvas          UIForgeCompiler
                          ↓
                     normal Godot .tscn
 ```
@@ -29,15 +29,15 @@ The JSON document is the authoring format. `.tscn` is generated output and is ne
 - `commands/` contains reusable document mutations used by CLI and editor paths.
 - `cli/` is a Godot headless entry point. `scripts/ui` selects it whenever Godot is installed.
 - `editor/` and `canvas/` are editor-only clients of the core model.
-- `inspectors/aether_property_catalog.gd` is the shared typed property contract used by the editor inspector and machine-readable capabilities. It covers the common Godot 4.7 Control/CanvasItem surface and node-specific text, texture, range, button, container, typography, accessibility, interaction, and effect properties. It also reports the installed Godot class property list and drives the inspector's native-property fields; `properties.godot_overrides` provides a deterministic JSON representation for the complete native property surface, including newer/specialized properties and theme override paths.
-- `editor/aether_asset_list.gd`, `editor/aether_hierarchy_tree.gd`, and canvas drop handlers provide editor-only drag/drop clients; they emit document mutations rather than creating runtime-only nodes.
-- `core/aether_runtime.gd` is a small optional integration helper; it is safe to copy/use from a game without the editor plugin.
+- `inspectors/uiforge_property_catalog.gd` is the shared typed property contract used by the editor inspector and machine-readable capabilities. It covers the common Godot 4.7 Control/CanvasItem surface and node-specific text, texture, range, button, container, typography, accessibility, interaction, and effect properties. It also reports the installed Godot class property list and drives the inspector's native-property fields; `properties.godot_overrides` provides a deterministic JSON representation for the complete native property surface, including newer/specialized properties and theme override paths.
+- `editor/uiforge_asset_list.gd`, `editor/uiforge_hierarchy_tree.gd`, and canvas drop handlers provide editor-only drag/drop clients; they emit document mutations rather than creating runtime-only nodes.
+- `core/uiforge_runtime.gd` is a small optional integration helper; it is safe to copy/use from a game without the editor plugin.
 
 ## Component model
 
 Primitive node types remain available (`Label`, `Button`, `Grid`, `VBox`, and so on). Semantic components such as `WindowFrame`, `ItemGrid`, `EquipmentSlot`, `SearchBox`, and `PrimaryButton` resolve to normal native Controls. An `ItemGrid` is a `GridContainer` with compositional `ItemSlot` children; it is not a monolithic MMO script.
 
-Component definitions can be declared in a document's top-level `components` object. `ComponentInstance` nodes merge the definition with instance overrides. Built-in definitions are exposed through `ui capabilities` and `addons/aether_ui/components/component_library.gd`.
+Component definitions can be declared in a document's top-level `components` object. `ComponentInstance` nodes merge the definition with instance overrides. Built-in definitions are exposed through `ui capabilities` and `addons/uiforge/components/component_library.gd`.
 
 ## Runtime contract
 

@@ -80,7 +80,7 @@ For a Godot property not present in the typed catalog, set `properties.godot_ove
   "godot_overrides": {
     "theme_override_constants/outline_size": 2,
     "theme_override_colors/font_color": "$colors.gold",
-    "texture_hover": {"$resource": "res://examples/assets/aether_gem.svg", "type": "Texture2D"}
+    "texture_hover": {"$resource": "res://examples/assets/uiforge_gem.svg", "type": "Texture2D"}
   }
 }
 ```
@@ -99,7 +99,7 @@ Fantasy frames can stay compositional. Add a `decorations` object to a panel/win
 }
 ```
 
-`ItemGrid` mock slots accept either simple strings or records such as `{"name":"Aether shard","icon":"res://ui/icons/shard.svg","count":12,"rarity":"rare"}`. If an occupied mock slot has no icon, the included dark-fantasy theme uses a deterministic original icon cycle so previews remain legible. Set `properties.show_label` to `true` when a slot should show its name; `rarity` maps to `$rarity.common`, `$rarity.uncommon`, `$rarity.rare`, `$rarity.epic`, or `$rarity.legendary`. The compiler expands these into ordinary `GridContainer`, `Panel`, `TextureRect`, and `Label` children, so runtime code can inspect and replace them normally.
+`ItemGrid` mock slots accept either simple strings or records such as `{"name":"UIForge shard","icon":"res://ui/icons/shard.svg","count":12,"rarity":"rare"}`. If an occupied mock slot has no icon, the included dark-fantasy theme uses a deterministic original icon cycle so previews remain legible. Set `properties.show_label` to `true` when a slot should show its name; `rarity` maps to `$rarity.common`, `$rarity.uncommon`, `$rarity.rare`, `$rarity.epic`, or `$rarity.legendary`. The compiler expands these into ordinary `GridContainer`, `Panel`, `TextureRect`, and `Label` children, so runtime code can inspect and replace them normally.
 
 ## Stable IDs and operations
 
@@ -143,7 +143,7 @@ The shipped examples intentionally use `preview_mode` values such as `empty_slot
 
 Treat errors as build blockers. Warnings are recommendations about overflow, hit targets, duplicate names, token usage, and similar quality risks. Run `validate` after every meaningful batch of edits, then `render` and `build`.
 
-The schema is versioned at [schemas/aether-ui.schema.json](../schemas/aether-ui.schema.json). V1 migration infrastructure is intentionally kept at the document boundary so future versions can be introduced without silently changing old documents.
+The schema is versioned at [schemas/uiforge.schema.json](../schemas/uiforge.schema.json). V1 migration infrastructure is intentionally kept at the document boundary so future versions can be introduced without silently changing old documents.
 
 ## Populated screen templates
 

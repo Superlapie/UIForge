@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Portable fallback for the Aether CLI when Godot is not installed.
+"""Portable fallback for the UIForge CLI when Godot is not installed.
 
 It deliberately speaks the same JSON document protocol as the Godot CLI. The
 authoritative editor/compiler is GDScript; this shim keeps AI document work,
@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-THEME_PATH = ROOT / "addons/aether_ui/themes/dark_fantasy.theme.json"
+THEME_PATH = ROOT / "addons/uiforge/themes/dark_fantasy.theme.json"
 SCHEMA_VERSION = 1
 NATIVE_TYPES = {
     "Control", "Panel", "Label", "RichText", "Texture", "Button", "TextureButton",
@@ -718,7 +718,7 @@ def get_path(node: dict[str, Any], path: str) -> Any:
 
 
 def template_catalog() -> dict[str, Any]:
-    return json.loads((ROOT / "addons/aether_ui/components/templates.json").read_text(encoding="utf-8"))
+    return json.loads((ROOT / "addons/uiforge/components/templates.json").read_text(encoding="utf-8"))
 
 
 def capabilities() -> dict[str, Any]:

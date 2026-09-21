@@ -7,30 +7,30 @@ func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	for key in AetherTemplates.catalog():
-		var created := AetherTemplates.create(key, "my_screen")
+	for key in UIForgeTemplates.catalog():
+		var created := UIForgeTemplates.create(key, "my_screen")
 		_check(created.get("document") != null, "create_%s" % key)
 		if created.get("document") == null:
 			continue
-		var doc: AetherDocument = created.document
+		var doc: UIForgeDocument = created.document
 		_check(doc.document_name() == "my_screen" and doc.source_path.is_empty(), "independent_%s" % key)
 		var output := "user://atlas_test_%s.tscn" % key
-		var compiled := AetherCompiler.new().compile_document(doc, output)
+		var compiled := UIForgeCompiler.new().compile_document(doc, output)
 		_check(compiled.success, "compile_%s" % key)
 		if compiled.success:
 			var instance := (ResourceLoader.load(output, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE) as PackedScene).instantiate()
 			_check(instance is Control, "load_%s" % key)
 			instance.free()
-	_check(AetherTemplates.create("missing", "test").document == null, "unknown_template")
-	var created := AetherTemplates.create("inventory", "inventory_test")
-	var doc: AetherDocument = created.document
+	_check(UIForgeTemplates.create("missing", "test").document == null, "unknown_template")
+	var created := UIForgeTemplates.create("inventory", "inventory_test")
+	var doc: UIForgeDocument = created.document
 	var texture_node := doc.find_node("backpack_slots_00_icon")
 	texture_node.properties.texture_region = [0, 0, -1, 362]
-	_check(AetherValidator.new().validate(doc).errors > 0, "reject_negative_region")
-	var studio := AetherStudio.new()
+	_check(UIForgeValidator.new().validate(doc).errors > 0, "reject_negative_region")
+	var studio := UIForgeStudio.new()
 	root.add_child(studio)
 	studio._create_new_document()
-	var entries := AetherTemplates.catalog().keys()
+	var entries := UIForgeTemplates.catalog().keys()
 	studio.template_select.select(entries.find("inventory") + 1)
 	studio._create_selected_template()
 	_check(studio.document_path.is_empty() and studio.dirty, "editor_template_is_unsaved_copy")

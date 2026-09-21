@@ -2,7 +2,7 @@
 
 UIForge is a community-built, AI-first Godot production tool for authoring sophisticated game interfaces. It has one canonical source format: readable `*.ui.json` documents. The visual editor, AI workflow, validator, compiler, and renderer all operate on that same document.
 
-The current `aether_ui` addon path and class namespace are retained for compatibility with existing projects and generated scenes.
+The current `uiforge` addon path and class namespace are retained for compatibility with existing projects and generated scenes.
 
 It is deliberately not a web editor, Figma bridge, marketplace, or custom runtime renderer. Compiled output is ordinary Godot `.tscn` content with stable node names and metadata for GDScript or C# gameplay code.
 

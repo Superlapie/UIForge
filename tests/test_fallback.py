@@ -16,7 +16,7 @@ def run(*args: str) -> tuple[dict, int]:
     return json.loads(process.stdout), process.returncode
 
 
-class AetherFallbackTests(unittest.TestCase):
+class UIForgeFallbackTests(unittest.TestCase):
     def test_atlas_templates_and_regions(self) -> None:
         caps, code = run("capabilities")
         self.assertEqual(code, 0)
@@ -106,7 +106,7 @@ class AetherFallbackTests(unittest.TestCase):
             import jsonschema
         except ImportError:
             self.skipTest("jsonschema is optional; the schema file remains part of the project contract")
-        schema = json.loads((ROOT / "schemas/aether-ui.schema.json").read_text(encoding="utf-8"))
+        schema = json.loads((ROOT / "schemas/uiforge.schema.json").read_text(encoding="utf-8"))
         for path in sorted((ROOT / "examples/specs").glob("*.ui.json")) + sorted((ROOT / "examples/atlas").glob("*.ui.json")):
             jsonschema.Draft202012Validator(schema).validate(json.loads(path.read_text(encoding="utf-8")))
 
@@ -139,7 +139,7 @@ class AetherFallbackTests(unittest.TestCase):
             result, code = run("build", str(source), str(output))
             self.assertEqual(code, 0, result)
             scene = output.read_text(encoding="utf-8")
-            self.assertIn("aether_gem.svg", scene)
+            self.assertIn("uiforge_gem.svg", scene)
             self.assertIn("metadata/aether_transitions", scene)
             self.assertIn("metadata/aether_effects", scene)
 
@@ -149,7 +149,7 @@ class AetherFallbackTests(unittest.TestCase):
             "name": "theme_override",
             "viewport": {"width": 800, "height": 600},
             "theme": "dark_fantasy",
-            "theme_overrides": {"styles": {"gem_frame": {"texture": "res://examples/assets/aether_gem.svg", "texture_margin_left": 12, "texture_margin_top": 12, "texture_margin_right": 12, "texture_margin_bottom": 12}}},
+            "theme_overrides": {"styles": {"gem_frame": {"texture": "res://examples/assets/uiforge_gem.svg", "texture_margin_left": 12, "texture_margin_top": 12, "texture_margin_right": 12, "texture_margin_bottom": 12}}},
             "root": {"id": "root", "type": "Panel", "style": "gem_frame", "children": [{"id": "label", "type": "Label", "properties": {"godot_overrides": {"theme_override_colors/font_color": "$colors.gold"}}}]},
         }
         with tempfile.TemporaryDirectory() as directory:

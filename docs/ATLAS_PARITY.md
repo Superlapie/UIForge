@@ -8,7 +8,7 @@ The new populated atlas complements the older six empty skeletons in `examples/s
 
 In the editor, choose **New**, select a screen or **Complete UI atlas**, then **Create**. The result is an unsaved copy; Save chooses your own source path. Existing unsaved work still gets the normal discard check. **Blank window** remains available.
 
-The CLI uses the same catalog (`addons/aether_ui/components/templates.json`):
+The CLI uses the same catalog (`addons/uiforge/components/templates.json`):
 
 ```sh
 ./scripts/ui capabilities

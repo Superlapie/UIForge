@@ -21,12 +21,12 @@ func _run() -> void:
 		"combat_hud": [Vector2(790, 900), 1.0]
 	}
 	for key in placements:
-		var loaded := AetherSerializer.load_document("res://examples/specs/%s.ui.json" % key)
+		var loaded := UIForgeSerializer.load_document("res://examples/specs/%s.ui.json" % key)
 		var path := "res://.aether/renders/parity/%s_gallery.tscn" % key
 		if loaded.get("document") == null:
 			failures.append("load:%s" % key)
 			continue
-		var result := AetherCompiler.new().compile_document(loaded.document, path)
+		var result := UIForgeCompiler.new().compile_document(loaded.document, path)
 		if not result.success:
 			failures.append("compile:%s" % key)
 			continue
@@ -38,10 +38,10 @@ func _run() -> void:
 		_caption(key.replace("_", " ").to_upper(), control.position - Vector2(0, 25))
 	for index in 4:
 		var state: String = ["normal", "hover", "pressed", "disabled"][index]
-		var data := AetherDocument.from_dict({"schema_version": 1, "name": "button_sample", "theme": "dark_fantasy", "viewport": {"width": 200, "height": 50}, "root": {"id": "sample", "type": "PrimaryButton", "layout": {"size": [192, 38]}, "properties": {"text": "Confirm", "font_size": "$font_size.body"}}})
-		data = AetherCompiler.document_for_preview_state(data, state)
+		var data := UIForgeDocument.from_dict({"schema_version": 1, "name": "button_sample", "theme": "dark_fantasy", "viewport": {"width": 200, "height": 50}, "root": {"id": "sample", "type": "PrimaryButton", "layout": {"size": [192, 38]}, "properties": {"text": "Confirm", "font_size": "$font_size.body"}}})
+		data = UIForgeCompiler.document_for_preview_state(data, state)
 		var path := "res://.aether/renders/parity/button_%s.tscn" % state
-		var result := AetherCompiler.new().compile_document(data, path)
+		var result := UIForgeCompiler.new().compile_document(data, path)
 		if not result.success:
 			failures.append("button:%s" % state)
 			continue

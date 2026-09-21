@@ -7,10 +7,10 @@ func _init() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1920, 1080)
-	var studio := AetherStudio.new()
+	var studio := UIForgeStudio.new()
 	root.add_child(studio)
 	studio.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var created := AetherTemplates.create("ui_atlas", "ui_atlas")
+	var created := UIForgeTemplates.create("ui_atlas", "ui_atlas")
 	if created.get("document") == null:
 		printerr(created)
 		quit(1)

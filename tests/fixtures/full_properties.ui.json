@@ -8,7 +8,7 @@
 		"type": "Control",
 		"layout": {"size": [1280, 720], "anchors_preset": "full_rect"},
 		"decorations": {
-			"corner_gem": {"texture": "res://examples/assets/aether_gem.svg", "position": [1120, 28], "size": [64, 64]}
+			"corner_gem": {"texture": "res://examples/assets/uiforge_gem.svg", "position": [1120, 28], "size": [64, 64]}
 		},
 		"children": [
 			{
@@ -41,7 +41,7 @@
 				"id": "gem_texture",
 				"type": "Texture",
 				"layout": {"position": [72, 120], "size": [96, 96], "min_size": [64, 64]},
-				"properties": {"texture": "res://examples/assets/aether_gem.svg", "expand_mode": 1, "stretch_mode": 5, "flip_h": false}
+				"properties": {"texture": "res://examples/assets/uiforge_gem.svg", "expand_mode": 1, "stretch_mode": 5, "flip_h": false}
 			},
 			{
 				"id": "named_button",
@@ -68,7 +68,7 @@
 				"id": "rarity_frame",
 				"type": "NinePatchRect",
 				"layout": {"position": [680, 96], "size": [360, 220]},
-				"properties": {"texture": "res://examples/assets/aether_gem.svg", "patch_margin_left": 12, "patch_margin_top": 12, "patch_margin_right": 12, "patch_margin_bottom": 12}
+				"properties": {"texture": "res://examples/assets/uiforge_gem.svg", "patch_margin_left": 12, "patch_margin_top": 12, "patch_margin_right": 12, "patch_margin_bottom": 12}
 			},
 			{
 				"id": "mode_dropdown",

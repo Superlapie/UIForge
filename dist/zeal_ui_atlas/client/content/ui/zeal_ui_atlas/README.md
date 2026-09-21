@@ -2,7 +2,7 @@
 
 This package contains native Godot scenes ready to instantiate, editable `*.ui.json` sources for UIForge, the artwork and fonts those scenes reference, and the complete atlas composition.
 
-The package is intentionally isolated under `client/content/ui/zeal_ui_atlas`. Copy this directory into a Godot project at the same path. The generated scenes do not require the Aether editor plugin at runtime.
+The package is intentionally isolated under `client/content/ui/zeal_ui_atlas`. Copy this directory into a Godot project at the same path. The generated scenes do not require the UIForge editor plugin at runtime.
 
 The canonical interface names are in `manifest.json`. Each interface has a matching source file in `interfaces/` and generated scene in `scenes/`.
 
