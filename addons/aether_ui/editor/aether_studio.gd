@@ -857,7 +857,7 @@ func _on_preview() -> void:
 		_show_diagnostics([{"severity": "error", "code": "PREVIEW_SCENE_LOAD_FAILED", "message": preview_path, "node": ""}])
 		return
 	preview_window = Window.new()
-	preview_window.title = "Aether Preview · %s" % document.document_name()
+	preview_window.title = "UIForge Preview · %s" % document.document_name()
 	preview_window.size = canvas.viewport_preview
 	preview_window.min_size = Vector2i(640, 360)
 	preview_window.transient = true

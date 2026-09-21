@@ -1,6 +1,6 @@
 # Architecture
 
-Aether has one source of truth:
+UIForge has one source of truth:
 
 ```text
 *.ui.json
