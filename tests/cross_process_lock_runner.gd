@@ -44,7 +44,7 @@ func _run() -> void:
 		var loaded := UIForgeSerializer.load_document(source_res)
 		if loaded.get("document") == null:
 			failures.append("iteration_%d_invalid_json" % iteration)
-		for suffix in [".uiforge_backup", ".uiforge_pending", ".uiforge_txn", ".result_A", ".result_B"]:
+		for suffix in [".uiforge_backup", ".uiforge_pending", ".uiforge_txn", ".result_A", ".result_B", ".uiforge_reclaim_guard"]:
 			if FileAccess.file_exists("%s%s" % [source_abs, suffix]):
 				if suffix.ends_with("_A") or suffix.ends_with("_B"):
 					DirAccess.remove_absolute("%s%s" % [source_abs, suffix])

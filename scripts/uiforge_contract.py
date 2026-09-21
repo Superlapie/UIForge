@@ -10,6 +10,7 @@ import re
 import secrets
 import shutil
 import socket
+import subprocess
 import time
 from pathlib import Path, PureWindowsPath
 from typing import Any, Callable
@@ -73,9 +74,31 @@ def fs_path(raw: str | Path) -> Path:
 
 def resolve_real_path(absolute: Path) -> Path:
     try:
+        if os.name == "nt":
+            return _windows_resolved_path(absolute)
         return absolute.resolve()
     except OSError:
         return absolute
+
+
+def _windows_resolved_path(absolute: Path) -> Path:
+    script = (
+        "$item = Get-Item -LiteralPath '{path}' -Force -ErrorAction SilentlyContinue; "
+        "if ($null -eq $item) {{ exit 2 }}; "
+        "Write-Output $item.FullName"
+    ).format(path=str(absolute).replace("'", "''"))
+    try:
+        completed = subprocess.run(
+            ["powershell", "-NoProfile", "-Command", script],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return absolute
+    if completed.returncode != 0 or not completed.stdout.strip():
+        return absolute
+    return Path(completed.stdout.strip())
 
 
 def project_relative(absolute: Path) -> str:
@@ -325,10 +348,81 @@ def _lock_dir(target_absolute: Path) -> Path:
     return target_absolute.with_name(target_absolute.name + ".uiforge_lock")
 
 
+def _reclaim_guard_path(target_absolute: Path) -> Path:
+    return target_absolute.with_name(target_absolute.name + ".uiforge_reclaim_guard")
+
+
+def _query_process_identity(pid: int) -> dict[str, Any]:
+    if pid <= 0:
+        return {"ok": False}
+    if os.name == "nt":
+        script = (
+            f"$p = Get-Process -Id {pid} -ErrorAction SilentlyContinue; "
+            "if ($null -eq $p) { exit 2 }; "
+            'Write-Output ("{0}|{1}" -f $p.Id, $p.StartTime.ToFileTimeUtc())'
+        )
+        try:
+            completed = subprocess.run(
+                ["powershell", "-NoProfile", "-Command", script],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        except OSError:
+            return {"ok": False, "unknown": True}
+        if completed.returncode == 2:
+            return {"ok": False, "dead": True}
+        if completed.returncode != 0 or not completed.stdout.strip():
+            return {"ok": False, "unknown": True}
+        parts = completed.stdout.strip().split("|")
+        if len(parts) < 2:
+            return {"ok": False, "unknown": True}
+        return {"ok": True, "pid": int(parts[0]), "start_ticks": parts[1]}
+    if not Path(f"/proc/{pid}").exists():
+        return {"ok": False, "dead": True}
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return {"ok": False, "dead": True}
+    proc_stat = Path(f"/proc/{pid}/stat")
+    try:
+        raw = proc_stat.read_text(encoding="utf-8")
+    except OSError:
+        return {"ok": True, "pid": pid, "start_ticks": ""}
+    if not raw:
+        return {"ok": True, "pid": pid, "start_ticks": ""}
+    parts = raw.split(")", 1)
+    if len(parts) < 2:
+        return {"ok": False, "unknown": True}
+    tail = parts[1].strip().split()
+    if len(tail) < 20:
+        return {"ok": True, "pid": pid, "start_ticks": ""}
+    return {"ok": True, "pid": pid, "start_ticks": tail[19]}
+
+
+def _pid_alive_status(meta: dict[str, Any]) -> str:
+    pid = int(meta.get("pid", 0))
+    if pid <= 0:
+        return "dead"
+    stored_start = str(meta.get("process_start", ""))
+    identity = _query_process_identity(pid)
+    if not identity.get("ok"):
+        return "dead" if identity.get("dead") else "unknown"
+    if not stored_start:
+        return "alive"
+    if not str(identity.get("start_ticks", "")):
+        return "unknown"
+    if str(identity.get("start_ticks", "")) != stored_start:
+        return "dead"
+    return "alive"
+
+
 def _write_lock_meta(lock_dir: Path, owner_nonce: str) -> None:
+    identity = _query_process_identity(os.getpid())
     payload = {
         "owner_nonce": owner_nonce,
         "pid": os.getpid(),
+        "process_start": str(identity.get("start_ticks", "")),
         "started": time.time(),
         "hostname": socket.gethostname(),
     }
@@ -352,11 +446,7 @@ def _remove_lock_dir(lock_dir: Path) -> None:
 
 
 def _pid_alive(pid: int) -> bool:
-    if pid <= 0:
-        return False
-    if os.name == "nt":
-        return True
-    return Path(f"/proc/{pid}").exists()
+    return _pid_alive_status({"pid": pid}) == "alive"
 
 
 def _lock_is_stale(lock_dir: Path) -> bool:
@@ -367,23 +457,49 @@ def _lock_is_stale(lock_dir: Path) -> bool:
     age = time.time() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
     if age < NEW_LOCK_GRACE_SECONDS:
         return False
-    if age >= LOCK_STALE_SECONDS:
+    if not meta:
         return True
-    if meta:
-        pid = int(meta.get("pid", 0))
-        if pid > 0 and _pid_alive(pid) and age < LOCK_STALE_SECONDS:
-            return False
-    if age < LOCK_STALE_SECONDS and not meta:
+    status = _pid_alive_status(meta)
+    if status == "alive":
+        return False
+    if status == "unknown":
         return False
     return True
 
 
-def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
-    if not _lock_is_stale(lock_dir):
+def _acquire_reclaim_guard(target_absolute: Path) -> bool:
+    guard = _reclaim_guard_path(target_absolute)
+    if guard.exists():
         return False
-    meta = _read_lock_meta(lock_dir)
-    expected_nonce = str(meta.get("owner_nonce", ""))
-    return reclaim_stale_lock_verified(lock_dir, expected_nonce)
+    try:
+        guard.mkdir()
+    except FileExistsError:
+        return False
+    except OSError:
+        return False
+    return True
+
+
+def _release_reclaim_guard(target_absolute: Path) -> None:
+    guard = _reclaim_guard_path(target_absolute)
+    if guard.exists():
+        shutil.rmtree(guard, ignore_errors=True)
+
+
+def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
+    target_absolute = lock_dir.with_name(lock_dir.name.removesuffix(".uiforge_lock"))
+    if not _acquire_reclaim_guard(target_absolute):
+        return False
+    try:
+        if not _lock_is_stale(lock_dir):
+            return False
+        meta = _read_lock_meta(lock_dir)
+        expected_nonce = str(meta.get("owner_nonce", ""))
+        if not expected_nonce or not _lock_is_stale(lock_dir):
+            return False
+        return reclaim_stale_lock_verified(lock_dir, expected_nonce)
+    finally:
+        _release_reclaim_guard(target_absolute)
 
 
 def reclaim_stale_lock_verified(lock_dir: Path, expected_nonce: str) -> bool:
@@ -435,32 +551,58 @@ def _cleanup_replace_sidecars(absolute: Path) -> None:
         meta_path.unlink(missing_ok=True)
 
 
-def recover_interrupted_replace(absolute: Path) -> None:
+def recover_interrupted_replace(absolute: Path) -> dict[str, Any]:
     backup_path = absolute.with_name(absolute.name + ".uiforge_replace_backup")
     meta_path = _replace_meta_path(absolute)
     meta = _read_replace_meta(meta_path)
     backup_exists = backup_path.exists()
     dest_exists = absolute.exists()
+    if meta and str(meta.get("target", "")) != str(absolute):
+        return {
+            "ok": False,
+            "status": "conflict",
+            "errors": [{"code": "REPLACE_TXN_INVALID", "message": f"Replace transaction target mismatch for {absolute}."}],
+        }
     if not dest_exists and backup_exists:
+        backup_hash = _file_text_hash(backup_path)
+        expected_backup = str(meta.get("backup_hash", ""))
+        if expected_backup and expected_backup != backup_hash:
+            return {
+                "ok": False,
+                "status": "conflict",
+                "errors": [{"code": "REPLACE_BACKUP_INVALID", "message": f"Replace backup hash mismatch for {absolute}."}],
+            }
         os.replace(backup_path, absolute)
         _cleanup_replace_sidecars(absolute)
-        return
+        return {"ok": True, "status": "recovered", "errors": []}
     if dest_exists and backup_exists:
         stage = str(meta.get("stage", ""))
+        dest_hash = _file_text_hash(absolute)
+        backup_hash = _file_text_hash(backup_path)
         if stage in {"commit", "complete"}:
+            expected_new = str(meta.get("new_hash", ""))
+            if expected_new and expected_new != dest_hash:
+                return {
+                    "ok": False,
+                    "status": "conflict",
+                    "errors": [{"code": "REPLACE_RECOVERY_CONFLICT", "message": f"Committed destination hash mismatch for {absolute}."}],
+                }
             backup_path.unlink(missing_ok=True)
             _cleanup_replace_sidecars(absolute)
-            return
-        if not meta and _file_text_hash(absolute) != _file_text_hash(backup_path):
+            return {"ok": True, "status": "clean", "errors": []}
+        if not meta and dest_hash != backup_hash:
             backup_path.unlink(missing_ok=True)
-            return
+            return {"ok": True, "status": "clean", "errors": []}
     if dest_exists and not backup_exists and meta:
         _cleanup_replace_sidecars(absolute)
+    return {"ok": True, "status": "clean", "errors": []}
 
 
 def replace_file(source_absolute: Path, dest_absolute: Path) -> None:
+    recovery = recover_interrupted_replace(dest_absolute)
+    if not recovery.get("ok", False):
+        raise OSError(recovery.get("errors", [{"code": "REPLACE_RECOVERY_CONFLICT"}])[0].get("message", "replace recovery conflict"))
     dest_absolute.parent.mkdir(parents=True, exist_ok=True)
-    recover_interrupted_replace(dest_absolute)
     os.replace(source_absolute, dest_absolute)
     _cleanup_replace_sidecars(dest_absolute)
 
@@ -468,7 +610,11 @@ def replace_file(source_absolute: Path, dest_absolute: Path) -> None:
 def acquire_lock(target_absolute: Path) -> dict[str, Any]:
     lock_dir = _lock_dir(target_absolute)
     owner_nonce = secrets.token_hex(16)
+    guard = _reclaim_guard_path(target_absolute)
     for attempt in range(4):
+        if guard.exists():
+            time.sleep(0.025 * (attempt + 1))
+            continue
         try:
             lock_dir.mkdir()
             try:
@@ -533,6 +679,9 @@ def write_text_atomically(
         lock_path = lock.get("lock_path")
         owner_nonce = str(lock.get("owner_nonce", ""))
         try:
+            recovery = recover_interrupted_replace(absolute)
+            if not recovery.get("ok", False):
+                return {"success": False, "committed": False, "errors": recovery.get("errors", [])}
             if source_identity_value:
                 commit_check = check_commit_replace_allowed(target_path, source_identity_value, force)
                 if not commit_check.get("ok"):

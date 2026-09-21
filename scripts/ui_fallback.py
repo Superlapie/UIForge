@@ -759,7 +759,7 @@ def build_tscn(data: dict[str, Any], source: str) -> tuple[str, list[dict[str, A
         node_type = str(node.get("type", "Control"))
         native_type = native(node_type)
         node_id = str(node.get("id", "Node"))
-        node_name = re.sub(r"[^A-Za-z0-9_]", "_", node_id) or "Node"
+        node_name = re.sub(r"[^A-Za-z0-9_-]", "_", str(node_id)) or f"Node_{abs(hash(node_id))}"
         node_path = node_name if parent == "." else f"{parent}/{node_name}"
         if root:
             lines.append(f'[node name="{node_name}" type="{native_type}"]')

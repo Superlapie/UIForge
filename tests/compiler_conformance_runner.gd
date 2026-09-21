@@ -173,11 +173,10 @@ func _authored_sibling_indices(snapshot: Dictionary, expected_ids: Array) -> Arr
 
 func _semantic_entry(node: Node, parent_id: String, child_index: int) -> Dictionary:
 	var node_id := UIForgeMetadata.read_node_id(node)
-	var display_name: String = node_id if not node_id.is_empty() else str(node.name)
 	return {
 		"parent_id": parent_id,
 		"child_index": child_index,
-		"name": display_name,
+		"name": str(node.name),
 		"type": node.get_class(),
 		"uiforge_id": node_id,
 		"uiforge_type": str(UIForgeMetadata.read_meta(node, "type", "")),

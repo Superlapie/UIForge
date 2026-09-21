@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from uiforge_contract import (  # noqa: E402
-    LOCK_STALE_SECONDS,
+    NEW_LOCK_GRACE_SECONDS,
     _file_text_hash,
     _lock_dir,
     _read_lock_meta,
@@ -99,7 +99,7 @@ class Batch23SecurityTests(unittest.TestCase):
             lock_dir = _lock_dir(target)
             lock_dir.mkdir()
             (lock_dir / "owner.json").write_text(
-                json.dumps({"owner_nonce": "stale-owner", "pid": 999999, "started": time.time() - LOCK_STALE_SECONDS - 10}),
+                json.dumps({"owner_nonce": "stale-owner", "pid": 999999, "process_start": "0", "started": time.time() - NEW_LOCK_GRACE_SECONDS - 10}),
                 encoding="utf-8",
             )
             self.assertTrue(_try_reclaim_stale_lock(lock_dir))

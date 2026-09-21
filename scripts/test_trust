@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PROJECT_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+
+if [ -n "${GODOT_BIN:-}" ]; then
+	GODOT="$GODOT_BIN"
+elif command -v godot >/dev/null 2>&1; then
+	GODOT=$(command -v godot)
+elif command -v godot4 >/dev/null 2>&1; then
+	GODOT=$(command -v godot4)
+else
+	echo '{"success":false,"errors":[{"code":"GODOT_MISSING","message":"Godot executable required for native trust tests."}]}' >&2
+	exit 1
+fi
+
+cd "$PROJECT_DIR"
+"$GODOT" --headless --path "$PROJECT_DIR" --script res://tests/trust_runner.gd
+"$GODOT" --headless --path "$PROJECT_DIR" --script res://tests/cross_process_lock_runner.gd
+"$GODOT" --headless --path "$PROJECT_DIR" --script res://tests/compiler_conformance_runner.gd

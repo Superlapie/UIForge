@@ -80,14 +80,28 @@ static func resolve_real_path(absolute: String) -> String:
 static func _realpath_directory(dir_path: String) -> String:
 	var normalized := _godot_absolute(dir_path)
 	if OS.get_name() == "Windows":
-		# Windows junction/reparse targets are not fully canonicalized here; portable Python
-		# resolve_real_path() remains the stronger containment layer for symlink escapes.
-		return normalized.simplify_path()
+		return _windows_resolved_path(normalized)
 	var output: Array = []
 	var exit_code := OS.execute("realpath", ["-m", normalized], output, true, false)
 	if exit_code == 0 and not output.is_empty():
 		return str(output[0]).strip_edges().replace("\\", "/")
 	return normalized.simplify_path()
+
+static func _windows_resolved_path(path: String) -> String:
+	var output: Array = []
+	var escaped := path.replace("'", "''")
+	var script := (
+		"$item = Get-Item -LiteralPath '%s' -Force -ErrorAction SilentlyContinue; "
+		+ "if ($null -eq $item) { exit 2 }; "
+		+ "Write-Output $item.FullName"
+	) % escaped
+	var exit_code := OS.execute("powershell", ["-NoProfile", "-Command", script], output, true, false)
+	if exit_code == 0 and not output.is_empty():
+		return str(output[0]).strip_edges().replace("\\", "/")
+	return normalized_fallback(path)
+
+static func normalized_fallback(path: String) -> String:
+	return _godot_absolute(path).simplify_path()
 
 static func _godot_absolute(path: String) -> String:
 	return path.replace("\\", "/").simplify_path()

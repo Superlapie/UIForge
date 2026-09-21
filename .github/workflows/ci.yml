@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  portable:
+  portable-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -27,9 +27,9 @@ jobs:
           python-version: "3.12"
       - name: Run Windows filesystem and trust tests
         shell: bash
-        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security -v
+        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security -v
 
-  godot:
+  godot-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -45,3 +45,21 @@ jobs:
         env:
           GODOT_BIN: godot
         run: PATH="$HOME/.local/bin:$PATH" ./scripts/test
+
+  godot-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Godot 4.7.2
+        shell: bash
+        run: |
+          curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_win64.exe.zip
+          unzip -q godot.zip
+          GODOT_EXE=$(find . -maxdepth 1 -name 'Godot_v4.7.2-stable_win64.exe' | head -n 1)
+          mv "$GODOT_EXE" ./godot.exe
+          ./godot.exe --version
+      - name: Run native Windows trust suite
+        shell: bash
+        env:
+          GODOT_BIN: ./godot.exe
+        run: ./scripts/test_trust

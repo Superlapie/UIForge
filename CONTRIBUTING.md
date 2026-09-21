@@ -22,8 +22,8 @@ You keep copyright in your contributions, but you may not contribute code or ass
 
 ## Before opening a PR
 
-1. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the relevant authoring guide.
-2. Run `./scripts/test` locally.
+1. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/PLATFORM_POLICY.md](docs/PLATFORM_POLICY.md), and the relevant authoring guide.
+2. Run `./scripts/test` locally when Godot is available on Linux, and ensure native Windows trust coverage remains green in CI.
 3. Keep changes focused and update the JSON source, schema, and docs together when a contract changes.
 4. Do not hand-edit generated `.tscn` output when the source document can be changed instead.
 5. Do not add secrets, credentials, or proprietary assets.
