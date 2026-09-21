@@ -15,7 +15,7 @@ func _run() -> void:
 		var doc: UIForgeDocument = created.document
 		_check(doc.document_name() == "my_screen" and doc.source_path.is_empty(), "independent_%s" % key)
 		var output := "user://atlas_test_%s.tscn" % key
-		var compiled := UIForgeCompiler.new().compile_document(doc, output)
+		var compiled := UIForgeCompiler.new().compile_document(doc, output, "", {"allow_outside_project": true, "force": true})
 		_check(compiled.success, "compile_%s" % key)
 		if compiled.success:
 			var instance := (ResourceLoader.load(output, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE) as PackedScene).instantiate()

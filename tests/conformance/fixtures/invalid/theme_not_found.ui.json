@@ -1,0 +1,7 @@
+{
+	"schema_version": 1,
+	"name": "theme_not_found",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "missing_theme_name",
+	"root": {"id": "root", "type": "Panel", "layout": {"position": [0, 0], "size": [200, 200]}, "children": []}
+}

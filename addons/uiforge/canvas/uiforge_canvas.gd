@@ -54,8 +54,8 @@ func refresh_native_preview() -> void:
 	native_preview_valid = false
 	native_controls.clear()
 	var preview := UIForgeCompiler.document_for_preview_state(document, preview_state)
-	var path := "user://aether_canvas_%s_%s.tscn" % [OS.get_process_id(), get_instance_id()]
-	var compiled := UIForgeCompiler.new().compile_document(preview, path)
+	var path := "user://uiforge_canvas_%s_%s.tscn" % [OS.get_process_id(), get_instance_id()]
+	var compiled := UIForgeCompiler.new().compile_document(preview, path, document.source_path, {"allow_outside_project": true, "force": true})
 	if not compiled.get("success", false):
 		queue_redraw()
 		return
@@ -80,12 +80,12 @@ func refresh_native_preview() -> void:
 
 func _index_native_controls(node: Node) -> void:
 	if node is Control:
-		native_controls[str(node.get_meta("aether_id", node.name))] = node
+		native_controls[str(node.get_meta("uiforge_id", node.get_meta("aether_id", node.name)))] = node
 	for child in node.get_children():
 		_index_native_controls(child)
 
 func _exit_tree() -> void:
-	var path := "user://aether_canvas_%s_%s.tscn" % [OS.get_process_id(), get_instance_id()]
+	var path := "user://uiforge_canvas_%s_%s.tscn" % [OS.get_process_id(), get_instance_id()]
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(path)
 
@@ -520,7 +520,7 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 func _asset_path_from_drop(data: Variant) -> String:
 	var path := ""
 	if data is Dictionary:
-		path = str(data.get("aether_asset_path", data.get("resource_path", "")))
+		path = str(data.get("uiforge_asset_path", data.get("aether_asset_path", data.get("resource_path", ""))))
 		if path.is_empty() and data.has("files"):
 			var files: Variant = data.get("files")
 			if files is Array or files is PackedStringArray:

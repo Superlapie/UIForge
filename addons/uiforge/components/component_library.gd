@@ -77,7 +77,10 @@ static func _resolve_definition(component_name: String, custom_definitions: Dict
 	if component_name in chain:
 		return {"native_type": "Control"}
 	if custom_definitions.has(component_name):
-		var custom: Dictionary = custom_definitions[component_name]
+		var custom_value: Variant = custom_definitions[component_name]
+		if not custom_value is Dictionary:
+			return definitions().get(component_name, {})
+		var custom: Dictionary = custom_value
 		var result: Dictionary = {}
 		var base_name := str(custom.get("base", ""))
 		if not base_name.is_empty():

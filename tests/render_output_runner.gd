@@ -4,7 +4,7 @@ func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	var path := "res://.aether/test/combat_hud_1280.png"
+	var path := "res://.uiforge/test/combat_hud_1280.png"
 	var image := Image.new()
 	var load_error := image.load(path)
 	if load_error != OK:

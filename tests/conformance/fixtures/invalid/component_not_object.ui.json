@@ -1,0 +1,8 @@
+{
+	"schema_version": 1,
+	"name": "component_not_object",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"components": {"MyPanel": "bad"},
+	"root": {"id": "root", "type": "Panel", "layout": {"position": [0, 0], "size": [200, 200]}, "children": []}
+}

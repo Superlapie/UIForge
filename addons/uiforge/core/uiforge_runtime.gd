@@ -2,12 +2,13 @@ class_name UIForgeRuntime
 extends RefCounted
 
 ## Small language-neutral helpers for generated scenes. Gameplay code remains in the game.
-## Generated nodes carry metadata/aether_id, metadata/aether_action, and metadata/aether_binding.
+## Generated nodes carry metadata/uiforge_id, metadata/uiforge_action, and metadata/uiforge_binding.
+## Legacy aether_* metadata is read only for compatibility with earlier generated scenes.
 
 static func find_by_id(root: Node, node_id: String) -> Node:
 	if root == null:
 		return null
-	if str(root.get_meta("aether_id", "")) == node_id or root.name == node_id:
+	if str(root.get_meta("uiforge_id", root.get_meta("aether_id", ""))) == node_id or root.name == node_id:
 		return root
 	for child in root.get_children():
 		var found := find_by_id(child, node_id)
@@ -30,17 +31,17 @@ static func set_value(root: Node, node_id: String, value: float) -> bool:
 	return true
 
 static func action_id(node: Node) -> String:
-	return str(node.get_meta("aether_action", ""))
+	return str(UIForgeMetadata.read_meta(node, "action", ""))
 
 static func binding_id(node: Node) -> String:
-	return str(node.get_meta("aether_binding", ""))
+	return str(UIForgeMetadata.read_meta(node, "binding", ""))
 
 static func transition_config(node: Node) -> Dictionary:
-	var parsed: Variant = JSON.parse_string(str(node.get_meta("aether_transitions", "{}")))
+	var parsed: Variant = JSON.parse_string(str(UIForgeMetadata.read_meta(node, "transitions", "{}")))
 	return parsed if parsed is Dictionary else {}
 
 static func effect_config(node: Node) -> Variant:
-	var raw := str(node.get_meta("aether_effects", "{}"))
+	var raw := str(UIForgeMetadata.read_meta(node, "effects", "{}"))
 	var parsed: Variant = JSON.parse_string(raw)
 	return parsed if parsed != null else raw
 

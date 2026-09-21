@@ -23,7 +23,7 @@ func _run() -> void:
 			failures.append("load:%s" % filename)
 			continue
 		var instance := packed.instantiate()
-		if instance == null or str(instance.get_meta("aether_id", "")) != str(examples[filename]):
+		if instance == null or str(instance.get_meta("uiforge_id", instance.get_meta("aether_id", ""))) != str(examples[filename]):
 			failures.append("instantiate:%s" % filename)
 		else:
 			instance.queue_free()

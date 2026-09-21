@@ -17,6 +17,23 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from uiforge_contract import (
+    check_create_allowed,
+    check_replace_allowed,
+    content_hash,
+    load_theme_checked,
+    provenance_header,
+    resource_id_part,
+    source_identity,
+    validate_authored_metadata_key,
+    validate_external_resource,
+    validate_godot_override,
+    validate_output,
+    verify_scene_syntax,
+    write_source_atomically,
+    write_text_atomically,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 THEME_PATH = ROOT / "addons/uiforge/themes/dark_fantasy.theme.json"
 SCHEMA_VERSION = 1
@@ -215,6 +232,7 @@ def commit_mutation(path: str, mutate) -> tuple[dict[str, Any], int]:
     data = loaded.get("document")
     if data is None:
         return {"success": False, "committed": False, "errors": loaded.get("errors", [])}, 1
+    expected_revision = str(loaded.get("revision_hash", ""))
     working = copy.deepcopy(data)
     operation = mutate(working)
     if not operation.get("success"):
@@ -229,7 +247,7 @@ def commit_mutation(path: str, mutate) -> tuple[dict[str, Any], int]:
             "warnings": validation["warnings"],
             "diagnostics": validation["diagnostics"],
         }, 1
-    saved = save(path, working)
+    saved = save(path, working, expected_revision)
     if not saved.get("success", False):
         operation["success"] = False
         operation["committed"] = False
@@ -243,7 +261,12 @@ def commit_mutation(path: str, mutate) -> tuple[dict[str, Any], int]:
 
 def fs_path(raw: str | Path) -> Path:
     value = str(raw)
-    return ROOT / value.removeprefix("res://") if value.startswith("res://") else Path(value)
+    if value.startswith("res://"):
+        return (ROOT / value.removeprefix("res://")).resolve()
+    path = Path(value).expanduser()
+    if not path.is_absolute():
+        return (ROOT / path).resolve()
+    return path.resolve()
 
 
 def load(path: str) -> dict[str, Any]:
@@ -254,33 +277,19 @@ def load(path: str) -> dict[str, Any]:
     except json.JSONDecodeError as exc:
         return {"document": None, "errors": [{"code": "JSON_PARSE_ERROR", "message": str(exc), "line": exc.lineno}]}
     if not isinstance(value, dict):
-        return {"document": None, "errors": [{"code": "DOCUMENT_NOT_OBJECT", "message": "The document root must be an object."}]}
-    return {"document": value, "errors": []}
+        return {"document": None, "revision_hash": "", "errors": [{"code": "DOCUMENT_NOT_OBJECT", "message": "The document root must be an object."}]}
+    return {"document": value, "revision_hash": content_hash(value), "errors": []}
 
 
-def save(path: str, data: dict[str, Any]) -> dict[str, Any]:
-    target = fs_path(path)
-    temporary = target.with_name(target.name + ".aether_tmp")
-    try:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        temporary.write_text(json.dumps(data, indent="\t", ensure_ascii=False) + "\n", encoding="utf-8")
-        temporary.replace(target)
-    except OSError as exc:
-        if temporary.exists():
-            try:
-                temporary.unlink()
-            except OSError:
-                pass
-        return {
-            "success": False,
-            "path": str(target),
-            "errors": [{"code": "FILE_WRITE_FAILED", "message": str(exc), "path": str(target)}],
-        }
-    return {"success": True, "path": str(target), "errors": []}
+def save(path: str, data: dict[str, Any], expected_revision: str = "") -> dict[str, Any]:
+    payload = json.dumps(data, indent="\t", ensure_ascii=False) + "\n"
+    return write_source_atomically(path, payload, expected_revision)
 
 
-def theme() -> dict[str, Any]:
-    return json.loads(THEME_PATH.read_text(encoding="utf-8"))
+def theme(document: dict[str, Any] | None = None) -> dict[str, Any]:
+    theme_name = str((document or {}).get("theme", "dark_fantasy"))
+    loaded = load_theme_checked(theme_name)
+    return loaded.get("theme") or json.loads(THEME_PATH.read_text(encoding="utf-8"))
 
 
 def merge_dicts(base: dict[str, Any], override: Any) -> dict[str, Any]:
@@ -330,12 +339,39 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     diagnostics: list[dict[str, Any]] = []
     ids: set[str] = set()
     names: set[str] = set()
-    theme_data = theme()
-    overrides = data.get("theme_overrides", {})
-    tokens = merge_dicts(theme_data.get("tokens", {}), overrides.get("tokens", {}) if isinstance(overrides, dict) else {})
 
     def add(severity: str, code: str, message: str, node: str = "", recommendation: str = ""):
         diagnostics.append({"severity": severity, "code": code, "message": message, "node": node, "recommendation": recommendation})
+
+    theme_loaded = load_theme_checked(str(data.get("theme", "")))
+    for error in theme_loaded.get("errors", []):
+        add(error.get("severity", "error"), error["code"], error["message"], error.get("node", ""), error.get("recommendation", ""))
+    theme_data = theme_loaded.get("theme") or {}
+    overrides = data.get("theme_overrides", {})
+    if "theme_overrides" in data and not isinstance(overrides, dict):
+        add("error", "THEME_OVERRIDES_INVALID", "theme_overrides must be an object.", "document", "Use theme_overrides: { tokens: {}, styles: {} }.")
+        overrides = {}
+    if isinstance(overrides, dict):
+        if "tokens" in overrides and not isinstance(overrides.get("tokens"), dict):
+            add("error", "THEME_OVERRIDES_INVALID", "theme_overrides.tokens must be an object.", "document")
+        if "styles" in overrides and not isinstance(overrides.get("styles"), dict):
+            add("error", "THEME_OVERRIDES_INVALID", "theme_overrides.styles must be an object.", "document")
+    tokens = merge_dicts(theme_data.get("tokens", {}), overrides.get("tokens", {}) if isinstance(overrides, dict) else {})
+    metadata_value = data.get("metadata", {})
+    if metadata_value is not None and not isinstance(metadata_value, dict):
+        add("error", "METADATA_INVALID", "metadata must be an object.", "document")
+    elif isinstance(metadata_value, dict):
+        for metadata_key in metadata_value:
+            diagnostic = validate_authored_metadata_key(str(metadata_key))
+            if diagnostic:
+                add(diagnostic["severity"], diagnostic["code"], diagnostic["message"], diagnostic.get("node", "document"), diagnostic.get("recommendation", ""))
+    components_value = data.get("components", {})
+    if "components" in data and not isinstance(components_value, dict):
+        add("error", "COMPONENTS_INVALID", "components must be an object.", "document")
+    elif isinstance(components_value, dict):
+        for component_name, definition in components_value.items():
+            if not isinstance(definition, dict):
+                add("error", "COMPONENT_INVALID", f"Component '{component_name}' must be an object.", str(component_name))
 
     def number_value(value: Any, field: str, node_id: str) -> float | None:
         if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -489,6 +525,24 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         effects = node.get("effects", {})
         if not isinstance(effects, (dict, list, str)):
             add("error", "EFFECTS_INVALID", "effects must be an effect name, object, or array.", node_id)
+        if "godot_overrides" in properties:
+            overrides_value = properties.get("godot_overrides")
+            if not isinstance(overrides_value, dict):
+                add("error", "GODOT_OVERRIDES_INVALID", "properties.godot_overrides must be an object.", node_id)
+            else:
+                for property_name in overrides_value:
+                    diagnostic = validate_godot_override(str(property_name))
+                    if diagnostic:
+                        add(diagnostic["severity"], diagnostic["code"], diagnostic["message"], node_id, diagnostic.get("recommendation", ""))
+        if "metadata" in node:
+            metadata_node = node.get("metadata")
+            if not isinstance(metadata_node, dict):
+                add("error", "METADATA_INVALID", "metadata must be an object.", node_id)
+            else:
+                for metadata_key in metadata_node:
+                    diagnostic = validate_authored_metadata_key(str(metadata_key))
+                    if diagnostic:
+                        add(diagnostic["severity"], diagnostic["code"], diagnostic["message"], node_id, diagnostic.get("recommendation", ""))
         scan_resources(properties.get("godot_overrides", {}) if isinstance(properties, dict) else {}, node_id)
         scan_resources(node.get("effects", {}), node_id)
         scan_resources(node.get("decorations", {}), node_id)
@@ -556,7 +610,9 @@ def materialize(node: dict[str, Any], custom: dict[str, Any]) -> dict[str, Any]:
     definition: dict[str, Any] = {}
     if component_name in custom:
         custom_definition = custom[component_name]
-        base_name = str(custom_definition.get("base", "")) if isinstance(custom_definition, dict) else ""
+        if not isinstance(custom_definition, dict):
+            return result
+        base_name = str(custom_definition.get("base", ""))
         if base_name:
             definition = materialize({"type": "ComponentInstance", "component": base_name}, custom)
         if isinstance(custom_definition, dict):
@@ -631,22 +687,25 @@ def godot_literal(property_name: str, value: Any, external_resource, tokens: dic
 
 
 def build_tscn(data: dict[str, Any], source: str) -> str:
-    theme_data = theme()
+    theme_data = theme(data)
     overrides = data.get("theme_overrides", {})
     if isinstance(overrides, dict):
         theme_data = merge_dicts(theme_data, overrides)
     tokens = theme_data.get("tokens", {})
     styles = theme_data.get("styles", {})
     subresources: list[str] = []
-    ext_resources: dict[str, tuple[str, str]] = {}
+    ext_resources: dict[str, dict[str, str]] = {}
     emitted_styles: dict[str, str] = {}
     custom_components = data.get("components", {}) if isinstance(data.get("components", {}), dict) else {}
+    identity = source_identity(source)
+    revision = content_hash(data)
 
     def external_resource(path: str, resource_type: str) -> str:
-        if path in ext_resources:
-            return ext_resources[path][0]
+        cache_key = f"{path}|{resource_type}"
+        if cache_key in ext_resources:
+            return ext_resources[cache_key]["id"]
         resource_id = f"{resource_type}_{len(ext_resources) + 1}"
-        ext_resources[path] = (resource_id, resource_type)
+        ext_resources[cache_key] = {"id": resource_id, "type": resource_type, "path": path}
         return resource_id
 
     def make_style(node_id: str, state: str, node_style: Any) -> str:
@@ -659,8 +718,8 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
         state_key = f"{state}_background"
         if state_key in chosen:
             chosen["background"] = chosen[state_key]
-        safe = re.sub(r"[^A-Za-z0-9_]", "_", node_id)
-        resource_id = f"StyleBox_{safe}_{state}"
+        safe = resource_id_part(node_id)
+        resource_id = f"StyleBox_{safe}_{resource_id_part(state)}"
         texture_path = chosen.get(f"{state}_texture", chosen.get("texture"))
         if isinstance(texture_path, str) and texture_path.startswith("res://"):
             texture_resource = external_resource(texture_path, "Texture2D")
@@ -684,7 +743,8 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
         emitted_styles[cache] = resource_id
         return resource_id
 
-    lines: list[str] = ["; GENERATED BY UIForge - EDIT THE .ui.json SOURCE DOCUMENT INSTEAD", f"; Source: {source}", f"[gd_scene load_steps=1 format=3]", ""]
+    header = provenance_header(identity, revision) + [f"; Source: {source}"]
+    lines: list[str] = header + [f"[gd_scene load_steps=1 format=3]", ""]
 
     def emit(node: dict[str, Any], parent: str, root: bool = False):
         node = materialize(node, custom_components)
@@ -697,15 +757,20 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
             lines.append(f'[node name="{node_name}" type="{native_type}"]')
         else:
             lines.append(f'[node name="{node_name}" type="{native_type}" parent="{parent}"]')
-        lines.extend([f"metadata/aether_id = {quote(node_id)}", f"metadata/aether_type = {quote(node_type)}", "metadata/aether_generated = true"])
+        lines.extend([f"metadata/uiforge_id = {quote(node_id)}", f"metadata/uiforge_type = {quote(node_type)}", "metadata/uiforge_generated = true"])
         if "action" in node:
-            lines.append(f"metadata/aether_action = {quote(str(node['action']))}")
+            lines.append(f"metadata/uiforge_action = {quote(str(node['action']))}")
         if "binding" in node:
-            lines.append(f"metadata/aether_binding = {quote(str(node['binding']))}")
+            lines.append(f"metadata/uiforge_binding = {quote(str(node['binding']))}")
         if "transitions" in node:
-            lines.append(f"metadata/aether_transitions = {quote(json.dumps(node.get('transitions', {}), separators=(',', ':')))}")
+            lines.append(f"metadata/uiforge_transitions = {quote(json.dumps(node.get('transitions', {}), separators=(',', ':')))}")
         if "effects" in node:
-            lines.append(f"metadata/aether_effects = {quote(json.dumps(node.get('effects', {}), separators=(',', ':')))}")
+            lines.append(f"metadata/uiforge_effects = {quote(json.dumps(node.get('effects', {}), separators=(',', ':')))}")
+        if isinstance(node.get("metadata"), dict):
+            for metadata_key, metadata_value in node["metadata"].items():
+                if validate_authored_metadata_key(str(metadata_key)):
+                    continue
+                lines.append(f"metadata/{metadata_key} = {scene_value(metadata_value)}")
         layout = node.get("layout", {})
         position = layout.get("position", []) if isinstance(layout, dict) else []
         size = layout.get("size", []) if isinstance(layout, dict) else []
@@ -774,7 +839,7 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
             target_property = "texture_normal" if native_type == "TextureButton" else "texture"
             if "texture_region" in properties:
                 region = properties["texture_region"]
-                atlas_id = f"AtlasTexture_{node_id}"
+                atlas_id = f"AtlasTexture_{resource_id_part(node_id)}"
                 rect = ", ".join(f"{float(v):.4f}" for v in region)
                 subresources.append(f'[sub_resource type="AtlasTexture" id="{atlas_id}"]\natlas = ExtResource("{resource_id}")\nregion = Rect2({rect})\nfilter_clip = true')
                 lines.append(f'{target_property} = SubResource("{atlas_id}")')
@@ -866,10 +931,14 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
 
     emit(data["root"], ".", True)
     load_steps = 1 + len(subresources) + len(ext_resources)
-    lines[2] = f"[gd_scene load_steps={load_steps} format=3]"
-    external_lines = [f'[ext_resource type="{resource_type}" path="{path}" id="{resource_id}"]' for path, (resource_id, resource_type) in ext_resources.items()]
+    gd_scene_index = len(header)
+    lines[gd_scene_index] = f"[gd_scene load_steps={load_steps} format=3]"
+    external_lines = [
+        f'[ext_resource type="{entry["type"]}" path={quote(entry["path"])} id="{entry["id"]}"]'
+        for entry in ext_resources.values()
+    ]
     resource_blocks = external_lines + ([""] if external_lines else []) + sum(([block, ""] for block in subresources), [])
-    return "\n".join(lines[:3] + [""] + resource_blocks + lines[3:]) + "\n"
+    return "\n".join(lines[: gd_scene_index + 2] + resource_blocks + lines[gd_scene_index + 2 :]) + "\n"
 
 
 def tree(node: dict[str, Any]) -> dict[str, Any]:
@@ -1024,6 +1093,29 @@ def operation_duplicate(data: dict[str, Any], node_id: str, new_id: str) -> dict
     return {"success": True, "node": duplicate}
 
 
+def parse_cli_flags(argv: list[str], start_index: int) -> tuple[dict[str, bool], list[str], int]:
+    flags = {"force": False, "allow_outside_project": False, "allow_unsafe": False}
+    unknown: list[str] = []
+    index = start_index
+    while index < len(argv):
+        token = argv[index]
+        if token == "--force":
+            flags["force"] = True
+            index += 1
+        elif token == "--allow-outside-project":
+            flags["allow_outside_project"] = True
+            index += 1
+        elif token == "--allow-unsafe":
+            flags["allow_unsafe"] = True
+            index += 1
+        elif token.startswith("--"):
+            unknown.append(token)
+            index += 1
+        else:
+            break
+    return flags, unknown, index
+
+
 def main(argv: list[str]) -> tuple[dict[str, Any], int]:
     if not argv or argv[0] in {"help", "--help", "-h"}:
         return {"success": True, "help": "Use ui capabilities, validate, inspect [document|tree|node], get, set, add, delete, move, duplicate, build, build-all, or render."}, 0
@@ -1032,7 +1124,16 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
         return {"success": True, "capabilities": capabilities()}, 0
     if command == "new":
         if len(argv) < 3:
-            return {"success": False, "errors": [{"code": "USAGE", "message": "ui new <template> <output.ui.json>"}]}, 1
+            return {"success": False, "errors": [{"code": "USAGE", "message": "ui new <template> <output.ui.json> [--force] [--allow-outside-project]"}]}, 1
+        flags, unknown, _ = parse_cli_flags(argv, 3)
+        if unknown:
+            return {"success": False, "errors": [{"code": "UNKNOWN_OPTION", "message": f"Unknown option '{unknown[0]}'."}]}, 1
+        path_check = validate_output(argv[2], ".ui.json", flags["allow_outside_project"])
+        if not path_check["ok"]:
+            return {"success": False, "committed": False, "errors": path_check["errors"]}, 1
+        create_check = check_create_allowed(argv[2], flags["force"])
+        if not create_check["ok"]:
+            return {"success": False, "committed": False, "errors": create_check["errors"]}, 1
         name = fs_path(argv[2]).name.removesuffix(".ui.json")
         name_diagnostic = document_name_diagnostic(name)
         if name_diagnostic:
@@ -1065,11 +1166,20 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
         saved["template"] = template
         return saved, 0
     if command == "build-all":
-        source_dir = fs_path(argv[1]) if len(argv) > 1 else ROOT / "examples/specs"
-        output_dir = fs_path(argv[2]) if len(argv) > 2 else ROOT / "examples/scenes"
+        source_dir = fs_path(argv[1]) if len(argv) > 1 and not argv[1].startswith("--") else ROOT / "examples/specs"
+        output_dir = fs_path(argv[2]) if len(argv) > 2 and not argv[2].startswith("--") else ROOT / "examples/scenes"
+        option_index = 1
+        if len(argv) > 1 and not argv[1].startswith("--"):
+            option_index = 2
+        if len(argv) > 2 and not argv[2].startswith("--"):
+            option_index = 3
+        flags, unknown, _ = parse_cli_flags(argv, option_index)
+        if unknown:
+            return {"success": False, "errors": [{"code": "UNKNOWN_OPTION", "message": f"Unknown option '{unknown[0]}'."}]}, 1
         built, failed = [], []
         for source in sorted(source_dir.glob("*.ui.json")):
-            result, code = main(["build", str(source), str(output_dir / (source.name.removesuffix(".ui.json") + ".tscn"))])
+            output = output_dir / (source.name.removesuffix(".ui.json") + ".tscn")
+            result, code = main(["build", str(source), str(output)] + ([ "--force"] if flags["force"] else []) + (["--allow-outside-project"] if flags["allow_outside_project"] else []))
             (built if code == 0 else failed).append(result)
         return {"success": not failed, "built": built, "failed": failed}, 0 if not failed else 1
     if len(argv) < 2:
@@ -1098,7 +1208,7 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
             return {"success": True, "id": argv[3], "parent": parent.get("id", "") if parent else "", "node": node}, 0
         if scope == "tokens":
             overrides = data.get("theme_overrides", {})
-            theme_data = merge_dicts(theme(), overrides) if isinstance(overrides, dict) else theme()
+            theme_data = merge_dicts(theme(data), overrides) if isinstance(overrides, dict) else theme(data)
             return {"success": True, "theme": data.get("theme", "dark_fantasy"), "tokens": theme_data.get("tokens", {})}, 0
         if scope == "components":
             return {"success": True, "components": {k: {"native_type": v[0], "style": v[1]} for k, v in COMPONENTS.items()}, "custom": data.get("components", {})}, 0
@@ -1137,14 +1247,26 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
             return {"success": False, "errors": [{"code": "USAGE", "message": "ui duplicate <file> <node_id> <new_id>"}]}, 1
         return commit_mutation(argv[1], lambda working: operation_duplicate(working, argv[2], argv[3]))
     if command == "build":
+        flags, unknown, _ = parse_cli_flags(argv, 3 if len(argv) > 2 and not argv[2].startswith("--") else 2)
+        if unknown:
+            return {"success": False, "errors": [{"code": "UNKNOWN_OPTION", "message": f"Unknown option '{unknown[0]}'."}]}, 1
         result = validate(data)
         if not result["success"]:
             return result, 1
-        output = argv[2] if len(argv) > 2 else argv[1].removesuffix(".ui.json") + ".tscn"
-        output_path = fs_path(output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(build_tscn(data, argv[1]), encoding="utf-8")
-        return {"success": True, "generated_scene": output, "warnings": result["warnings"], "diagnostics": result["diagnostics"]}, 0
+        output = argv[2] if len(argv) > 2 and not argv[2].startswith("--") else argv[1].removesuffix(".ui.json") + ".tscn"
+        path_check = validate_output(output, ".tscn", flags["allow_outside_project"])
+        if not path_check["ok"]:
+            return {"success": False, "errors": path_check["errors"]}, 1
+        identity = source_identity(argv[1])
+        revision = content_hash(data)
+        replace_check = check_replace_allowed(output, identity, revision, flags["force"])
+        if not replace_check["ok"]:
+            return {"success": False, "errors": replace_check["errors"]}, 1
+        scene_text = build_tscn(data, argv[1])
+        committed = write_text_atomically(output, scene_text, verify=verify_scene_syntax)
+        if not committed.get("success"):
+            return {"success": False, "committed": False, "errors": committed.get("errors", [])}, 1
+        return {"success": True, "committed": True, "generated_scene": output, "warnings": result["warnings"], "diagnostics": result["diagnostics"]}, 0
     if command == "render":
         return {"success": False, "errors": [{"code": "GODOT_UNAVAILABLE", "message": "PNG rendering requires a Godot 4 executable; install Godot and rerun the same command."}]}, 1
     return {"success": False, "errors": [{"code": "UNKNOWN_COMMAND", "message": command}]}, 1

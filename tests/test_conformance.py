@@ -127,7 +127,7 @@ class MutationConformanceTests(unittest.TestCase):
 
     def test_new_rejects_invalid_document_name(self) -> None:
         target = Path(self.tempdir.name) / "1 bad.ui.json"
-        result, code, stderr = run_cli("new", "blank", str(target))
+        result, code, stderr = run_cli("new", "blank", str(target), "--allow-outside-project")
         self.assertFalse(stderr.strip())
         self.assertNotEqual(code, 0, result)
         self.assertFalse(result.get("committed", True))

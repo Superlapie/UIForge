@@ -27,7 +27,7 @@ func _run() -> void:
 func _test_material_system() -> void:
 	var loaded := UIForgeSerializer.load_document("res://examples/specs/bank.ui.json")
 	var path := "user://material_bank.tscn"
-	_assert(UIForgeCompiler.new().compile_document(loaded.document, path).success, "material_bank_compiles")
+	_assert(UIForgeCompiler.new().compile_document(loaded.document, path, "", {"allow_outside_project": true, "force": true}).success, "material_bank_compiles")
 	var instance := (load(path) as PackedScene).instantiate()
 	var surface := instance.get_child(0) as TextureRect
 	_assert(surface != null and surface.mouse_filter == Control.MOUSE_FILTER_IGNORE, "surface_behind_content_and_ignores_input")
@@ -35,7 +35,7 @@ func _test_material_system() -> void:
 	instance.free()
 	var hud := UIForgeSerializer.load_document("res://examples/specs/combat_hud.ui.json")
 	path = "user://material_hud.tscn"
-	_assert(UIForgeCompiler.new().compile_document(hud.document, path).success, "material_hud_compiles")
+	_assert(UIForgeCompiler.new().compile_document(hud.document, path, "", {"allow_outside_project": true, "force": true}).success, "material_hud_compiles")
 	instance = (load(path) as PackedScene).instantiate()
 	var hit_target := instance.get_node("hud_medallion/medallion_action") as Button
 	for state in ["normal", "hover", "pressed"]:
@@ -46,7 +46,7 @@ func _test_material_system() -> void:
 		var doc := UIForgeDocument.from_dict({"schema_version": 1, "name": "state_test", "theme": "dark_fantasy", "viewport": {"width": 400, "height": 200}, "root": {"id": "button", "type": "PrimaryButton", "layout": {"size": [180, 36]}, "properties": {"text": "Confirm"}}})
 		var preview := UIForgeCompiler.document_for_preview_state(doc, state)
 		path = "user://material_%s.tscn" % state
-		_assert(UIForgeCompiler.new().compile_document(preview, path).success, "compile_state_%s" % state)
+		_assert(UIForgeCompiler.new().compile_document(preview, path, "", {"allow_outside_project": true, "force": true}).success, "compile_state_%s" % state)
 		var button := (load(path) as PackedScene).instantiate() as Button
 		var box := button.get_theme_stylebox("normal") as StyleBoxTexture
 		var expected: String = {"normal": "button_enamel.svg", "hover": "button_hover.svg", "pressed": "button_pressed.svg", "disabled": "button_smoke.svg"}[state]
@@ -82,7 +82,7 @@ func _test_document_operations() -> void:
 	_assert(not document.delete_node("test_button").is_empty(), "delete_node")
 	var instance := UIForgeComponentLibrary.materialize({"id": "buy_button", "type": "ComponentInstance", "component": "ButtonPrimary", "overrides": {"properties": {"text": "BUY"}}}, {"ButtonPrimary": {"base": "PrimaryButton", "properties": {"text": "BUY"}}})
 	_assert(instance.get("type", "") == "Button" and instance.get("properties", {}).get("text", "") == "BUY", "component_instance_override")
-	var round_trip_path := "user://aether_round_trip.ui.json"
+	var round_trip_path := "user://uiforge_round_trip.ui.json"
 	_assert(UIForgeSerializer.save_document(document, round_trip_path).success, "atomic_save")
 	var round_trip := UIForgeSerializer.load_document(round_trip_path)
 	_assert(round_trip.get("document") != null and round_trip["document"].root().get("id", "") == root_id, "round_trip_stable_id")
@@ -90,8 +90,8 @@ func _test_document_operations() -> void:
 func _test_compile_samples() -> void:
 	var compiler := UIForgeCompiler.new()
 	for filename in ["inventory", "bank", "equipment", "quest_journal", "settings", "combat_hud"]:
-		var target := "user://aether_test_%s.tscn" % filename
-		var result := compiler.compile_file("res://examples/specs/%s.ui.json" % filename, target)
+		var target := "user://uiforge_test_%s.tscn" % filename
+		var result := compiler.compile_file("res://examples/specs/%s.ui.json" % filename, target, {"allow_outside_project": true, "force": true})
 		_assert(result.success, "compile_%s" % filename)
 		if filename == "bank" and result.success:
 			var scene_text := FileAccess.get_file_as_string(target)
@@ -99,13 +99,13 @@ func _test_compile_samples() -> void:
 				_assert(scene_text.contains(artwork), "material_state_%s" % artwork)
 
 func _test_compile_full_property_fixture() -> void:
-	var target := "user://aether_test_full_properties.tscn"
-	var result := UIForgeCompiler.new().compile_file("res://tests/fixtures/full_properties.ui.json", target)
+	var target := "user://uiforge_test_full_properties.tscn"
+	var result := UIForgeCompiler.new().compile_file("res://tests/fixtures/full_properties.ui.json", target, {"allow_outside_project": true, "force": true})
 	_assert(result.success, "compile_full_property_fixture")
 	if result.success:
 		_assert(load(target) as PackedScene != null, "load_full_property_fixture")
-		_assert(FileAccess.get_file_as_string(target).contains("metadata/aether_transitions"), "compile_transition_metadata")
-		_assert(FileAccess.get_file_as_string(target).contains("metadata/aether_effects"), "compile_effect_metadata")
+		_assert(FileAccess.get_file_as_string(target).contains("metadata/uiforge_transitions"), "compile_transition_metadata")
+		_assert(FileAccess.get_file_as_string(target).contains("metadata/uiforge_effects"), "compile_effect_metadata")
 
 func _test_malformed_document_validation() -> void:
 	var malformed := UIForgeDocument.from_dict({"schema_version": 1, "name": "malformed", "viewport": {"width": 800, "height": 600}, "theme": "dark_fantasy", "root": {"id": "root", "type": "Panel", "layout": [], "properties": "bad", "children": {}}})
@@ -116,7 +116,7 @@ func _test_malformed_document_validation() -> void:
 	_assert(_has_diagnostic(result, "CHILDREN_INVALID"), "malformed_children_diagnostic")
 
 func _test_transactional_cli_mutations() -> void:
-	var source := "user://aether_transactional.ui.json"
+	var source := "user://uiforge_transactional.ui.json"
 	var document := UIForgeSerializer.create_default("transactional")
 	UIForgeSerializer.save_document(document, source)
 	var invalid := UIForgeMutationPipeline.commit(source, func(working: UIForgeDocument) -> Dictionary:

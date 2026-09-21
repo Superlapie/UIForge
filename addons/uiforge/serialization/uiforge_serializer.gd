@@ -2,54 +2,32 @@ class_name UIForgeSerializer
 extends RefCounted
 
 static func load_document(path: String) -> Dictionary:
-	if not FileAccess.file_exists(path):
-		return {"document": null, "errors": [{"code": "FILE_NOT_FOUND", "message": "Document not found: %s" % path}]}
-	var file := FileAccess.open(path, FileAccess.READ)
+	if not FileAccess.file_exists(UIForgePaths.normalize_requested(path)):
+		_recover_missing_source(path)
+	if not FileAccess.file_exists(UIForgePaths.normalize_requested(path)):
+		return {"document": null, "revision_hash": "", "errors": [{"code": "FILE_NOT_FOUND", "message": "Document not found: %s" % path}]}
+	var absolute := UIForgePaths.normalize_requested(path)
+	var file := FileAccess.open(absolute, FileAccess.READ)
 	if file == null:
-		return {"document": null, "errors": [{"code": "FILE_OPEN_FAILED", "message": "Could not open: %s" % path}]}
+		return {"document": null, "revision_hash": "", "errors": [{"code": "FILE_OPEN_FAILED", "message": "Could not open: %s" % path}]}
 	var text := file.get_as_text()
 	file.close()
 	var parser := JSON.new()
 	var error := parser.parse(text)
 	if error != OK or not parser.data is Dictionary:
-		return {"document": null, "errors": [{"code": "JSON_PARSE_ERROR", "message": parser.get_error_message(), "line": parser.get_error_line()}]}
-	return {"document": UIForgeDocument.from_dict(parser.data, path), "errors": []}
+		return {"document": null, "revision_hash": "", "errors": [{"code": "JSON_PARSE_ERROR", "message": parser.get_error_message(), "line": parser.get_error_line()}]}
+	var revision_hash := UIForgeHash.content_hash(parser.data)
+	return {"document": UIForgeDocument.from_dict(parser.data, path), "revision_hash": revision_hash, "errors": []}
 
-static func save_document(document: UIForgeDocument, path: String = "") -> Dictionary:
+static func save_document(document: UIForgeDocument, path: String = "", expected_revision: String = "") -> Dictionary:
 	var target := path if not path.is_empty() else document.source_path
 	if target.is_empty():
-		return {"success": false, "errors": [{"code": "NO_PATH", "message": "A document path is required."}]}
-	var absolute_target := ProjectSettings.globalize_path(target)
-	var absolute_temp := "%s.aether_tmp" % absolute_target
-	var absolute_backup := "%s.aether_backup" % absolute_target
-	# Recover a previous source if the editor was interrupted after moving it
-	# aside but before the replacement completed.
-	if not FileAccess.file_exists(absolute_target) and FileAccess.file_exists(absolute_backup):
-		DirAccess.rename_absolute(absolute_backup, absolute_target)
-	var file := FileAccess.open(absolute_temp, FileAccess.WRITE)
-	if file == null:
-		return {"success": false, "errors": [{"code": "FILE_WRITE_FAILED", "message": "Could not write: %s" % absolute_temp}]}
-	file.store_string(JSON.stringify(document.to_dict(), "\t"))
-	file.flush()
-	file.close()
-	if FileAccess.file_exists(absolute_backup):
-		DirAccess.remove_absolute(absolute_backup)
-	if FileAccess.file_exists(absolute_target):
-		var backup_error := DirAccess.rename_absolute(absolute_target, absolute_backup)
-		if backup_error != OK:
-			DirAccess.remove_absolute(absolute_temp)
-			return {"success": false, "errors": [{"code": "BACKUP_RENAME_FAILED", "message": "Could not protect %s" % target}]}
-	var rename_error := DirAccess.rename_absolute(absolute_temp, absolute_target)
-	if rename_error != OK:
-		if FileAccess.file_exists(absolute_backup):
-			DirAccess.rename_absolute(absolute_backup, absolute_target)
-		if FileAccess.file_exists(absolute_temp):
-			DirAccess.remove_absolute(absolute_temp)
-		return {"success": false, "errors": [{"code": "ATOMIC_RENAME_FAILED", "message": "Could not replace %s" % target}]}
-	if FileAccess.file_exists(absolute_backup):
-		DirAccess.remove_absolute(absolute_backup)
-	document.source_path = target
-	return {"success": true, "path": target, "errors": []}
+		return {"success": false, "committed": false, "errors": [{"code": "NO_PATH", "message": "A document path is required."}]}
+	var payload := JSON.stringify(document.to_dict(), "\t") + "\n"
+	var saved := UIForgeTransaction.write_source_atomically(target, payload, expected_revision)
+	if saved.get("success", false):
+		document.source_path = target
+	return saved
 
 static func create_default(document_name: String = "untitled") -> UIForgeDocument:
 	return UIForgeDocument.from_dict({
@@ -66,3 +44,9 @@ static func create_default(document_name: String = "untitled") -> UIForgeDocumen
 			"children": []
 		}
 	})
+
+static func _recover_missing_source(path: String) -> void:
+	var absolute := UIForgePaths.normalize_requested(path)
+	var backup_path := "%s.uiforge_backup" % absolute
+	var pending_path := "%s.uiforge_pending" % absolute
+	UIForgeTransaction._recover_interrupted_source(absolute, backup_path, pending_path)

@@ -46,8 +46,8 @@ func _run() -> void:
 		nine_slice._save_style()
 		_assert(document.data.get("theme_overrides", {}).get("styles", {}).get("ornate_gem_frame", {}).get("texture", "") == "res://examples/assets/uiforge_gem.svg", "nine_slice_style_saved")
 	document.find_node("asset_panel")["style"] = "ornate_gem_frame"
-	var target := "user://aether_editor_workflow.tscn"
-	var compiled := UIForgeCompiler.new().compile_document(document, target, "editor_workflow.ui.json")
+	var target := "user://uiforge_editor_workflow.tscn"
+	var compiled := UIForgeCompiler.new().compile_document(document, target, "editor_workflow.ui.json", {"allow_outside_project": true, "force": true})
 	_assert(compiled.success, "editor_workflow_compiles")
 	_assert(load(target) as PackedScene != null, "editor_workflow_scene_loads")
 	var compiled_text := FileAccess.get_file_as_string(target)

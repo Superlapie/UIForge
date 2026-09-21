@@ -5,6 +5,7 @@ static func commit(path: String, mutate: Callable) -> Dictionary:
 	var loaded := UIForgeSerializer.load_document(path)
 	if loaded.get("document") == null:
 		return {"success": false, "committed": false, "errors": loaded.get("errors", [])}
+	var expected_revision := str(loaded.get("revision_hash", ""))
 	var working: UIForgeDocument = UIForgeDocument.from_dict(loaded["document"].to_dict(), path)
 	var operation: Dictionary = mutate.call(working)
 	if not bool(operation.get("success", false)):
@@ -19,8 +20,8 @@ static func commit(path: String, mutate: Callable) -> Dictionary:
 			"warnings": validation.warnings,
 			"diagnostics": validation.diagnostics
 		}
-	var saved := UIForgeSerializer.save_document(working, path)
-	if not saved.success:
+	var saved := UIForgeSerializer.save_document(working, path, expected_revision)
+	if not saved.get("success", false):
 		operation["success"] = false
 		operation["committed"] = false
 		operation["errors"] = saved.get("errors", [])

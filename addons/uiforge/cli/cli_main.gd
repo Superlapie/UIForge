@@ -48,11 +48,41 @@ func _dispatch() -> Dictionary:
 func _load(path: String) -> Dictionary:
 	return UIForgeSerializer.load_document(path)
 
+func _cli_flags(start_index: int) -> Dictionary:
+	var flags := {"force": false, "allow_outside_project": false, "allow_unsafe": false, "unknown": []}
+	var index := start_index
+	while index < args.size():
+		var token := str(args[index])
+		if token == "--force":
+			flags.force = true
+			index += 1
+		elif token == "--allow-outside-project":
+			flags.allow_outside_project = true
+			index += 1
+		elif token == "--allow-unsafe":
+			flags.allow_unsafe = true
+			index += 1
+		elif token.begins_with("--"):
+			flags.unknown.append(token)
+			index += 1
+		else:
+			break
+	return flags
+
 func _new_document() -> Dictionary:
 	if args.size() < 3:
-		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui new <template> <output.ui.json>"}]}
+		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui new <template> <output.ui.json> [--force] [--allow-outside-project]"}]}
 	var template := str(args[1])
 	var output := str(args[2])
+	var flags := _cli_flags(3)
+	if not flags.unknown.is_empty():
+		return {"success": false, "errors": [{"code": "UNKNOWN_OPTION", "message": "Unknown option '%s'." % flags.unknown[0]}]}
+	var path_check := UIForgePaths.validate_output(output, UIForgePaths.ArtifactKind.SOURCE, flags.allow_outside_project)
+	if not path_check.ok:
+		return {"success": false, "committed": false, "errors": path_check.errors}
+	var create_check := UIForgeArtifact.check_create_allowed(output, flags.force)
+	if not create_check.ok:
+		return {"success": false, "committed": false, "errors": create_check.errors}
 	var document_name := output.get_file().trim_suffix(".ui.json")
 	var name_error := UIForgeID.document_name_diagnostic(document_name)
 	if not name_error.is_empty():
@@ -186,14 +216,35 @@ func _duplicate_value() -> Dictionary:
 
 func _build_document() -> Dictionary:
 	if args.size() < 2:
-		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui build <document.ui.json> [output.tscn]"}]}
+		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui build <document.ui.json> [output.tscn] [--force] [--allow-outside-project]"}]}
 	var source := str(args[1])
-	var output := str(args[2]) if args.size() > 2 else "%s.tscn" % source.trim_suffix(".ui.json")
-	return UIForgeCompiler.new().compile_file(source, output)
+	var output := ""
+	var option_index := 2
+	if args.size() > 2 and not str(args[2]).begins_with("--"):
+		output = str(args[2])
+		option_index = 3
+	if output.is_empty():
+		output = "%s.tscn" % source.trim_suffix(".ui.json")
+	var flags := _cli_flags(option_index)
+	if not flags.unknown.is_empty():
+		return {"success": false, "errors": [{"code": "UNKNOWN_OPTION", "message": "Unknown option '%s'." % flags.unknown[0]}]}
+	return UIForgeCompiler.new().compile_file(source, output, {
+		"force": flags.force,
+		"allow_outside_project": flags.allow_outside_project,
+		"allow_unsafe": flags.allow_unsafe,
+	})
 
 func _build_all() -> Dictionary:
-	var source_dir := str(args[1]) if args.size() > 1 else "examples/specs"
-	var output_dir := str(args[2]) if args.size() > 2 else "examples/scenes"
+	var source_dir := str(args[1]) if args.size() > 1 and not str(args[1]).begins_with("--") else "examples/specs"
+	var output_dir := str(args[2]) if args.size() > 2 and not str(args[2]).begins_with("--") else "examples/scenes"
+	var option_index := 1
+	if args.size() > 1 and not str(args[1]).begins_with("--"):
+		option_index = 2
+	if args.size() > 2 and not str(args[2]).begins_with("--"):
+		option_index = 3
+	var flags := _cli_flags(option_index)
+	if not flags.unknown.is_empty():
+		return {"success": false, "errors": [{"code": "UNKNOWN_OPTION", "message": "Unknown option '%s'." % flags.unknown[0]}]}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output_dir))
 	var directory := DirAccess.open(source_dir)
 	if directory == null:
@@ -211,7 +262,11 @@ func _build_all() -> Dictionary:
 	source_files.sort()
 	for source_file in source_files:
 		var output := "%s/%s.tscn" % [output_dir, source_file.trim_suffix(".ui.json")]
-		var result := UIForgeCompiler.new().compile_file("%s/%s" % [source_dir, source_file], output)
+		var result := UIForgeCompiler.new().compile_file("%s/%s" % [source_dir, source_file], output, {
+			"force": flags.force,
+			"allow_outside_project": flags.allow_outside_project,
+			"allow_unsafe": flags.allow_unsafe,
+		})
 		if result.success:
 			built.append(result)
 		else:
@@ -220,46 +275,75 @@ func _build_all() -> Dictionary:
 
 func _render_document() -> Dictionary:
 	if args.size() < 2:
-		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui render <document.ui.json> [--viewport 1920x1080] [--output path.png]"}]}
+		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui render <document.ui.json> [--viewport 1920x1080] [--output path.png] [--state normal] [--reference reference.png --diff diff.png] [--force] [--allow-outside-project]"}]}
 	var source := str(args[1])
 	var size := Vector2i(1920, 1080)
 	var output := ""
 	var state := "normal"
 	var reference_path := ""
 	var diff_output := ""
+	var force := false
+	var allow_outside := false
 	var index := 2
 	while index < args.size():
-		if args[index] == "--viewport" and index + 1 < args.size():
-			var pieces := str(args[index + 1]).split("x")
-			if pieces.size() == 2:
-				size = Vector2i(int(pieces[0]), int(pieces[1]))
+		var token := str(args[index])
+		if token == "--viewport" and index + 1 < args.size():
+			var viewport_value := str(args[index + 1])
+			if not viewport_value.contains("x"):
+				return {"success": false, "errors": [{"code": "VIEWPORT_INVALID", "message": "Viewport must use WIDTHxHEIGHT such as 1920x1080."}]}
+			var pieces := viewport_value.split("x")
+			if pieces.size() != 2 or not pieces[0].is_valid_int() or not pieces[1].is_valid_int():
+				return {"success": false, "errors": [{"code": "VIEWPORT_INVALID", "message": "Viewport must use positive integer WIDTHxHEIGHT."}]}
+			var width := int(pieces[0])
+			var height := int(pieces[1])
+			if width <= 0 or height <= 0:
+				return {"success": false, "errors": [{"code": "VIEWPORT_INVALID", "message": "Viewport width and height must be positive integers."}]}
+			size = Vector2i(width, height)
 			index += 2
-		elif args[index] == "--output" and index + 1 < args.size():
+		elif token == "--output" and index + 1 < args.size():
 			output = str(args[index + 1])
 			index += 2
-		elif args[index] == "--state" and index + 1 < args.size():
-			state = str(args[index + 1])
+		elif token == "--state" and index + 1 < args.size():
+			state = str(args[index + 1]).to_lower()
+			if state == "focus":
+				state = "focused"
+			if state not in UIForgeTypes.STATES:
+				return {"success": false, "errors": [{"code": "STATE_INVALID", "message": "Unsupported render state '%s'." % state}]}
 			index += 2
-		elif args[index] == "--reference" and index + 1 < args.size():
+		elif token == "--reference" and index + 1 < args.size():
 			reference_path = str(args[index + 1])
 			index += 2
-		elif args[index] == "--diff" and index + 1 < args.size():
+		elif token == "--diff" and index + 1 < args.size():
 			diff_output = str(args[index + 1])
 			index += 2
-		else:
+		elif token == "--force":
+			force = true
 			index += 1
+		elif token == "--allow-outside-project":
+			allow_outside = true
+			index += 1
+		elif token.begins_with("--"):
+			return {"success": false, "errors": [{"code": "UNKNOWN_OPTION", "message": "Unknown option '%s'." % token}]}
+		else:
+			return {"success": false, "errors": [{"code": "UNKNOWN_ARGUMENT", "message": "Unexpected argument '%s'." % token}]}
+	if not diff_output.is_empty() and reference_path.is_empty():
+		return {"success": false, "errors": [{"code": "USAGE", "message": "--diff requires --reference."}]}
 	if output.is_empty():
-		output = ".aether/renders/%s_%dx%d.png" % [source.get_file().trim_suffix(".ui.json"), size.x, size.y]
+		output = ".uiforge/renders/%s_%dx%d.png" % [source.get_file().trim_suffix(".ui.json"), size.x, size.y]
+	var output_check := UIForgePaths.validate_output(output, UIForgePaths.ArtifactKind.IMAGE, allow_outside)
+	if not output_check.ok:
+		return {"success": false, "errors": output_check.errors}
 	var output_dir := output.get_base_dir()
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output_dir))
-	# Keep the temporary scene beside the requested image. This makes parallel
-	# agent renders safe even when different output directories reuse a filename.
 	var generated_scene := "%s_preview.tscn" % output.trim_suffix(".png")
 	var loaded := UIForgeSerializer.load_document(source)
 	if loaded.get("document") == null:
 		return {"success": false, "errors": loaded.get("errors", [])}
 	var render_document: UIForgeDocument = UIForgeCompiler.document_for_preview_state(loaded["document"], state)
-	var compiled := UIForgeCompiler.new().compile_document(render_document, generated_scene, source)
+	var compiled := UIForgeCompiler.new().compile_document(render_document, generated_scene, source, {
+		"force": force,
+		"allow_outside_project": allow_outside,
+	})
 	if not compiled.success:
 		return compiled
 	var packed := load(ProjectSettings.globalize_path(generated_scene)) as PackedScene
@@ -302,18 +386,19 @@ func _render_document() -> Dictionary:
 	if not reference_path.is_empty():
 		var reference_image := Image.new()
 		var reference_fs := ProjectSettings.globalize_path(reference_path) if reference_path.begins_with("res://") else reference_path
-		if reference_image.load(reference_fs) == OK:
-			result["reference_image"] = reference_path
-			if not diff_output.is_empty():
-				DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(diff_output.get_base_dir()))
-				var diff := _make_diff(image, reference_image, size)
-				var diff_error := diff.save_png(ProjectSettings.globalize_path(diff_output))
-				if diff_error == OK:
-					result["diff_image"] = diff_output
-				else:
-					result["warnings"] = [{"code": "DIFF_WRITE_FAILED", "message": diff_output}]
-		else:
-			result["warnings"] = [{"code": "REFERENCE_LOAD_FAILED", "message": reference_path}]
+		if reference_image.load(reference_fs) != OK:
+			return {"success": false, "errors": [{"code": "REFERENCE_LOAD_FAILED", "message": reference_path}]}
+		result["reference_image"] = reference_path
+		if not diff_output.is_empty():
+			var diff_check := UIForgePaths.validate_output(diff_output, UIForgePaths.ArtifactKind.IMAGE, allow_outside)
+			if not diff_check.ok:
+				return {"success": false, "errors": diff_check.errors}
+			DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(diff_output.get_base_dir()))
+			var diff := _make_diff(image, reference_image, size)
+			var diff_error := diff.save_png(ProjectSettings.globalize_path(diff_output))
+			if diff_error != OK:
+				return {"success": false, "errors": [{"code": "DIFF_WRITE_FAILED", "message": diff_output}]}
+			result["diff_image"] = diff_output
 	return result
 
 func _make_diff(rendered: Image, reference: Image, size: Vector2i) -> Image:
@@ -329,4 +414,4 @@ func _make_diff(rendered: Image, reference: Image, size: Vector2i) -> Image:
 	return diff
 
 func _help_text() -> String:
-	return "UIForge CLI\n\n" + "ui capabilities\nui validate <file.ui.json>\nui inspect <file.ui.json> [document|tree|node <node_id>|tokens|components|diagnostics]\nui get <file.ui.json> <node_id> [property.path]\nui set <file.ui.json> <node_id> <property.path> <value>\nui add <file.ui.json> <parent_id> '<node_json>'\nui delete <file.ui.json> <node_id>\nui move <file.ui.json> <node_id> <new_parent_id> [index]\nui duplicate <file.ui.json> <node_id> <new_id>\nui build <file.ui.json> [output.tscn]\nui build-all [source_dir] [output_dir]\nui render <file.ui.json> --viewport 1920x1080 [--state hover] [--output file.png] [--reference reference.png --diff diff.png]"
+	return "UIForge CLI\n\n" + "ui capabilities\nui validate <file.ui.json>\nui inspect <file.ui.json> [document|tree|node <node_id>|tokens|components|diagnostics]\nui get <file.ui.json> <node_id> [property.path]\nui set <file.ui.json> <node_id> <property.path> <value>\nui add <file.ui.json> <parent_id> '<node_json>'\nui delete <file.ui.json> <node_id>\nui move <file.ui.json> <node_id> <new_parent_id> [index]\nui duplicate <file.ui.json> <node_id> <new_id>\nui new <template> <output.ui.json> [--force] [--allow-outside-project]\nui build <file.ui.json> [output.tscn] [--force] [--allow-outside-project]\nui build-all [source_dir] [output_dir] [--force] [--allow-outside-project]\nui render <file.ui.json> --viewport 1920x1080 [--state normal] [--output file.png] [--reference reference.png --diff diff.png] [--force] [--allow-outside-project]"

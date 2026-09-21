@@ -1,0 +1,8 @@
+{
+	"schema_version": 1,
+	"name": "theme_overrides_tokens_string",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"theme_overrides": {"tokens": "bad"},
+	"root": {"id": "root", "type": "Panel", "layout": {"position": [0, 0], "size": [200, 200]}, "children": []}
+}

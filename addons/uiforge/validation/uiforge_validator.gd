@@ -25,10 +25,15 @@ var theme: UIForgeTheme
 
 func validate(input: UIForgeDocument, theme_override: UIForgeTheme = null) -> Dictionary:
 	document = input
-	theme = theme_override if theme_override != null else UIForgeTheme.from_document(input)
 	diagnostics = []
 	ids = {}
 	names = {}
+	theme = theme_override
+	if theme == null:
+		var theme_result := _load_theme_for_validation()
+		if not theme_result.get("ok", false):
+			return result()
+		theme = theme_result.theme
 	for key in document.data.keys():
 		if str(key) not in TOP_LEVEL_KEYS:
 			_add("error", "UNKNOWN_DOCUMENT_KEY", "Unknown top-level key '%s'." % key, "", "Remove the key or extend the UIForge V1 contract deliberately.")
@@ -51,11 +56,8 @@ func validate(input: UIForgeDocument, theme_override: UIForgeTheme = null) -> Di
 		_add("error", "ROOT_MISSING", "A document must contain a root node.", "", "Add a root Control or WindowFrame.")
 	else:
 		_validate_node(root_node, "", viewport)
-	var theme_overrides: Variant = document.data.get("theme_overrides", {})
-	if theme_overrides is Dictionary:
-		_scan_tokens(theme_overrides, "document")
-	elif document.data.has("theme_overrides"):
-		_add("error", "THEME_OVERRIDES_INVALID", "theme_overrides must be an object.", "document", "Use theme_overrides: { tokens: {}, styles: {} }.")
+	_validate_theme_overrides()
+	_validate_document_metadata()
 	_validate_custom_components()
 	_validate_references()
 	return result()
@@ -211,10 +213,21 @@ func _validate_node_properties(node: Dictionary, node_id: String, properties: Di
 			valid = region[0] >= 0 and region[1] >= 0 and region[2] > 0 and region[3] > 0
 		if not valid or not str(properties.get("texture", "")).begins_with("res://") or UIForgeComponentLibrary.native_type(node_type) not in ["TextureRect", "TextureButton", "NinePatchRect"]:
 			_add("error", "TEXTURE_REGION_INVALID", "Texture region needs a texture control, resource path, and [x, y, positive width, positive height] in pixels.", node_id, "Choose a sprite rectangle with positive dimensions.")
+	if node.has("metadata"):
+		var metadata_value: Variant = node.get("metadata")
+		if not metadata_value is Dictionary:
+			_add("error", "METADATA_INVALID", "metadata must be an object.", node_id, "Use metadata: { key: value }.")
+		else:
+			for metadata_key in metadata_value:
+				_add_diagnostic(UIForgeMetadata.validate_authored_key(str(metadata_key)))
 	if properties.has("godot_overrides"):
 		var overrides_value: Variant = properties.get("godot_overrides")
 		if not overrides_value is Dictionary:
 			_add("error", "GODOT_OVERRIDES_INVALID", "properties.godot_overrides must be an object.", node_id, "Use native Godot property paths mapped to JSON values.")
+		else:
+			var native_type := UIForgeComponentLibrary.native_type(node_type)
+			for diagnostic in UIForgePropertyGuard.validate_overrides(overrides_value, native_type, node_id):
+				_add_diagnostic(diagnostic)
 	if properties.has("columns"):
 		var columns_value: Variant = properties["columns"]
 		if not _is_whole_number(columns_value) or int(columns_value) < 1:
@@ -313,6 +326,44 @@ func _number_value(value: Variant, field: String, node_id: String) -> Variant:
 func _is_interactive(node: Dictionary) -> bool:
 	return str(node.get("type", "")) in UIForgeTypes.INTERACTIVE_TYPES or str(node.get("action", "")).is_empty() == false
 
+func _load_theme_for_validation() -> Dictionary:
+	var theme_name := str(document.data.get("theme", ""))
+	var loaded := UIForgeTheme.load_named_checked(theme_name)
+	for error in loaded.get("errors", []):
+		_add_diagnostic(error)
+	if loaded.theme == null:
+		return {"ok": false, "theme": null}
+	var merged := UIForgeTheme.from_document_checked(document)
+	for error in merged.get("errors", []):
+		_add_diagnostic(error)
+	if merged.get("theme") == null:
+		return {"ok": false, "theme": null}
+	return {"ok": true, "theme": merged.theme}
+
+func _validate_theme_overrides() -> void:
+	if not document.data.has("theme_overrides"):
+		return
+	var theme_overrides: Variant = document.data.get("theme_overrides")
+	if not theme_overrides is Dictionary:
+		_add("error", "THEME_OVERRIDES_INVALID", "theme_overrides must be an object.", "document", "Use theme_overrides: { tokens: {}, styles: {} }.")
+		return
+	if theme_overrides.has("tokens") and not theme_overrides.get("tokens") is Dictionary:
+		_add("error", "THEME_OVERRIDES_INVALID", "theme_overrides.tokens must be an object.", "document", "Use theme_overrides.tokens as an object.")
+	if theme_overrides.has("styles") and not theme_overrides.get("styles") is Dictionary:
+		_add("error", "THEME_OVERRIDES_INVALID", "theme_overrides.styles must be an object.", "document", "Use theme_overrides.styles as an object.")
+	if theme_overrides is Dictionary:
+		_scan_tokens(theme_overrides, "document")
+
+func _validate_document_metadata() -> void:
+	var metadata_value: Variant = document.data.get("metadata", {})
+	if metadata_value == null:
+		return
+	if not metadata_value is Dictionary:
+		_add("error", "METADATA_INVALID", "metadata must be an object.", "document", "Use metadata: { key: value }.")
+		return
+	for metadata_key in metadata_value:
+		_add_diagnostic(UIForgeMetadata.validate_authored_key(str(metadata_key)))
+
 func _validate_custom_components() -> void:
 	var definitions_value: Variant = document.data.get("components", {})
 	if not definitions_value is Dictionary:
@@ -322,10 +373,35 @@ func _validate_custom_components() -> void:
 	var definitions: Dictionary = definitions_value
 	if definitions.is_empty():
 		return
+	for component_name in definitions:
+		var definition: Variant = definitions[component_name]
+		if not definition is Dictionary:
+			_add("error", "COMPONENT_INVALID", "Component '%s' must be an object." % component_name, component_name, "Define each custom component as an object.")
+			continue
+		_validate_component_definition(str(component_name), definition, definitions)
 	var visiting: Dictionary = {}
 	var visited: Dictionary = {}
 	for component_name in definitions:
-		_check_component_cycle(str(component_name), definitions, visiting, visited, [])
+		if definitions[component_name] is Dictionary:
+			_check_component_cycle(str(component_name), definitions, visiting, visited, [])
+
+func _validate_component_definition(component_name: String, definition: Dictionary, definitions: Dictionary) -> void:
+	for key in definition.keys():
+		if str(key) not in ["base", "native_type", "node", "type", "layout", "properties", "style", "children", "metadata"]:
+			_add("error", "COMPONENT_KEY_UNKNOWN", "Unknown component key '%s' on '%s'." % [key, component_name], component_name, "Use base/node/layout/properties/style/children.")
+	if definition.has("node") and not definition.get("node") is Dictionary:
+		_add("error", "COMPONENT_NODE_INVALID", "Component '%s'.node must be an object." % component_name, component_name, "Provide a node object or omit node.")
+	if definition.has("children"):
+		var children_value: Variant = definition.get("children")
+		if not children_value is Array:
+			_add("error", "COMPONENT_CHILDREN_INVALID", "Component '%s'.children must be an array." % component_name, component_name, "Use an array of node objects.")
+		else:
+			for child in children_value:
+				if not child is Dictionary:
+					_add("error", "COMPONENT_CHILD_INVALID", "Component '%s' contains a non-object child." % component_name, component_name, "Use node objects in children.")
+	var base := str(definition.get("base", ""))
+	if not base.is_empty() and not UIForgeComponentLibrary.has(base) and not definitions.has(base):
+		_add("error", "COMPONENT_BASE_UNKNOWN", "Component '%s' references unknown base '%s'." % [component_name, base], component_name, "Choose a built-in or sibling component base.")
 
 func _check_component_cycle(name: String, definitions: Dictionary, visiting: Dictionary, visited: Dictionary, chain: Array[String]) -> void:
 	if visited.has(name):

@@ -1,8 +1,11 @@
 .godot/
 .aether/
+.uiforge/
 scripts/__pycache__/
 tests/__pycache__/
 *.uid
 .aether/renders/*_preview.tscn
+.uiforge/renders/*_preview.tscn
 # PNGs are reproducible render outputs; keep the directory available locally.
 .aether/renders/*.png
+.uiforge/renders/*.png

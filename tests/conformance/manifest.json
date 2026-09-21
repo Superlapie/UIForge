@@ -15,6 +15,11 @@
 		{"id": "invalid_transition", "file": "invalid/invalid_transition.ui.json", "expect_valid": false, "expect_codes": ["TRANSITION_DURATION_INVALID"], "schema_valid": false},
 		{"id": "malformed_children", "file": "invalid/malformed_children.ui.json", "expect_valid": false, "expect_codes": ["CHILDREN_INVALID"], "schema_valid": false},
 		{"id": "invalid_schema_version", "file": "invalid/invalid_schema_version.ui.json", "expect_valid": false, "expect_codes": ["SCHEMA_VERSION_UNSUPPORTED"], "schema_valid": false},
-		{"id": "unknown_component", "file": "invalid/unknown_component.ui.json", "expect_valid": false, "expect_codes": ["UNKNOWN_COMPONENT"]}
+		{"id": "unknown_component", "file": "invalid/unknown_component.ui.json", "expect_valid": false, "expect_codes": ["UNKNOWN_COMPONENT"]},
+		{"id": "theme_overrides_string", "file": "invalid/theme_overrides_string.ui.json", "expect_valid": false, "expect_codes": ["THEME_OVERRIDES_INVALID"]},
+		{"id": "theme_overrides_tokens_string", "file": "invalid/theme_overrides_tokens_string.ui.json", "expect_valid": false, "expect_codes": ["THEME_OVERRIDES_INVALID"]},
+		{"id": "components_string", "file": "invalid/components_string.ui.json", "expect_valid": false, "expect_codes": ["COMPONENTS_INVALID"]},
+		{"id": "component_not_object", "file": "invalid/component_not_object.ui.json", "expect_valid": false, "expect_codes": ["COMPONENT_INVALID"]},
+		{"id": "theme_not_found", "file": "invalid/theme_not_found.ui.json", "expect_valid": false, "expect_codes": ["THEME_NOT_FOUND"]}
 	]
 }
