@@ -64,8 +64,13 @@ static func _try_reclaim_stale_lock(lock_dir: String) -> bool:
 			return false
 	if age < STALE_SECONDS and meta.is_empty():
 		return false
+	var expected_nonce := str(meta.get("owner_nonce", ""))
 	var reclaim_path := "%s.reclaim_%s" % [lock_dir, _random_nonce()]
 	if DirAccess.rename_absolute(lock_dir, reclaim_path) != OK:
+		return false
+	var reclaimed_meta := _read_lock_meta(reclaim_path)
+	if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
+		DirAccess.rename_absolute(reclaim_path, lock_dir)
 		return false
 	_remove_lock_dir(reclaim_path)
 	return true

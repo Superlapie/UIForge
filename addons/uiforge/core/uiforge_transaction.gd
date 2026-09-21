@@ -14,24 +14,51 @@ static func unique_temp_path(absolute: String, extension: String = "") -> String
 	return "%s/.uiforge_tmp_%s_%s%s" % [directory, stem, nonce, extension if extension.begins_with(".") else ".%s" % extension]
 
 static func replace_file(source_absolute: String, dest_absolute: String) -> Dictionary:
+	_recover_interrupted_replace(dest_absolute)
 	if not FileAccess.file_exists(source_absolute):
 		return {"ok": false, "errors": [{"code": "FILE_WRITE_FAILED", "message": "Missing staged file %s" % source_absolute}]}
 	if not FileAccess.file_exists(dest_absolute):
 		if DirAccess.rename_absolute(source_absolute, dest_absolute) == OK:
+			_cleanup_replace_sidecars(dest_absolute)
 			return {"ok": true, "errors": []}
+		return {"ok": false, "errors": [{"code": "ATOMIC_RENAME_FAILED", "message": "Could not create %s" % dest_absolute}]}
 	var backup_path := "%s.uiforge_replace_backup" % dest_absolute
+	var meta_path := _replace_meta_path(dest_absolute)
+	var backup_hash := _file_text_hash(dest_absolute)
+	var new_hash := _file_text_hash(source_absolute)
+	_write_replace_meta(meta_path, {
+		"target": dest_absolute,
+		"stage": "backup",
+		"backup_hash": backup_hash,
+		"new_hash": new_hash,
+	})
 	if FileAccess.file_exists(backup_path):
 		DirAccess.remove_absolute(backup_path)
 	var backup_error := DirAccess.rename_absolute(dest_absolute, backup_path)
 	if backup_error != OK:
+		_cleanup_replace_meta(meta_path)
 		return {"ok": false, "errors": [{"code": "BACKUP_RENAME_FAILED", "message": "Could not protect %s" % dest_absolute}]}
+	_write_replace_meta(meta_path, {
+		"target": dest_absolute,
+		"stage": "commit",
+		"backup_hash": backup_hash,
+		"new_hash": new_hash,
+	})
 	var replace_error := DirAccess.rename_absolute(source_absolute, dest_absolute)
 	if replace_error != OK:
 		if FileAccess.file_exists(backup_path):
 			DirAccess.rename_absolute(backup_path, dest_absolute)
+		_cleanup_replace_sidecars(dest_absolute)
 		return {"ok": false, "errors": [{"code": "ATOMIC_RENAME_FAILED", "message": "Could not replace %s" % dest_absolute}]}
+	_write_replace_meta(meta_path, {
+		"target": dest_absolute,
+		"stage": "complete",
+		"backup_hash": backup_hash,
+		"new_hash": _file_text_hash(dest_absolute),
+	})
 	if FileAccess.file_exists(backup_path):
 		DirAccess.remove_absolute(backup_path)
+	_cleanup_replace_sidecars(dest_absolute)
 	return {"ok": true, "errors": []}
 
 static func write_text_atomically(
@@ -70,6 +97,7 @@ static func write_text_atomically(
 			UIForgeLock.release(lock_path, owner_nonce)
 			DirAccess.remove_absolute(temp_path)
 			return {"success": false, "committed": false, "errors": commit_check.get("errors", [])}
+	_recover_interrupted_replace(absolute)
 	var replace_result := replace_file(temp_path, absolute)
 	UIForgeLock.release(lock_path, owner_nonce)
 	if not replace_result.get("ok", false):
@@ -239,6 +267,61 @@ static func _cleanup_sidecars(absolute: String) -> void:
 	_cleanup_txn(paths)
 	if FileAccess.file_exists(paths.backup):
 		DirAccess.remove_absolute(paths.backup)
+
+static func recover_interrupted_replace_for_path(target_path: String) -> void:
+	var absolute := UIForgePaths.normalize_requested(target_path)
+	if absolute.is_empty():
+		return
+	_recover_interrupted_replace(absolute)
+
+static func _replace_meta_path(absolute: String) -> String:
+	return "%s.uiforge_replace_txn" % absolute
+
+static func _write_replace_meta(meta_path: String, payload: Dictionary) -> void:
+	var file := FileAccess.open(meta_path, FileAccess.WRITE)
+	if file == null:
+		return
+	file.store_string(JSON.stringify(payload))
+	file.close()
+
+static func _read_replace_meta(meta_path: String) -> Dictionary:
+	if not FileAccess.file_exists(meta_path):
+		return {}
+	var file := FileAccess.open(meta_path, FileAccess.READ)
+	if file == null:
+		return {}
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	file.close()
+	return parsed if parsed is Dictionary else {}
+
+static func _cleanup_replace_meta(meta_path: String) -> void:
+	if FileAccess.file_exists(meta_path):
+		DirAccess.remove_absolute(meta_path)
+
+static func _cleanup_replace_sidecars(absolute: String) -> void:
+	_cleanup_replace_meta(_replace_meta_path(absolute))
+
+static func _recover_interrupted_replace(dest_absolute: String) -> void:
+	var backup_path := "%s.uiforge_replace_backup" % dest_absolute
+	var meta_path := _replace_meta_path(dest_absolute)
+	var meta := _read_replace_meta(meta_path)
+	var backup_exists := FileAccess.file_exists(backup_path)
+	var dest_exists := FileAccess.file_exists(dest_absolute)
+	if not dest_exists and backup_exists:
+		DirAccess.rename_absolute(backup_path, dest_absolute)
+		_cleanup_replace_sidecars(dest_absolute)
+		return
+	if dest_exists and backup_exists:
+		var stage := str(meta.get("stage", ""))
+		if stage in ["commit", "complete"]:
+			DirAccess.remove_absolute(backup_path)
+			_cleanup_replace_meta(meta_path)
+			return
+		if meta.is_empty() and _file_text_hash(dest_absolute) != _file_text_hash(backup_path):
+			DirAccess.remove_absolute(backup_path)
+			return
+	if dest_exists and not backup_exists and not meta.is_empty():
+		_cleanup_replace_meta(meta_path)
 
 static func recover_interrupted_source_for_path(target_path: String) -> void:
 	var absolute := UIForgePaths.normalize_requested(target_path)

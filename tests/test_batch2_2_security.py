@@ -152,7 +152,7 @@ class Batch22SecurityTests(unittest.TestCase):
             replacement = "[gd_scene]\n\n[node name=\"Broken\" type=\"Control\"]\n"
             destination.write_text(original, encoding="utf-8")
             staging.write_text(replacement, encoding="utf-8")
-            with mock.patch("uiforge_contract.os.replace", side_effect=[None, OSError("forced failure"), None]):
+            with mock.patch("uiforge_contract.os.replace", side_effect=OSError("forced failure")):
                 with self.assertRaises(OSError):
                     replace_file(staging, destination)
             self.assertEqual(destination.read_text(encoding="utf-8"), original)

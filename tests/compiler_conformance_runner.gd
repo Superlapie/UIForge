@@ -7,6 +7,8 @@ const GENERATED_META_KEYS := [
 	"aether_id", "aether_type", "aether_generated", "aether_action", "aether_binding",
 	"aether_transitions", "aether_effects", "aether_decoration",
 ]
+const FLOAT_PRECISION := 6
+const LOAD_OK_SENTINEL := "UIFORGE_SCENE_LOAD_OK"
 
 func _init() -> void:
 	call_deferred("_run")
@@ -21,6 +23,10 @@ func _run() -> void:
 	manifest_file.close()
 	var fixtures: Array = manifest.get("fixtures", []) if manifest is Dictionary else []
 	var failures: Array[String] = []
+	if _normalize_float(0.1) == _normalize_float(0.4):
+		failures.append("float precision collapsed distinct values")
+	if _normalize_float(0.1000004) != _normalize_float(0.1000001):
+		failures.append("float precision failed to normalize noise")
 	DirAccess.make_dir_recursive_absolute("user://compiler_conformance")
 	for entry in fixtures:
 		if not entry is Dictionary:
@@ -52,12 +58,16 @@ func _run() -> void:
 			continue
 		var fallback_root := fallback_scene.instantiate()
 		var native_root := native_scene.instantiate()
-		var fallback_snapshot := _semantic_snapshot_list(fallback_root)
-		var native_snapshot := _semantic_snapshot_list(native_root)
+		var fallback_snapshot := _semantic_snapshot_root(fallback_root)
+		var native_snapshot := _semantic_snapshot_root(native_root)
 		fallback_root.free()
 		native_root.free()
 		if JSON.stringify(fallback_snapshot) != JSON.stringify(native_snapshot):
 			failures.append("%s semantic snapshot mismatch" % fixture_id)
+		if fixture_id == "sibling_order":
+			var ordered := _authored_sibling_indices(native_snapshot, ["first", "second", "third"])
+			if ordered.size() != 3 or ordered[0] >= ordered[1] or ordered[1] >= ordered[2]:
+				failures.append("%s sibling_order child_index mismatch: %s" % [fixture_id, JSON.stringify(ordered)])
 	if failures.is_empty():
 		print(JSON.stringify({"success": true, "fixtures": fixtures.size()}))
 	else:
@@ -106,34 +116,68 @@ func _capture_load_errors(scene_path: String) -> Array[String]:
 	var script := ProjectSettings.globalize_path("res://tests/scene_load_capture.gd")
 	var out: PackedStringArray = []
 	var err: PackedStringArray = []
-	OS.execute(godot_bin, PackedStringArray(["--headless", "--path", project, "--script", script, "--", scene_path]), out, true, true)
+	var exit_code := OS.execute(godot_bin, PackedStringArray(["--headless", "--path", project, "--script", script, "--", scene_path]), out, true, true)
+	var combined := out + err
 	var errors: Array[String] = []
-	for line in out + err:
+	var result_text := _read_scene_load_result()
+	if exit_code != 0:
+		errors.append("scene load subprocess failed with exit code %d for %s" % [exit_code, scene_path])
+	for line in combined:
 		var trimmed := str(line).strip_edges()
 		if trimmed.contains("ERROR:"):
 			errors.append(trimmed)
+	if exit_code == 0 and result_text != LOAD_OK_SENTINEL:
+		errors.append("scene load subprocess missing success sentinel for %s" % scene_path)
 	return errors
 
-func _semantic_snapshot_list(node: Node) -> Array:
-	var entries: Array = []
-	_collect_semantic_entries(node, "", entries)
-	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		return str(a.get("uiforge_id", "")) < str(b.get("uiforge_id", ""))
-	)
-	return entries
+func _read_scene_load_result() -> String:
+	var result_path := ProjectSettings.globalize_path("user://scene_load_capture_result.txt")
+	if not FileAccess.file_exists(result_path):
+		return ""
+	var file := FileAccess.open("user://scene_load_capture_result.txt", FileAccess.READ)
+	if file == null:
+		return ""
+	var text := file.get_as_text().strip_edges()
+	file.close()
+	return text
 
-func _collect_semantic_entries(node: Node, parent_id: String, entries: Array) -> void:
-	var node_id := UIForgeMetadata.read_node_id(node)
-	var next_parent := node_id if not node_id.is_empty() else parent_id
-	if not node_id.is_empty():
-		entries.append(_semantic_entry(node, parent_id))
+func _semantic_snapshot_root(root: Node) -> Dictionary:
+	var root_id := UIForgeMetadata.read_node_id(root)
+	var entry := _semantic_entry(root, "", 0)
+	entry["children"] = _semantic_children_snapshot(root, root_id)
+	return entry
+
+func _semantic_children_snapshot(node: Node, parent_id: String) -> Array:
+	var children: Array = []
+	var sibling_index := 0
 	for child in node.get_children():
-		_collect_semantic_entries(child, next_parent, entries)
+		var child_id := UIForgeMetadata.read_node_id(child)
+		if child_id.is_empty():
+			children.append_array(_semantic_children_snapshot(child, parent_id))
+			continue
+		var entry := _semantic_entry(child, parent_id, sibling_index)
+		sibling_index += 1
+		entry["children"] = _semantic_children_snapshot(child, child_id)
+		children.append(entry)
+	return children
 
-func _semantic_entry(node: Node, parent_id: String) -> Dictionary:
+func _authored_sibling_indices(snapshot: Dictionary, expected_ids: Array) -> Array:
+	var indices: Array = []
+	for child in snapshot.get("children", []):
+		if not child is Dictionary:
+			continue
+		var child_id := str(child.get("uiforge_id", ""))
+		if expected_ids.has(child_id):
+			indices.append(int(child.get("child_index", -1)))
+	return indices
+
+func _semantic_entry(node: Node, parent_id: String, child_index: int) -> Dictionary:
 	var node_id := UIForgeMetadata.read_node_id(node)
+	var display_name: String = node_id if not node_id.is_empty() else str(node.name)
 	return {
 		"parent_id": parent_id,
+		"child_index": child_index,
+		"name": display_name,
 		"type": node.get_class(),
 		"uiforge_id": node_id,
 		"uiforge_type": str(UIForgeMetadata.read_meta(node, "type", "")),
@@ -142,8 +186,9 @@ func _semantic_entry(node: Node, parent_id: String) -> Dictionary:
 		"binding": _normalize_meta_value(str(UIForgeMetadata.read_meta(node, "binding", ""))),
 		"transitions": _normalize_meta_value(str(UIForgeMetadata.read_meta(node, "transitions", ""))),
 		"effects": _normalize_meta_value(str(UIForgeMetadata.read_meta(node, "effects", ""))),
-		"layout": _round_values(_layout_snapshot(node)),
-		"properties": _round_values(_property_snapshot(node)),
+		"layout": _normalize_values(_layout_snapshot(node)),
+		"properties": _normalize_values(_property_snapshot(node)),
+		"theme_overrides": _normalize_values(_theme_override_snapshot(node)),
 	}
 
 func _normalize_meta_value(raw: String) -> Variant:
@@ -156,18 +201,22 @@ func _normalize_meta_value(raw: String) -> Variant:
 			return parsed
 	return raw
 
-func _round_values(value: Variant) -> Variant:
+func _normalize_float(value: float) -> float:
+	var scale := pow(10.0, FLOAT_PRECISION)
+	return round(value * scale) / scale
+
+func _normalize_values(value: Variant) -> Variant:
 	if value is float:
-		return int(round(value))
+		return _normalize_float(value)
 	if value is Array:
 		var items: Array = []
 		for item in value:
-			items.append(_round_values(item))
+			items.append(_normalize_values(item))
 		return items
 	if value is Dictionary:
 		var normalized := {}
 		for key in value.keys():
-			normalized[key] = _round_values(value[key])
+			normalized[key] = _normalize_values(value[key])
 		return normalized
 	return value
 
@@ -196,9 +245,49 @@ func _layout_snapshot(node: Node) -> Dictionary:
 		"size": [control.size.x, control.size.y],
 		"anchors": [control.anchor_left, control.anchor_top, control.anchor_right, control.anchor_bottom],
 		"offsets": [control.offset_left, control.offset_top, control.offset_right, control.offset_bottom],
+		"scale": [control.scale.x, control.scale.y],
+		"rotation": control.rotation,
 		"visible": control.visible,
 		"mouse_filter": control.mouse_filter,
 	}
+
+func _theme_override_snapshot(node: Node) -> Dictionary:
+	var result := {}
+	for prop in node.get_property_list():
+		var prop_name := str(prop.get("name", ""))
+		if not prop_name.begins_with("theme_override_"):
+			continue
+		var override_value: Variant = _normalize_resource_value(node.get(prop_name))
+		if override_value == null:
+			continue
+		result[prop_name] = override_value
+	return result
+
+func _normalize_resource_value(value: Variant) -> Variant:
+	if value == null:
+		return null
+	if value is Resource:
+		var resource := value as Resource
+		if resource is StyleBox:
+			return {"class": resource.get_class()}
+		var resource_path := resource.resource_path
+		if resource_path.contains("::"):
+			resource_path = resource_path.split("::", false, 1)[1]
+		var payload := {
+			"path": resource_path,
+			"class": resource.get_class(),
+		}
+		if resource is Font:
+			pass
+		if resource is Texture2D:
+			payload["size"] = [(resource as Texture2D).get_width(), (resource as Texture2D).get_height()]
+		return payload
+	if value is Color:
+		var color := value as Color
+		return [color.r, color.g, color.b, color.a]
+	if value is float:
+		return _normalize_float(value)
+	return value
 
 func _property_snapshot(node: Node) -> Dictionary:
 	var result := {}
@@ -206,11 +295,22 @@ func _property_snapshot(node: Node) -> Dictionary:
 		var label := node as Label
 		result["text"] = label.text
 		result["horizontal_alignment"] = label.horizontal_alignment
+		result["vertical_alignment"] = label.vertical_alignment
+		if label.label_settings != null:
+			result["label_settings"] = _normalize_resource_value(label.label_settings)
+		if label.get("theme_font") != null:
+			result["font"] = _normalize_resource_value(label.get("theme_font"))
 	elif node is Button:
 		var button := node as Button
 		result["text"] = button.text
 		result["disabled"] = button.disabled
 		result["toggle_mode"] = button.toggle_mode
+		if button.get("icon") != null:
+			result["icon"] = _normalize_resource_value(button.get("icon"))
+	elif node is TextureButton:
+		var texture_button := node as TextureButton
+		if texture_button.texture_normal != null:
+			result["texture_normal"] = _normalize_resource_value(texture_button.texture_normal)
 	elif node is LineEdit:
 		result["text"] = (node as LineEdit).text
 		result["placeholder"] = (node as LineEdit).placeholder_text
@@ -219,13 +319,18 @@ func _property_snapshot(node: Node) -> Dictionary:
 		result["value"] = range_node.value
 		result["min_value"] = range_node.min_value
 		result["max_value"] = range_node.max_value
+		result["step"] = range_node.step
 	elif node is TextureRect:
 		var texture := (node as TextureRect).texture
 		if texture != null:
-			result["texture"] = {"path": texture.resource_path, "class": texture.get_class()}
+			result["texture"] = _normalize_resource_value(texture)
+		result["expand_mode"] = (node as TextureRect).expand_mode
+		result["stretch_mode"] = (node as TextureRect).stretch_mode
 	elif node is ProgressBar:
 		var bar := node as ProgressBar
 		result["value"] = bar.value
 		result["min_value"] = bar.min_value
 		result["max_value"] = bar.max_value
+	elif node.get("material") != null:
+		result["material"] = _normalize_resource_value(node.get("material"))
 	return result

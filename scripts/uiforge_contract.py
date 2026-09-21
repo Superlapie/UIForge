@@ -379,13 +379,82 @@ def _lock_is_stale(lock_dir: Path) -> bool:
 def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
     if not _lock_is_stale(lock_dir):
         return False
+    meta = _read_lock_meta(lock_dir)
+    expected_nonce = str(meta.get("owner_nonce", ""))
+    return reclaim_stale_lock_verified(lock_dir, expected_nonce)
+
+
+def reclaim_stale_lock_verified(lock_dir: Path, expected_nonce: str) -> bool:
+    if not lock_dir.exists():
+        return False
     reclaim_path = lock_dir.with_name(f"{lock_dir.name}.reclaim_{secrets.token_hex(8)}")
     try:
         os.replace(lock_dir, reclaim_path)
     except OSError:
         return False
+    reclaimed_meta = _read_lock_meta(reclaim_path)
+    if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
+        try:
+            os.replace(reclaim_path, lock_dir)
+        except OSError:
+            pass
+        return False
     _remove_lock_dir(reclaim_path)
     return True
+
+
+def _replace_meta_path(absolute: Path) -> Path:
+    return absolute.with_name(absolute.name + ".uiforge_replace_txn")
+
+
+def _write_replace_meta(meta_path: Path, payload: dict[str, Any]) -> None:
+    meta_path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _read_replace_meta(meta_path: Path) -> dict[str, Any]:
+    if not meta_path.exists():
+        return {}
+    try:
+        payload = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _cleanup_replace_sidecars(absolute: Path) -> None:
+    meta_path = _replace_meta_path(absolute)
+    if meta_path.exists():
+        meta_path.unlink(missing_ok=True)
+
+
+def recover_interrupted_replace(absolute: Path) -> None:
+    backup_path = absolute.with_name(absolute.name + ".uiforge_replace_backup")
+    meta_path = _replace_meta_path(absolute)
+    meta = _read_replace_meta(meta_path)
+    backup_exists = backup_path.exists()
+    dest_exists = absolute.exists()
+    if not dest_exists and backup_exists:
+        os.replace(backup_path, absolute)
+        _cleanup_replace_sidecars(absolute)
+        return
+    if dest_exists and backup_exists:
+        stage = str(meta.get("stage", ""))
+        if stage in {"commit", "complete"}:
+            backup_path.unlink(missing_ok=True)
+            _cleanup_replace_sidecars(absolute)
+            return
+        if not meta and _file_text_hash(absolute) != _file_text_hash(backup_path):
+            backup_path.unlink(missing_ok=True)
+            return
+    if dest_exists and not backup_exists and meta:
+        _cleanup_replace_sidecars(absolute)
+
+
+def replace_file(source_absolute: Path, dest_absolute: Path) -> None:
+    dest_absolute.parent.mkdir(parents=True, exist_ok=True)
+    recover_interrupted_replace(dest_absolute)
+    os.replace(source_absolute, dest_absolute)
+    _cleanup_replace_sidecars(dest_absolute)
 
 
 def acquire_lock(target_absolute: Path) -> dict[str, Any]:
@@ -430,25 +499,6 @@ def release_lock(lock_path: Path | None, owner_nonce: str = "") -> None:
     if meta.get("owner_nonce") != owner_nonce:
         return
     _remove_lock_dir(lock_path)
-
-
-def replace_file(source_absolute: Path, dest_absolute: Path) -> None:
-    dest_absolute.parent.mkdir(parents=True, exist_ok=True)
-    if not dest_absolute.exists():
-        os.replace(source_absolute, dest_absolute)
-        return
-    backup_path = dest_absolute.with_name(dest_absolute.name + ".uiforge_replace_backup")
-    if backup_path.exists():
-        backup_path.unlink()
-    os.replace(dest_absolute, backup_path)
-    try:
-        os.replace(source_absolute, dest_absolute)
-    except OSError:
-        if backup_path.exists():
-            os.replace(backup_path, dest_absolute)
-        raise
-    if backup_path.exists():
-        backup_path.unlink()
 
 
 def write_text_atomically(
