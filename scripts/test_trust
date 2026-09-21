@@ -16,6 +16,7 @@ else
 fi
 
 cd "$PROJECT_DIR"
+"$GODOT" --headless --editor --path "$PROJECT_DIR" --quit
 "$GODOT" --headless --path "$PROJECT_DIR" --script res://tests/trust_runner.gd
 "$GODOT" --headless --path "$PROJECT_DIR" --script res://tests/cross_process_lock_runner.gd
 "$GODOT" --headless --path "$PROJECT_DIR" --script res://tests/compiler_conformance_runner.gd
