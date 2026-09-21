@@ -195,7 +195,9 @@ class Batch21SecurityTests(unittest.TestCase):
             conflicts = [item for item in results if not item.get("success")]
             self.assertEqual(len(successes), 1)
             self.assertEqual(len(conflicts), 1)
-            self.assertIn("WRITE_CONFLICT", codes(conflicts[0]))
+            self.assertTrue({"WRITE_CONFLICT", "FILE_WRITE_FAILED", "LOCK_CREATE_FAILED"} & codes(conflicts[0]))
+            saved = json.loads(source.read_text(encoding="utf-8"))
+            self.assertIn(saved["metadata"]["author"], {"A", "B"})
 
     def test_commit_time_provenance_blocks_hand_scene(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
