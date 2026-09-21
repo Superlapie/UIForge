@@ -39,10 +39,10 @@ class UIForgeFallbackTests(unittest.TestCase):
             self.assertIn('type="AtlasTexture"', scene)
             self.assertIn("region = Rect2(0.0000, 0.0000, 362.0000, 362.0000)", scene)
             for region in ([0, 0, -1, 10], [0, 0, 1], [0, 0, "bad", 10], [False, 0, 10, 10]):
-                run("set", str(source), "backpack_slots_00_icon", "properties.texture_region", json.dumps(region))
-                result, code = run("validate", str(source))
-                self.assertNotEqual(code, 0)
-                self.assertIn("TEXTURE_REGION_INVALID", {v["code"] for v in result["diagnostics"]})
+                result, code = run("set", str(source), "backpack_slots_00_icon", "properties.texture_region", json.dumps(region))
+                self.assertNotEqual(code, 0, (region, result))
+                self.assertFalse(result.get("committed", True), (region, result))
+                self.assertIn("TEXTURE_REGION_INVALID", {item["code"] for item in result.get("diagnostics", result.get("errors", []))})
             missing = Path(directory) / "unknown.ui.json"
             result, code = run("new", "unknown", str(missing))
             self.assertNotEqual(code, 0)

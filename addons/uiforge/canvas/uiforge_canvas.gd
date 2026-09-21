@@ -466,12 +466,11 @@ func _gui_input(event: InputEvent) -> void:
 					drag_start_size = Vector2(float(size_array[0]), float(size_array[1])) if size_array.size() >= 2 else Vector2(120, 40)
 				else:
 					select_node("")
-			accept_event()
-		elif event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-			if is_dragging or is_resizing:
-				_commit_drag()
-			is_dragging = false
-			is_resizing = false
+			else:
+				if is_dragging or is_resizing:
+					_commit_drag()
+				is_dragging = false
+				is_resizing = false
 			accept_event()
 	elif event is InputEventMouseMotion:
 		if is_panning:

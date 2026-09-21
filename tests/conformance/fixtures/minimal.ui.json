@@ -1,0 +1,32 @@
+{
+	"schema_version": 1,
+	"name": "conformance_minimal",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "Panel",
+		"layout": {"size": [400, 300]},
+		"children": [
+			{
+				"id": "child_a",
+				"type": "Label",
+				"layout": {"position": [12, 12], "size": [120, 32]},
+				"properties": {"text": "A"}
+			},
+			{
+				"id": "parent_b",
+				"type": "Panel",
+				"layout": {"position": [12, 56], "size": [200, 120]},
+				"children": [
+					{
+						"id": "child_b1",
+						"type": "Label",
+						"layout": {"position": [8, 8], "size": [80, 24]},
+						"properties": {"text": "B1"}
+					}
+				]
+			}
+		]
+	}
+}

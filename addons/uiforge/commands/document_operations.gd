@@ -26,6 +26,12 @@ static func add_value(document: UIForgeDocument, parent_id: String, raw_node: St
 	var value := parse_value(raw_node)
 	if not value is Dictionary:
 		return {"success": false, "error": {"code": "NODE_JSON_INVALID", "message": "The new node must be a JSON object."}}
+	var node_id := str(value.get("id", ""))
+	var id_error := UIForgeID.diagnostic(node_id)
+	if not id_error.is_empty():
+		return {"success": false, "error": id_error}
+	if not document.find_node(node_id).is_empty():
+		return {"success": false, "error": {"code": "DUPLICATE_ID", "message": "Node id '%s' already exists." % node_id, "node": node_id}}
 	if not document.add_child(parent_id, value):
 		return {"success": false, "error": {"code": "ADD_FAILED", "parent": parent_id}}
 	return {"success": true, "node": value, "parent": parent_id}
@@ -42,6 +48,11 @@ static func move_value(document: UIForgeDocument, node_id: String, parent_id: St
 	return {"success": true, "node": node_id, "parent": parent_id, "index": index}
 
 static func duplicate_value(document: UIForgeDocument, node_id: String, new_id: String) -> Dictionary:
+	var id_error := UIForgeID.diagnostic(new_id, node_id)
+	if not id_error.is_empty():
+		return {"success": false, "error": id_error}
+	if not document.find_node(new_id).is_empty():
+		return {"success": false, "error": {"code": "DUPLICATE_ID", "message": "Node id '%s' already exists." % new_id, "node": new_id}}
 	var copy := document.duplicate_node(node_id, new_id)
 	if copy.is_empty():
 		return {"success": false, "error": {"code": "DUPLICATE_FAILED", "node": node_id}}

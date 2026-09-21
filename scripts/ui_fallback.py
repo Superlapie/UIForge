@@ -20,6 +20,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 THEME_PATH = ROOT / "addons/uiforge/themes/dark_fantasy.theme.json"
 SCHEMA_VERSION = 1
+ID_GRAMMAR = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
+TOP_LEVEL_KEYS = {
+    "schema_version", "name", "viewport", "theme", "root", "components",
+    "theme_overrides", "metadata", "mock_data", "reference",
+}
 NATIVE_TYPES = {
     "Control", "Panel", "Label", "RichText", "Texture", "Button", "TextureButton",
     "CheckBox", "CheckButton", "Slider", "HSlider", "VSlider", "SpinBox", "ProgressBar", "LineEdit",
@@ -133,6 +138,81 @@ def capability_native_properties() -> dict[str, list[dict[str, Any]]]:
     return {node_type: [] for node_type in sorted(NATIVE_TYPES | set(COMPONENTS))}
 
 
+def is_valid_id(node_id: str) -> bool:
+    return bool(node_id) and ID_GRAMMAR.fullmatch(str(node_id)) is not None
+
+
+def id_diagnostic(node_id: str, context_id: str = "") -> dict[str, Any]:
+    if is_valid_id(node_id):
+        return {}
+    return {
+        "severity": "error",
+        "code": "ID_INVALID",
+        "message": f"Node id '{node_id}' must match {ID_GRAMMAR.pattern}.",
+        "node": context_id or node_id,
+        "recommendation": "Use stable snake_case IDs that start with a letter and survive Godot node-name validation unchanged.",
+    }
+
+
+def contains_id(node: dict[str, Any], target_id: str) -> bool:
+    for child in node.get("children", []):
+        if not isinstance(child, dict):
+            continue
+        if str(child.get("id", "")) == target_id or contains_id(child, target_id):
+            return True
+    return False
+
+
+def remap_ids(node: dict[str, Any], base_id: str) -> None:
+    node["id"] = base_id
+    children = node.get("children", [])
+    if not isinstance(children, list):
+        return
+    for index, child in enumerate(children):
+        if isinstance(child, dict):
+            remap_ids(child, f"{base_id}_{index + 1}")
+
+
+def collect_ids(node: dict[str, Any]) -> set[str]:
+    ids: set[str] = set()
+    for current, _parent in walk(node):
+        node_id = str(current.get("id", ""))
+        if node_id:
+            ids.add(node_id)
+    return ids
+
+
+def commit_mutation(path: str, mutate) -> tuple[dict[str, Any], int]:
+    loaded = load(path)
+    data = loaded.get("document")
+    if data is None:
+        return {"success": False, "committed": False, "errors": loaded.get("errors", [])}, 1
+    working = copy.deepcopy(data)
+    operation = mutate(working)
+    if not operation.get("success"):
+        operation["committed"] = False
+        return operation, 1
+    validation = validate(working)
+    if not validation["success"]:
+        return {
+            "success": False,
+            "committed": False,
+            "errors": [item for item in validation["diagnostics"] if item.get("severity") == "error"],
+            "warnings": validation["warnings"],
+            "diagnostics": validation["diagnostics"],
+        }, 1
+    saved = save(path, working)
+    if not saved.get("success", False):
+        operation["success"] = False
+        operation["committed"] = False
+        operation["errors"] = saved.get("errors", [{"code": "SAVE_FAILED", "message": path}])
+        return operation, 1
+    operation["success"] = True
+    operation["committed"] = True
+    operation.pop("saved", None)
+    return operation, 0
+
+
 def fs_path(raw: str | Path) -> Path:
     value = str(raw)
     return ROOT / value.removeprefix("res://") if value.startswith("res://") else Path(value)
@@ -211,17 +291,25 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     def add(severity: str, code: str, message: str, node: str = "", recommendation: str = ""):
         diagnostics.append({"severity": severity, "code": code, "message": message, "node": node, "recommendation": recommendation})
 
+    for key in data.keys():
+        if str(key) not in TOP_LEVEL_KEYS:
+            add("error", "UNKNOWN_DOCUMENT_KEY", f"Unknown top-level key '{key}'.", "", "Remove the key or extend the UIForge V1 contract deliberately.")
     if data.get("schema_version") != SCHEMA_VERSION:
         add("error", "SCHEMA_VERSION_UNSUPPORTED", "Document schema_version must be 1.")
     if not data.get("name"):
         add("error", "DOCUMENT_NAME_MISSING", "Document name is required.")
-    viewport = data.get("viewport", {})
+    viewport_value = data.get("viewport", {})
+    viewport = viewport_value if isinstance(viewport_value, dict) else {}
+    if not isinstance(viewport_value, dict) and "viewport" in data:
+        add("error", "VIEWPORT_INVALID", "viewport must be an object.", "viewport", "Use {\"width\": 1920, \"height\": 1080}.")
     if int(viewport.get("width", 0)) <= 0 or int(viewport.get("height", 0)) <= 0:
         add("error", "VIEWPORT_INVALID", "Viewport width and height must be positive.", "viewport")
     root = data.get("root")
     if not isinstance(root, dict):
         add("error", "ROOT_MISSING", "A document must contain a root node.")
         root = {}
+    elif not isinstance(root.get("children", []), list) and "children" in root:
+        add("error", "CHILDREN_INVALID", "children must be an array.", str(root.get("id", "")))
 
     def scan(value: Any, node_id: str):
         if isinstance(value, str) and value.startswith("$") and resolve(value, tokens) is None:
@@ -248,9 +336,13 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         node_type = str(node.get("type", ""))
         if not node_id:
             add("error", "NODE_ID_MISSING", "Every node needs a stable unique id.")
+        elif not is_valid_id(node_id):
+            diagnostic = id_diagnostic(node_id)
+            add(diagnostic["severity"], diagnostic["code"], diagnostic["message"], diagnostic["node"], diagnostic.get("recommendation", ""))
         elif node_id in ids:
             add("error", "DUPLICATE_ID", f"Duplicate node id '{node_id}'.", node_id)
-        ids.add(node_id)
+        else:
+            ids.add(node_id)
         if node_type not in NATIVE_TYPES and node_type not in COMPONENTS and node_type != "ComponentInstance":
             add("error", "UNKNOWN_NODE_TYPE", f"Unknown node type '{node_type}'.", node_id)
         if node_type == "ComponentInstance":
@@ -311,8 +403,11 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         scan_resources(properties.get("godot_overrides", {}) if isinstance(properties, dict) else {}, node_id)
         scan_resources(node.get("effects", {}), node_id)
         scan_resources(node.get("decorations", {}), node_id)
-        if "columns" in properties and (not isinstance(properties["columns"], int) or properties["columns"] < 1):
+        if "columns" in properties and (not isinstance(properties["columns"], (int, float)) or int(properties["columns"]) < 1):
             add("error", "GRID_COLUMNS_INVALID", "Grid columns must be a positive integer.", node_id)
+        children_value = node.get("children", [])
+        if "children" in node and not isinstance(children_value, list):
+            add("error", "CHILDREN_INVALID", "children must be an array.", node_id)
         if parent and parent.get("type") in {"Label", "RichText", "Button", "TextureButton", "CheckBox", "CheckButton", "Slider", "HSlider", "VSlider", "SpinBox", "ProgressBar", "LineEdit", "TextEdit", "OptionButton", "MenuButton", "LinkButton", "ColorRect", "NinePatchRect", "Separator", "Spacer"}:
             add("error", "INVALID_PARENT_RELATIONSHIP", f"Node '{node_id}' is parented under leaf control '{parent.get('id', '')}'.", node_id)
     scan_resources(data.get("theme_overrides", {}), "document")
@@ -725,6 +820,117 @@ def capabilities() -> dict[str, Any]:
     return {"schema_version": 1, "templates": template_catalog(), "supported_node_types": sorted(NATIVE_TYPES | set(COMPONENTS)), "components": sorted(COMPONENTS), "states": ["normal", "hover", "pressed", "focused", "disabled", "selected"], "viewport_presets": [{"width": w, "height": h} for w, h in [(1280, 720), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160)]], "themes": ["dark_fantasy"], "properties": PROPERTY_GROUPS, "property_schemas": capability_property_schemas(), "native_properties": capability_native_properties(), "operations": ["get", "set", "add", "delete", "move", "duplicate", "validate", "build", "render", "inspect", "new"]}
 
 
+def add_child(data: dict[str, Any], parent_id: str, node: dict[str, Any], index: int = -1) -> bool:
+    parent, _ = find(data, parent_id)
+    if parent is None:
+        return False
+    children = parent.setdefault("children", [])
+    if not isinstance(children, list):
+        return False
+    if index < 0 or index >= len(children):
+        children.append(node)
+    else:
+        children.insert(index, node)
+    return True
+
+
+def delete_node(data: dict[str, Any], node_id: str) -> dict[str, Any] | None:
+    root = data.get("root", {})
+    if isinstance(root, dict) and str(root.get("id", "")) == node_id:
+        return None
+    target, parent = find(data, node_id)
+    if target is None or parent is None:
+        return None
+    siblings = parent.get("children", [])
+    if not isinstance(siblings, list):
+        return None
+    siblings.remove(target)
+    return target
+
+
+def move_node(data: dict[str, Any], node_id: str, parent_id: str, index: int = -1) -> bool:
+    moving, _ = find(data, node_id)
+    if moving is None or node_id == parent_id or contains_id(moving, parent_id):
+        return False
+    target, old_parent = find(data, node_id)
+    if target is None or old_parent is None:
+        return False
+    siblings = old_parent.get("children", [])
+    if not isinstance(siblings, list):
+        return False
+    old_index = siblings.index(target)
+    removed = delete_node(data, node_id)
+    if removed is None:
+        return False
+    if not add_child(data, parent_id, removed, index):
+        siblings.insert(old_index, removed)
+        return False
+    return True
+
+
+def duplicate_node(data: dict[str, Any], node_id: str, new_id: str) -> dict[str, Any] | None:
+    original, parent = find(data, node_id)
+    if original is None or parent is None:
+        return None
+    duplicate = copy.deepcopy(original)
+    remap_ids(duplicate, new_id)
+    siblings = parent.get("children", [])
+    if not isinstance(siblings, list):
+        return None
+    siblings.insert(siblings.index(original) + 1, duplicate)
+    return duplicate
+
+
+def operation_set(data: dict[str, Any], node_id: str, property_path: str, raw_value: str) -> dict[str, Any]:
+    node, _ = find(data, node_id)
+    if node is None:
+        return {"success": False, "error": {"code": "NODE_NOT_FOUND", "node": node_id}}
+    value = parse_value(raw_value)
+    if not set_path(node, property_path, value):
+        return {"success": False, "error": {"code": "SET_FAILED", "message": "Node or property path not found.", "node": node_id}}
+    return {"success": True, "id": node_id, "property": property_path, "value": value}
+
+
+def operation_add(data: dict[str, Any], parent_id: str, raw_node: str) -> dict[str, Any]:
+    value = parse_value(raw_node)
+    if not isinstance(value, dict):
+        return {"success": False, "error": {"code": "NODE_JSON_INVALID", "message": "The new node must be a JSON object."}}
+    node_id = str(value.get("id", ""))
+    diagnostic = id_diagnostic(node_id)
+    if diagnostic:
+        return {"success": False, "error": diagnostic}
+    if find(data, node_id)[0] is not None:
+        return {"success": False, "error": {"code": "DUPLICATE_ID", "message": f"Node id '{node_id}' already exists.", "node": node_id}}
+    if not add_child(data, parent_id, value):
+        return {"success": False, "error": {"code": "ADD_FAILED", "parent": parent_id}}
+    return {"success": True, "node": value, "parent": parent_id}
+
+
+def operation_delete(data: dict[str, Any], node_id: str) -> dict[str, Any]:
+    removed = delete_node(data, node_id)
+    if removed is None:
+        return {"success": False, "error": {"code": "DELETE_FAILED", "node": node_id}}
+    return {"success": True, "deleted": removed}
+
+
+def operation_move(data: dict[str, Any], node_id: str, parent_id: str, index: int = -1) -> dict[str, Any]:
+    if not move_node(data, node_id, parent_id, index):
+        return {"success": False, "error": {"code": "MOVE_FAILED", "node": node_id, "parent": parent_id}}
+    return {"success": True, "node": node_id, "parent": parent_id, "index": index}
+
+
+def operation_duplicate(data: dict[str, Any], node_id: str, new_id: str) -> dict[str, Any]:
+    diagnostic = id_diagnostic(new_id, node_id)
+    if diagnostic:
+        return {"success": False, "error": diagnostic}
+    if find(data, new_id)[0] is not None:
+        return {"success": False, "error": {"code": "DUPLICATE_ID", "message": f"Node id '{new_id}' already exists.", "node": new_id}}
+    duplicate = duplicate_node(data, node_id, new_id)
+    if duplicate is None:
+        return {"success": False, "error": {"code": "DUPLICATE_FAILED", "node": node_id}}
+    return {"success": True, "node": duplicate}
+
+
 def main(argv: list[str]) -> tuple[dict[str, Any], int]:
     if not argv or argv[0] in {"help", "--help", "-h"}:
         return {"success": True, "help": "Use ui capabilities, validate, inspect [document|tree|node], get, set, add, delete, move, duplicate, build, build-all, or render."}, 0
@@ -803,49 +1009,24 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
     if command == "set":
         if len(argv) < 5:
             return {"success": False, "errors": [{"code": "USAGE", "message": "ui set <file> <node_id> <property.path> <value>"}]}, 1
-        node, _ = find(data, argv[2])
-        if node is None:
-            return {"success": False, "error": {"code": "NODE_NOT_FOUND", "node": argv[2]}}, 1
-        value = parse_value(argv[4])
-        set_path(node, argv[3], value)
-        save(argv[1], data)
-        return {"success": True, "id": argv[2], "property": argv[3], "value": value, "saved": True}, 0
+        return commit_mutation(argv[1], lambda working: operation_set(working, argv[2], argv[3], argv[4]))
     if command == "add":
         if len(argv) < 4:
             return {"success": False, "errors": [{"code": "USAGE", "message": "ui add <file> <parent_id> '<node_json>'"}]}, 1
-        parent, _ = find(data, argv[2])
-        value = parse_value(argv[3])
-        if parent is None or not isinstance(value, dict):
-            return {"success": False, "error": {"code": "ADD_FAILED"}}, 1
-        parent.setdefault("children", []).append(value)
-        save(argv[1], data)
-        return {"success": True, "node": value, "saved": True}, 0
-    if command in {"delete", "move", "duplicate"}:
+        return commit_mutation(argv[1], lambda working: operation_add(working, argv[2], argv[3]))
+    if command == "delete":
         if len(argv) < 3:
-            return {"success": False, "errors": [{"code": "USAGE", "message": f"ui {command} <file> ..."}]}, 1
-        target, parent = find(data, argv[2])
-        if target is None or parent is None:
-            return {"success": False, "error": {"code": f"{command.upper()}_FAILED", "node": argv[2]}}, 1
-        siblings = parent.get("children", [])
-        if command == "delete":
-            siblings.remove(target)
-            result = {"success": True, "deleted": target}
-        elif command == "duplicate":
-            new_id = argv[3] if len(argv) > 3 else f"{argv[2]}_copy"
-            duplicate = copy.deepcopy(target)
-            duplicate["id"] = new_id
-            siblings.insert(siblings.index(target) + 1, duplicate)
-            result = {"success": True, "node": duplicate}
-        else:
-            new_parent, _ = find(data, argv[3]) if len(argv) > 3 else (None, None)
-            if new_parent is None:
-                return {"success": False, "error": {"code": "MOVE_FAILED", "parent": argv[3]}}, 1
-            siblings.remove(target)
-            new_parent.setdefault("children", []).append(target)
-            result = {"success": True, "node": argv[2], "parent": argv[3]}
-        save(argv[1], data)
-        result["saved"] = True
-        return result, 0
+            return {"success": False, "errors": [{"code": "USAGE", "message": "ui delete <file> <node_id>"}]}, 1
+        return commit_mutation(argv[1], lambda working: operation_delete(working, argv[2]))
+    if command == "move":
+        if len(argv) < 4:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "ui move <file> <node_id> <new_parent_id> [index]"}]}, 1
+        index = int(argv[4]) if len(argv) > 4 else -1
+        return commit_mutation(argv[1], lambda working: operation_move(working, argv[2], argv[3], index))
+    if command == "duplicate":
+        if len(argv) < 4:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "ui duplicate <file> <node_id> <new_id>"}]}, 1
+        return commit_mutation(argv[1], lambda working: operation_duplicate(working, argv[2], argv[3]))
     if command == "build":
         result = validate(data)
         if not result["success"]:

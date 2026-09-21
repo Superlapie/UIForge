@@ -13,12 +13,15 @@ func _run() -> void:
 	_test_compile_samples()
 	_test_compile_full_property_fixture()
 	_test_validation_contract()
+	_test_malformed_document_validation()
+	_test_transactional_cli_mutations()
+	_test_canvas_drag_release()
 	_test_material_system()
 	if failures.is_empty():
-		print(JSON.stringify({"success": true, "passed": 8, "failed": 0}))
+		print(JSON.stringify({"success": true, "passed": 11, "failed": 0}))
 		quit(0)
 	else:
-		print(JSON.stringify({"success": false, "passed": 8 - failures.size(), "failed": failures.size(), "failures": failures}, "\t"))
+		print(JSON.stringify({"success": false, "passed": 11 - failures.size(), "failed": failures.size(), "failures": failures}, "\t"))
 		quit(1)
 
 func _test_material_system() -> void:
@@ -104,6 +107,45 @@ func _test_compile_full_property_fixture() -> void:
 		_assert(FileAccess.get_file_as_string(target).contains("metadata/aether_transitions"), "compile_transition_metadata")
 		_assert(FileAccess.get_file_as_string(target).contains("metadata/aether_effects"), "compile_effect_metadata")
 
+func _test_malformed_document_validation() -> void:
+	var malformed := UIForgeDocument.from_dict({"schema_version": 1, "name": "malformed", "viewport": {"width": 800, "height": 600}, "theme": "dark_fantasy", "root": {"id": "root", "type": "Panel", "layout": [], "properties": "bad", "children": {}}})
+	var result := UIForgeValidator.new().validate(malformed)
+	_assert(not result.success, "malformed_document_rejected")
+	_assert(_has_diagnostic(result, "LAYOUT_INVALID"), "malformed_layout_diagnostic")
+	_assert(_has_diagnostic(result, "PROPERTIES_INVALID"), "malformed_properties_diagnostic")
+	_assert(_has_diagnostic(result, "CHILDREN_INVALID"), "malformed_children_diagnostic")
+
+func _test_transactional_cli_mutations() -> void:
+	var source := "user://aether_transactional.ui.json"
+	var document := UIForgeSerializer.create_default("transactional")
+	UIForgeSerializer.save_document(document, source)
+	var invalid := UIForgeMutationPipeline.commit(source, func(working: UIForgeDocument) -> Dictionary:
+		return UIForgeDocumentOperations.set_value(working, str(working.root().get("id", "")), "properties.columns", "0")
+	)
+	_assert(not invalid.success and not bool(invalid.get("committed", true)), "invalid_mutation_not_committed")
+	var reloaded := UIForgeSerializer.load_document(source)
+	_assert(reloaded["document"].get_property(str(reloaded["document"].root().get("id", "")), "properties.columns") == null, "source_untouched_after_invalid_mutation")
+
+func _test_canvas_drag_release() -> void:
+	var canvas := UIForgeCanvas.new()
+	var document := UIForgeSerializer.create_default("canvas_drag")
+	canvas.set_document(document)
+	get_root().add_child(canvas)
+	canvas.select_node(str(document.root().get("id", "")))
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = Vector2(120, 120)
+	canvas._gui_input(press)
+	_assert(canvas.is_dragging or canvas.is_resizing, "canvas_drag_started")
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	release.position = Vector2(140, 140)
+	canvas._gui_input(release)
+	_assert(not canvas.is_dragging and not canvas.is_resizing, "canvas_drag_release_clears_state")
+	canvas.queue_free()
+
 func _test_validation_contract() -> void:
 	var broken_resource := UIForgeDocument.from_dict({"schema_version": 1, "name": "broken_resource", "viewport": {"width": 800, "height": 600}, "theme": "dark_fantasy", "root": {"id": "root", "type": "Control", "children": [{"id": "missing_texture", "type": "Texture", "properties": {"texture": "res://does_not_exist.svg"}}]}})
 	var resource_result := UIForgeValidator.new().validate(broken_resource)
@@ -117,6 +159,9 @@ func _test_validation_contract() -> void:
 	var unsupported_property := UIForgeDocument.from_dict({"schema_version": 1, "name": "unsupported_property", "viewport": {"width": 800, "height": 600}, "theme": "dark_fantasy", "root": {"id": "root", "type": "Label", "properties": {"not_a_godot_property": true}}})
 	var property_result := UIForgeValidator.new().validate(unsupported_property)
 	_assert(_has_diagnostic(property_result, "UNSUPPORTED_PROPERTY"), "unsupported_property_rejected")
+	var invalid_id := UIForgeDocument.from_dict({"schema_version": 1, "name": "invalid_id", "viewport": {"width": 800, "height": 600}, "theme": "dark_fantasy", "root": {"id": "1bad", "type": "Label"}})
+	var id_result := UIForgeValidator.new().validate(invalid_id)
+	_assert(_has_diagnostic(id_result, "ID_INVALID"), "invalid_id_rejected")
 
 func _has_diagnostic(result: Dictionary, code: String) -> bool:
 	for diagnostic in result.get("diagnostics", []):

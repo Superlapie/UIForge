@@ -116,64 +116,53 @@ func _get_node() -> Dictionary:
 func _set_value() -> Dictionary:
 	if args.size() < 5:
 		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui set <document.ui.json> <node_id> <property.path> <value>"}]}
-	var loaded := _load(str(args[1]))
-	if loaded.get("document") == null:
-		return {"success": false, "errors": loaded.get("errors", [])}
-	var document: UIForgeDocument = loaded["document"]
-	var operation := UIForgeDocumentOperations.set_value(document, str(args[2]), str(args[3]), str(args[4]))
-	if operation.success:
-		var saved := UIForgeSerializer.save_document(document, str(args[1]))
-		operation["saved"] = saved.success
-	return operation
+	var path := str(args[1])
+	var node_id := str(args[2])
+	var property_path := str(args[3])
+	var raw_value := str(args[4])
+	return UIForgeMutationPipeline.commit(path, func(document: UIForgeDocument) -> Dictionary:
+		return UIForgeDocumentOperations.set_value(document, node_id, property_path, raw_value)
+	)
 
 func _add_value() -> Dictionary:
 	if args.size() < 4:
 		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui add <document.ui.json> <parent_id> '<node_json>'"}]}
-	var loaded := _load(str(args[1]))
-	if loaded.get("document") == null:
-		return {"success": false, "errors": loaded.get("errors", [])}
-	var document: UIForgeDocument = loaded["document"]
-	var operation := UIForgeDocumentOperations.add_value(document, str(args[2]), str(args[3]))
-	if operation.success:
-		operation["saved"] = UIForgeSerializer.save_document(document, str(args[1])).success
-	return operation
+	var path := str(args[1])
+	var parent_id := str(args[2])
+	var raw_node := str(args[3])
+	return UIForgeMutationPipeline.commit(path, func(document: UIForgeDocument) -> Dictionary:
+		return UIForgeDocumentOperations.add_value(document, parent_id, raw_node)
+	)
 
 func _delete_value() -> Dictionary:
 	if args.size() < 3:
 		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui delete <document.ui.json> <node_id>"}]}
-	var loaded := _load(str(args[1]))
-	if loaded.get("document") == null:
-		return {"success": false, "errors": loaded.get("errors", [])}
-	var document: UIForgeDocument = loaded["document"]
-	var operation := UIForgeDocumentOperations.delete_value(document, str(args[2]))
-	if operation.success:
-		operation["saved"] = UIForgeSerializer.save_document(document, str(args[1])).success
-	return operation
+	var path := str(args[1])
+	var node_id := str(args[2])
+	return UIForgeMutationPipeline.commit(path, func(document: UIForgeDocument) -> Dictionary:
+		return UIForgeDocumentOperations.delete_value(document, node_id)
+	)
 
 func _move_value() -> Dictionary:
 	if args.size() < 4:
 		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui move <document.ui.json> <node_id> <new_parent_id> [index]"}]}
-	var loaded := _load(str(args[1]))
-	if loaded.get("document") == null:
-		return {"success": false, "errors": loaded.get("errors", [])}
-	var document: UIForgeDocument = loaded["document"]
+	var path := str(args[1])
+	var node_id := str(args[2])
+	var parent_id := str(args[3])
 	var index := int(args[4]) if args.size() > 4 else -1
-	var operation := UIForgeDocumentOperations.move_value(document, str(args[2]), str(args[3]), index)
-	if operation.success:
-		operation["saved"] = UIForgeSerializer.save_document(document, str(args[1])).success
-	return operation
+	return UIForgeMutationPipeline.commit(path, func(document: UIForgeDocument) -> Dictionary:
+		return UIForgeDocumentOperations.move_value(document, node_id, parent_id, index)
+	)
 
 func _duplicate_value() -> Dictionary:
 	if args.size() < 4:
 		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui duplicate <document.ui.json> <node_id> <new_id>"}]}
-	var loaded := _load(str(args[1]))
-	if loaded.get("document") == null:
-		return {"success": false, "errors": loaded.get("errors", [])}
-	var document: UIForgeDocument = loaded["document"]
-	var operation := UIForgeDocumentOperations.duplicate_value(document, str(args[2]), str(args[3]))
-	if operation.success:
-		operation["saved"] = UIForgeSerializer.save_document(document, str(args[1])).success
-	return operation
+	var path := str(args[1])
+	var node_id := str(args[2])
+	var new_id := str(args[3])
+	return UIForgeMutationPipeline.commit(path, func(document: UIForgeDocument) -> Dictionary:
+		return UIForgeDocumentOperations.duplicate_value(document, node_id, new_id)
+	)
 
 func _build_document() -> Dictionary:
 	if args.size() < 2:
