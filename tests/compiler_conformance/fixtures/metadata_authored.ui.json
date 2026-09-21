@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "name": "metadata_authored",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "metadata": {"screen_group": "demo"},
+  "root": {
+    "id": "metadata_root",
+    "type": "WindowFrame",
+    "layout": {"position": [40, 40], "size": [420, 280]},
+    "properties": {"title": "Metadata"},
+    "metadata": {"panel_role": "primary"},
+    "children": []
+  }
+}

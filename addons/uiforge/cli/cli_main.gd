@@ -49,7 +49,7 @@ func _load(path: String) -> Dictionary:
 	return UIForgeSerializer.load_document(path)
 
 func _cli_flags(start_index: int) -> Dictionary:
-	var flags := {"force": false, "allow_outside_project": false, "allow_unsafe": false, "unknown": []}
+	var flags := {"force": false, "allow_outside_project": false, "unknown": []}
 	var index := start_index
 	while index < args.size():
 		var token := str(args[index])
@@ -60,7 +60,7 @@ func _cli_flags(start_index: int) -> Dictionary:
 			flags.allow_outside_project = true
 			index += 1
 		elif token == "--allow-unsafe":
-			flags.allow_unsafe = true
+			flags.unknown.append(token)
 			index += 1
 		elif token.begins_with("--"):
 			flags.unknown.append(token)
@@ -231,7 +231,6 @@ func _build_document() -> Dictionary:
 	return UIForgeCompiler.new().compile_file(source, output, {
 		"force": flags.force,
 		"allow_outside_project": flags.allow_outside_project,
-		"allow_unsafe": flags.allow_unsafe,
 	})
 
 func _build_all() -> Dictionary:
@@ -265,7 +264,6 @@ func _build_all() -> Dictionary:
 		var result := UIForgeCompiler.new().compile_file("%s/%s" % [source_dir, source_file], output, {
 			"force": flags.force,
 			"allow_outside_project": flags.allow_outside_project,
-			"allow_unsafe": flags.allow_unsafe,
 		})
 		if result.success:
 			built.append(result)

@@ -686,7 +686,7 @@ def godot_literal(property_name: str, value: Any, external_resource, tokens: dic
     return scene_value(value)
 
 
-def build_tscn(data: dict[str, Any], source: str) -> str:
+def build_tscn(data: dict[str, Any], source: str) -> tuple[str, list[dict[str, Any]]]:
     theme_data = theme(data)
     overrides = data.get("theme_overrides", {})
     if isinstance(overrides, dict):
@@ -699,8 +699,13 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
     custom_components = data.get("components", {}) if isinstance(data.get("components", {}), dict) else {}
     identity = source_identity(source)
     revision = content_hash(data)
+    compile_errors: list[dict[str, Any]] = []
 
-    def external_resource(path: str, resource_type: str) -> str:
+    def external_resource(path: str, resource_type: str, property_name: str, node_id: str) -> str:
+        diagnostic = validate_external_resource(path, resource_type, property_name, node_id)
+        if diagnostic:
+            compile_errors.append(diagnostic)
+            return ""
         cache_key = f"{path}|{resource_type}"
         if cache_key in ext_resources:
             return ext_resources[cache_key]["id"]
@@ -722,7 +727,10 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
         resource_id = f"StyleBox_{safe}_{resource_id_part(state)}"
         texture_path = chosen.get(f"{state}_texture", chosen.get("texture"))
         if isinstance(texture_path, str) and texture_path.startswith("res://"):
-            texture_resource = external_resource(texture_path, "Texture2D")
+            texture_resource = external_resource(texture_path, "Texture2D", "style.texture", node_id)
+            if not texture_resource:
+                emitted_styles[cache] = resource_id
+                return resource_id
             block = [f'[sub_resource type="StyleBoxTexture" id="{resource_id}"]', f'texture = ExtResource("{texture_resource}")']
             for margin in ("left", "top", "right", "bottom"):
                 key = f"texture_margin_{margin}"
@@ -752,7 +760,7 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
         native_type = native(node_type)
         node_id = str(node.get("id", "Node"))
         node_name = re.sub(r"[^A-Za-z0-9_]", "_", node_id) or "Node"
-        path = node_name if parent == "." else f"{parent}/{node_name}"
+        node_path = node_name if parent == "." else f"{parent}/{node_name}"
         if root:
             lines.append(f'[node name="{node_name}" type="{native_type}"]')
         else:
@@ -769,6 +777,9 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
         if isinstance(node.get("metadata"), dict):
             for metadata_key, metadata_value in node["metadata"].items():
                 if validate_authored_metadata_key(str(metadata_key)):
+                    continue
+                if str(metadata_key) == "uiforge_decoration":
+                    lines.append("metadata/uiforge_decoration = true")
                     continue
                 lines.append(f"metadata/{metadata_key} = {scene_value(metadata_value)}")
         layout = node.get("layout", {})
@@ -835,28 +846,32 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
             if key in properties:
                 lines.append(f"{key} = {int(properties[key])}")
         if "texture" in properties and isinstance(properties["texture"], str) and properties["texture"].startswith("res://"):
-            resource_id = external_resource(properties["texture"], "Texture2D")
-            target_property = "texture_normal" if native_type == "TextureButton" else "texture"
-            if "texture_region" in properties:
-                region = properties["texture_region"]
-                atlas_id = f"AtlasTexture_{resource_id_part(node_id)}"
-                rect = ", ".join(f"{float(v):.4f}" for v in region)
-                subresources.append(f'[sub_resource type="AtlasTexture" id="{atlas_id}"]\natlas = ExtResource("{resource_id}")\nregion = Rect2({rect})\nfilter_clip = true')
-                lines.append(f'{target_property} = SubResource("{atlas_id}")')
-            else:
-                lines.append(f'{target_property} = ExtResource("{resource_id}")')
+            resource_id = external_resource(properties["texture"], "Texture2D", "texture", node_id)
+            if resource_id:
+                target_property = "texture_normal" if native_type == "TextureButton" else "texture"
+                if "texture_region" in properties:
+                    region = properties["texture_region"]
+                    atlas_id = f"AtlasTexture_{resource_id_part(node_id)}"
+                    rect = ", ".join(f"{float(v):.4f}" for v in region)
+                    subresources.append(f'[sub_resource type="AtlasTexture" id="{atlas_id}"]\natlas = ExtResource("{resource_id}")\nregion = Rect2({rect})\nfilter_clip = true')
+                    lines.append(f'{target_property} = SubResource("{atlas_id}")')
+                else:
+                    lines.append(f'{target_property} = ExtResource("{resource_id}")')
         if "icon" in properties and isinstance(properties["icon"], str) and properties["icon"].startswith("res://") and native_type in {"Button", "CheckBox", "TextureButton", "LinkButton"}:
-            resource_id = external_resource(properties["icon"], "Texture2D")
-            lines.append(f'icon = ExtResource("{resource_id}")')
+            resource_id = external_resource(properties["icon"], "Texture2D", "icon", node_id)
+            if resource_id:
+                lines.append(f'icon = ExtResource("{resource_id}")')
         font_role = "heading" if properties.get("font_size") in ("$font_size.title", "$font_size.heading") else "default"
         font_path = resolve(properties.get("font", theme_data.get("fonts", {}).get(font_role, "")), tokens)
         if native_type in {"Label", "RichTextLabel", "Button", "LineEdit", "CheckBox", "CheckButton", "OptionButton"} and isinstance(font_path, str) and font_path.startswith("res://"):
-            resource_id = external_resource(font_path, "FontFile")
-            font_key = "normal_font" if native_type == "RichTextLabel" else "font"
-            lines.append(f'theme_override_fonts/{font_key} = ExtResource("{resource_id}")')
+            resource_id = external_resource(font_path, "FontFile", "font", node_id)
+            if resource_id:
+                font_key = "normal_font" if native_type == "RichTextLabel" else "font"
+                lines.append(f'theme_override_fonts/{font_key} = ExtResource("{resource_id}")')
         if "material" in properties and isinstance(properties["material"], str) and properties["material"].startswith("res://"):
-            resource_id = external_resource(properties["material"], "Material")
-            lines.append(f'material = ExtResource("{resource_id}")')
+            resource_id = external_resource(properties["material"], "Material", "material", node_id)
+            if resource_id:
+                lines.append(f'material = ExtResource("{resource_id}")')
         for key in ("font_size", "outline_size"):
             if key in properties:
                 value = resolve(properties[key], tokens)
@@ -873,15 +888,21 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
             resource_id = make_style(node_id, key, style_ref)
             lines.append(f'theme_override_styles/{key} = SubResource("{resource_id}")')
         for key, icon_ref in native_skin.get("icons", {}).items():
-            resource_id = external_resource(icon_ref, "Texture2D")
-            lines.append(f'theme_override_icons/{key} = ExtResource("{resource_id}")')
+            resource_id = external_resource(icon_ref, "Texture2D", f"theme_override_icons/{key}", node_id)
+            if resource_id:
+                lines.append(f'theme_override_icons/{key} = ExtResource("{resource_id}")')
         typed_properties = {"text", "placeholder_text", "visible", "clip_contents", "show_behind_parent", "top_level", "z_as_relative", "y_sort_enabled", "use_parent_material", "clip_children", "light_mask", "visibility_layer", "texture_filter", "texture_repeat", "layout_direction", "mouse_default_cursor_shape", "tooltip_text", "focus_mode", "value", "min_value", "max_value", "step", "columns", "editable", "disabled", "autowrap_mode", "horizontal_alignment", "vertical_alignment", "show_percentage", "bbcode_enabled", "fit_content", "scroll_active", "toggle_mode", "button_pressed", "secret", "clear_button_enabled", "caret_blink", "selecting_enabled", "ticks_on_borders", "allow_greater", "allow_lesser", "ignore_texture_size", "flip_h", "flip_v", "max_length", "tick_count", "horizontal_scroll_mode", "vertical_scroll_mode", "alignment", "clip_text", "flat", "expand_icon", "icon_alignment", "text_overrun_behavior", "theme_type_variation", "accessibility_name", "accessibility_description", "auto_translate", "separation", "modulate", "self_modulate", "material", "theme", "icon", "texture", "expand_mode", "stretch_mode", "patch_margin_left", "patch_margin_top", "patch_margin_right", "patch_margin_bottom", "font", "font_size", "outline_size", "color", "font_color", "font_outline_color", "font_shadow_color"}
         if isinstance(raw_overrides, dict):
             for property_name, raw_value in raw_overrides.items():
                 property_name = str(property_name)
                 if property_name in typed_properties or not property_name or "\n" in property_name or "\r" in property_name:
                     continue
-                lines.append(f"{property_name} = {godot_literal(property_name, raw_value, external_resource, tokens)}")
+                override_diagnostic = validate_godot_override(property_name, native_type)
+                if override_diagnostic:
+                    override_diagnostic["node"] = node_id
+                    compile_errors.append(override_diagnostic)
+                    continue
+                lines.append(f"{property_name} = {godot_literal(property_name, raw_value, lambda path, resource_type, prop=property_name, nid=node_id: external_resource(path, resource_type, prop, nid), tokens)}")
         supported_styles = {"Panel", "Button", "TextureButton", "CheckBox", "LineEdit", "ProgressBar", "TabBar", "ScrollContainer"}
         if native_type in supported_styles:
             style = node.get("style", style_name(node_type))
@@ -924,10 +945,10 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
             visual.update(node["style"])
         if native_type == "Panel" and visual.get("surface_texture"):
             inset = visual.get("surface_inset", 10)
-            children.insert(0, {"id": f"{node_id}__surface", "type": "Texture", "layout": {"anchors_preset": "full_rect", "offsets": {"left": inset, "top": inset, "right": -inset, "bottom": -inset}, "mouse_filter": 2}, "properties": {"texture": visual["surface_texture"], "expand_mode": 1, "stretch_mode": 6, "self_modulate": visual.get("surface_tint", "#ffffff80")}})
+            children.insert(0, {"id": f"{node_id}__surface", "type": "Texture", "layout": {"anchors_preset": "full_rect", "offsets": {"left": inset, "top": inset, "right": -inset, "bottom": -inset}, "mouse_filter": 2}, "properties": {"texture": visual["surface_texture"], "expand_mode": 1, "stretch_mode": 6, "self_modulate": visual.get("surface_tint", "#ffffff80")}, "metadata": {"uiforge_decoration": True}})
         for child in children:
             if isinstance(child, dict):
-                emit(child, path)
+                emit(child, "." if root else node_path, False)
 
     emit(data["root"], ".", True)
     load_steps = 1 + len(subresources) + len(ext_resources)
@@ -938,7 +959,7 @@ def build_tscn(data: dict[str, Any], source: str) -> str:
         for entry in ext_resources.values()
     ]
     resource_blocks = external_lines + ([""] if external_lines else []) + sum(([block, ""] for block in subresources), [])
-    return "\n".join(lines[: gd_scene_index + 2] + resource_blocks + lines[gd_scene_index + 2 :]) + "\n"
+    return "\n".join(lines[: gd_scene_index + 2] + resource_blocks + lines[gd_scene_index + 2 :]) + "\n", compile_errors
 
 
 def tree(node: dict[str, Any]) -> dict[str, Any]:
@@ -1094,7 +1115,7 @@ def operation_duplicate(data: dict[str, Any], node_id: str, new_id: str) -> dict
 
 
 def parse_cli_flags(argv: list[str], start_index: int) -> tuple[dict[str, bool], list[str], int]:
-    flags = {"force": False, "allow_outside_project": False, "allow_unsafe": False}
+    flags = {"force": False, "allow_outside_project": False}
     unknown: list[str] = []
     index = start_index
     while index < len(argv):
@@ -1106,7 +1127,7 @@ def parse_cli_flags(argv: list[str], start_index: int) -> tuple[dict[str, bool],
             flags["allow_outside_project"] = True
             index += 1
         elif token == "--allow-unsafe":
-            flags["allow_unsafe"] = True
+            unknown.append(token)
             index += 1
         elif token.startswith("--"):
             unknown.append(token)
@@ -1262,8 +1283,10 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
         replace_check = check_replace_allowed(output, identity, revision, flags["force"])
         if not replace_check["ok"]:
             return {"success": False, "errors": replace_check["errors"]}, 1
-        scene_text = build_tscn(data, argv[1])
-        committed = write_text_atomically(output, scene_text, verify=verify_scene_syntax)
+        scene_text, compile_errors = build_tscn(data, argv[1])
+        if compile_errors:
+            return {"success": False, "committed": False, "errors": compile_errors}, 1
+        committed = write_text_atomically(output, scene_text, identity, flags["force"], verify=verify_scene_syntax)
         if not committed.get("success"):
             return {"success": False, "committed": False, "errors": committed.get("errors", [])}, 1
         return {"success": True, "committed": True, "generated_scene": output, "warnings": result["warnings"], "diagnostics": result["diagnostics"]}, 0

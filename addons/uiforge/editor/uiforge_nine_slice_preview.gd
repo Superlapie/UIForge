@@ -28,7 +28,7 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 
 func _asset_path(data: Variant) -> String:
 	if data is Dictionary:
-		var path := str(data.get("aether_asset_path", data.get("resource_path", "")))
+		var path := str(data.get("uiforge_asset_path", data.get("aether_asset_path", data.get("resource_path", ""))))
 		if path.is_empty() and data.has("files"):
 			var files: Variant = data.get("files")
 			if files is Array or files is PackedStringArray:

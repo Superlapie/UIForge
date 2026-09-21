@@ -11,7 +11,7 @@ func _run() -> void:
 	root.size = Vector2i(1800, 1120)
 	root.content_scale_size = Vector2i(1800, 1120)
 	RenderingServer.set_default_clear_color(Color("#080c10"))
-	DirAccess.make_dir_recursive_absolute("res://.aether/renders/parity")
+	DirAccess.make_dir_recursive_absolute("res://.uiforge/renders/parity")
 	var placements := {
 		"inventory": [Vector2(30, 50), 1.0],
 		"bank": [Vector2(290, 50), 1.0],
@@ -22,7 +22,7 @@ func _run() -> void:
 	}
 	for key in placements:
 		var loaded := UIForgeSerializer.load_document("res://examples/specs/%s.ui.json" % key)
-		var path := "res://.aether/renders/parity/%s_gallery.tscn" % key
+		var path := "res://.uiforge/renders/parity/%s_gallery.tscn" % key
 		if loaded.get("document") == null:
 			failures.append("load:%s" % key)
 			continue
@@ -40,7 +40,7 @@ func _run() -> void:
 		var state: String = ["normal", "hover", "pressed", "disabled"][index]
 		var data := UIForgeDocument.from_dict({"schema_version": 1, "name": "button_sample", "theme": "dark_fantasy", "viewport": {"width": 200, "height": 50}, "root": {"id": "sample", "type": "PrimaryButton", "layout": {"size": [192, 38]}, "properties": {"text": "Confirm", "font_size": "$font_size.body"}}})
 		data = UIForgeCompiler.document_for_preview_state(data, state)
-		var path := "res://.aether/renders/parity/button_%s.tscn" % state
+		var path := "res://.uiforge/renders/parity/button_%s.tscn" % state
 		var result := UIForgeCompiler.new().compile_document(data, path)
 		if not result.success:
 			failures.append("button:%s" % state)
@@ -53,10 +53,10 @@ func _run() -> void:
 		await process_frame
 	await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
-	var error := image.save_png("res://.aether/renders/parity/gallery.png")
+	var error := image.save_png("res://.uiforge/renders/parity/gallery.png")
 	if error != OK:
 		failures.append("save:%s" % error)
-	print(JSON.stringify({"success": failures.is_empty(), "errors": failures, "image": ".aether/renders/parity/gallery.png"}))
+	print(JSON.stringify({"success": failures.is_empty(), "errors": failures, "image": ".uiforge/renders/parity/gallery.png"}))
 	quit(0 if failures.is_empty() else 1)
 
 func _caption(text: String, position: Vector2) -> void:

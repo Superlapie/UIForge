@@ -11,6 +11,7 @@ run_native() {
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/atlas_workflow_runner.gd
 	"$PROJECT_DIR/scripts/ui" validate examples/specs/inventory.ui.json
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/conformance_runner.gd
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/compiler_conformance_runner.gd
 	"$PROJECT_DIR/scripts/ui" build-all examples/specs examples/scenes --force
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/scene_load_runner.gd
 	"$PROJECT_DIR/scripts/ui" render examples/specs/combat_hud.ui.json --viewport 1280x720 --output .uiforge/test/combat_hud_1280.png --force

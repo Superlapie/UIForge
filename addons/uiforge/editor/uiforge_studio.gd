@@ -847,7 +847,7 @@ func _on_preview() -> void:
 		return
 	var state := str(state_select.get_selected_metadata()) if state_select != null else "normal"
 	var preview_document := UIForgeCompiler.document_for_preview_state(document, state)
-	var preview_path := "user://aether_preview_%s.tscn" % document.document_name()
+	var preview_path := "user://uiforge_preview_%s.tscn" % document.document_name()
 	var result := UIForgeCompiler.new().compile_document(preview_document, preview_path, document_path)
 	if not result.success:
 		_show_diagnostics(result.errors)
@@ -863,7 +863,7 @@ func _on_preview() -> void:
 	preview_window.transient = true
 	preview_window.exclusive = false
 	var preview_root := packed.instantiate()
-	preview_root.set_meta("aether_preview", true)
+	preview_root.set_meta("uiforge_preview", true)
 	var design_size := Vector2(preview_document.viewport_size())
 	var viewport_data: Dictionary = preview_document.data.get("viewport", {})
 	var scale_mode := str(viewport_data.get("scale_mode", "fit"))

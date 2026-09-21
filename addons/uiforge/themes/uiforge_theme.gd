@@ -23,10 +23,43 @@ static func available_theme_names() -> Array[String]:
 	names.sort()
 	return names
 
+static func is_valid_theme_identifier(theme_name: String) -> bool:
+	var normalized := str(theme_name).strip_edges()
+	if normalized.is_empty() or normalized != theme_name:
+		return false
+	if "/" in normalized or "\\" in normalized or ".." in normalized or "." in normalized:
+		return false
+	for ch in normalized:
+		if ord(ch) < 32:
+			return false
+	var pattern := RegEx.create_from_string("^[A-Za-z0-9_-]+$")
+	return pattern.search(normalized) != null
+
 static func load_named_checked(theme_name: String) -> Dictionary:
 	var normalized := str(theme_name).strip_edges()
 	if normalized.is_empty():
 		return {"theme": null, "errors": [{"severity": "error", "code": "THEME_NOT_FOUND", "message": "Document theme name is required.", "recommendation": "Set theme to one of: %s." % ", ".join(available_theme_names())}]}
+	if not is_valid_theme_identifier(normalized):
+		return {
+			"theme": null,
+			"errors": [{
+				"severity": "error",
+				"code": "THEME_NAME_INVALID",
+				"message": "Theme name '%s' is not a valid identifier." % normalized,
+				"recommendation": "Use an exact theme id from addons/uiforge/themes/*.theme.json.",
+			}],
+		}
+	var available := available_theme_names()
+	if not normalized in available:
+		return {
+			"theme": null,
+			"errors": [{
+				"severity": "error",
+				"code": "THEME_NOT_FOUND",
+				"message": "Theme '%s' was not found." % normalized,
+				"recommendation": "Choose one of: %s." % ", ".join(available),
+			}],
+		}
 	var path := "res://addons/uiforge/themes/%s.theme.json" % normalized
 	if not FileAccess.file_exists(path):
 		return {

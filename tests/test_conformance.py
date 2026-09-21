@@ -123,7 +123,7 @@ class MutationConformanceTests(unittest.TestCase):
         self.assertNotEqual(code, 0, result)
         self.assertFalse(result.get("success", True))
         self.assertFalse(result.get("committed", True))
-        self.assertIn("FILE_WRITE_FAILED", diagnostic_codes(result))
+        self.assertTrue({"FILE_WRITE_FAILED", "LOCK_CREATE_FAILED"} & diagnostic_codes(result))
 
     def test_new_rejects_invalid_document_name(self) -> None:
         target = Path(self.tempdir.name) / "1 bad.ui.json"

@@ -46,7 +46,4 @@ static func create_default(document_name: String = "untitled") -> UIForgeDocumen
 	})
 
 static func _recover_missing_source(path: String) -> void:
-	var absolute := UIForgePaths.normalize_requested(path)
-	var backup_path := "%s.uiforge_backup" % absolute
-	var pending_path := "%s.uiforge_pending" % absolute
-	UIForgeTransaction._recover_interrupted_source(absolute, backup_path, pending_path)
+	UIForgeTransaction.recover_interrupted_source_for_path(path)

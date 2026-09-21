@@ -1,0 +1,8 @@
+{
+  "fixtures": [
+    {"id": "minimal", "source": "res://tests/conformance/fixtures/minimal.ui.json"},
+    {"id": "metadata_authored", "source": "res://tests/compiler_conformance/fixtures/metadata_authored.ui.json"},
+    {"id": "godot_override_safe", "source": "res://tests/compiler_conformance/fixtures/godot_override_safe.ui.json"},
+    {"id": "foo_bar", "source": "res://tests/compiler_conformance/fixtures/foo-bar.ui.json"}
+  ]
+}

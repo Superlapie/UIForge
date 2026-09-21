@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "foo-bar",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "foo-bar_root",
+    "type": "Panel",
+    "layout": {"position": [10, 10], "size": [220, 120]},
+    "children": [
+      {
+        "id": "foo_bar_child",
+        "type": "Label",
+        "layout": {"position": [12, 12], "size": [180, 24]},
+        "properties": {"text": "foo-bar / foo_bar"}
+      }
+    ]
+  }
+}

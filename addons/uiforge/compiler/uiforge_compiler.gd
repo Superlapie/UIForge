@@ -8,6 +8,7 @@ var subresource_lines: Array[String] = []
 var ext_resources: Dictionary = {}
 var style_ids: Dictionary = {}
 var custom_components: Dictionary = {}
+var compile_errors: Array = []
 
 static func document_for_preview_state(input: UIForgeDocument, state: String) -> UIForgeDocument:
 	var result := UIForgeDocument.from_dict(input.data, input.source_path)
@@ -99,7 +100,7 @@ func compile_document(input: UIForgeDocument, output_path: String, original_sour
 	source_path = original_source if not original_source.is_empty() else input.source_path
 	var allow_outside := bool(options.get("allow_outside_project", false))
 	var force := bool(options.get("force", false))
-	var allow_unsafe := bool(options.get("allow_unsafe", false))
+	compile_errors = []
 	var path_check := UIForgePaths.validate_output(output_path, UIForgePaths.ArtifactKind.SCENE, allow_outside)
 	if not path_check.ok:
 		return {"success": false, "errors": path_check.errors}
@@ -124,14 +125,18 @@ func compile_document(input: UIForgeDocument, output_path: String, original_sour
 	var graph_errors := UIForgeGraphValidator.validate_materialized_graph(input, theme, self)
 	if not graph_errors.is_empty():
 		return {"success": false, "errors": graph_errors, "warnings": validation.get("warnings", 0), "diagnostics": validation.get("diagnostics", []) + graph_errors}
-	var source_identity := UIForgeArtifact.source_identity(source_path)
+	var source_identity := UIForgeArtifact.source_identity(source_path if not source_path.is_empty() else input.source_path)
+	if source_identity.is_empty():
+		source_identity = "inline://%s" % input.document_name()
 	var source_hash := UIForgeHash.document_revision(input)
 	var replace_check := UIForgeArtifact.check_replace_allowed(output_path, source_identity, source_hash, force)
 	if not replace_check.ok:
 		return {"success": false, "errors": replace_check.errors}
 	var root_node := _materialize_node(input.root())
 	var node_lines: Array[String] = []
-	_emit_node(root_node, ".", node_lines, true, allow_unsafe)
+	_emit_node(root_node, ".", node_lines, true)
+	if not compile_errors.is_empty():
+		return {"success": false, "committed": false, "errors": compile_errors}
 	var lines: Array[String] = []
 	lines.append_array(UIForgeArtifact.provenance_header(source_identity, source_hash))
 	lines.append("; Source: %s" % source_path)
@@ -146,9 +151,12 @@ func compile_document(input: UIForgeDocument, output_path: String, original_sour
 		lines.append("")
 	lines.append_array(node_lines)
 	var scene_text := "\n".join(lines) + "\n"
-	var committed := UIForgeTransaction.write_text_atomically(output_path, scene_text, Callable(), func(temp_path: String) -> Dictionary:
-		return UIForgeTransaction.verify_scene_syntax(temp_path)
-	)
+	var committed := UIForgeTransaction.write_text_atomically(output_path, scene_text, {
+		"source_identity": source_identity,
+		"force": force,
+		"verify": func(temp_path: String) -> Dictionary:
+			return UIForgeTransaction.verify_scene_syntax(temp_path),
+	})
 	if not committed.get("success", false):
 		return {"success": false, "committed": false, "errors": committed.get("errors", [])}
 	return {
@@ -167,7 +175,7 @@ func _materialize_node(node: Dictionary) -> Dictionary:
 		result["type"] = "Control"
 	return result
 
-func _emit_node(node: Dictionary, parent_path: String, lines: Array[String], is_root: bool = false, allow_unsafe: bool = false) -> void:
+func _emit_node(node: Dictionary, parent_path: String, lines: Array[String], is_root: bool = false) -> void:
 	var resolved := _materialize_node(node)
 	var node_id := str(resolved.get("id", "node"))
 	var node_name := String(node_id).validate_node_name()
@@ -193,18 +201,24 @@ func _emit_node(node: Dictionary, parent_path: String, lines: Array[String], is_
 	if resolved.has("metadata") and resolved.metadata is Dictionary:
 		for metadata_key in resolved.metadata:
 			var key := str(metadata_key)
-			if not UIForgeMetadata.validate_authored_key(key).is_empty():
+			if key == "uiforge_decoration":
+				lines.append("metadata/uiforge_decoration = true")
+				continue
+			var metadata_diagnostic := UIForgeMetadata.validate_authored_key(key)
+			if not metadata_diagnostic.is_empty():
+				metadata_diagnostic["node"] = node_id
+				compile_errors.append(metadata_diagnostic)
 				continue
 			lines.append("metadata/%s = %s" % [key, _variant_literal(resolved.metadata[metadata_key])])
 	_emit_layout(resolved.get("layout", {}), lines)
-	_emit_properties(resolved, native_type, node_id, lines, allow_unsafe)
+	_emit_properties(resolved, native_type, node_id, lines)
 	_emit_styles(resolved, native_type, node_id, lines)
 	if not is_root:
 		lines.append("")
 	var children := _children_for(resolved)
 	for child in children:
 		if child is Dictionary:
-			_emit_node(child, node_path, lines, false, allow_unsafe)
+			_emit_node(child, node_path, lines, false)
 
 func _children_for(node: Dictionary) -> Array:
 	var children: Array = []
@@ -337,7 +351,7 @@ func _emit_layout(layout_value: Variant, lines: Array[String]) -> void:
 	if layout.has("mouse_filter"):
 		lines.append("mouse_filter = %d" % int(layout.mouse_filter))
 
-func _emit_properties(node: Dictionary, native_type: String, node_id: String, lines: Array[String], allow_unsafe: bool = false) -> void:
+func _emit_properties(node: Dictionary, native_type: String, node_id: String, lines: Array[String]) -> void:
 	var properties: Dictionary = node.get("properties", {})
 	var title := str(properties.get("title", ""))
 	var text := str(properties.get("text", title))
@@ -414,18 +428,23 @@ func _emit_properties(node: Dictionary, native_type: String, node_id: String, li
 	if properties.has("self_modulate"):
 		lines.append("self_modulate = %s" % _color_literal(properties.self_modulate, Color.WHITE))
 	if properties.has("material") and str(properties.material).begins_with("res://"):
-		var material_id := _add_external_resource(str(properties.material), "Material")
-		lines.append("material = ExtResource(\"%s\")" % material_id)
+		var material_id := _register_external_resource(str(properties.material), "Material", "material", node_id)
+		if not material_id.is_empty():
+			lines.append("material = ExtResource(\"%s\")" % material_id)
 	if properties.has("theme") and str(properties.theme).begins_with("res://"):
-		var theme_id := _add_external_resource(str(properties.theme), "Theme")
-		lines.append("theme = ExtResource(\"%s\")" % theme_id)
+		var theme_id := _register_external_resource(str(properties.theme), "Theme", "theme", node_id)
+		if not theme_id.is_empty():
+			lines.append("theme = ExtResource(\"%s\")" % theme_id)
 	if properties.has("icon") and native_type in ["Button", "CheckBox", "TextureButton", "LinkButton"] and str(properties.icon).begins_with("res://"):
-		var resource_id := _add_external_resource(str(properties.icon), "Texture2D")
-		lines.append("icon = ExtResource(\"%s\")" % resource_id)
+		var resource_id := _register_external_resource(str(properties.icon), "Texture2D", "icon", node_id)
+		if not resource_id.is_empty():
+			lines.append("icon = ExtResource(\"%s\")" % resource_id)
 	if properties.has("texture") and native_type in ["TextureRect", "TextureButton", "NinePatchRect"] and str(properties.texture).begins_with("res://"):
-		var texture_id := _add_external_resource(str(properties.texture), "Texture2D")
+		var texture_id := _register_external_resource(str(properties.texture), "Texture2D", "texture", node_id)
 		var texture_value := "ExtResource(\"%s\")" % texture_id
-		if properties.has("texture_region"):
+		if texture_id.is_empty():
+			pass
+		elif properties.has("texture_region"):
 			var region: Array = properties.texture_region
 			var atlas_id := "AtlasTexture_%s" % _resource_id_part(node_id)
 			subresource_lines.append("[sub_resource type=\"AtlasTexture\" id=\"%s\"]" % atlas_id)
@@ -433,7 +452,8 @@ func _emit_properties(node: Dictionary, native_type: String, node_id: String, li
 			subresource_lines.append("region = Rect2(%s, %s, %s, %s)" % [_number(region[0]), _number(region[1]), _number(region[2]), _number(region[3])])
 			subresource_lines.append("filter_clip = true\n")
 			texture_value = "SubResource(\"%s\")" % atlas_id
-		lines.append("%s = %s" % ["texture_normal" if native_type == "TextureButton" else "texture", texture_value])
+		if not texture_id.is_empty():
+			lines.append("%s = %s" % ["texture_normal" if native_type == "TextureButton" else "texture", texture_value])
 	if properties.has("expand_mode") and native_type == "TextureRect":
 		lines.append("expand_mode = %d" % int(properties.expand_mode))
 	if properties.has("stretch_mode") and native_type == "TextureRect":
@@ -448,9 +468,10 @@ func _emit_properties(node: Dictionary, native_type: String, node_id: String, li
 	var font_role := "heading" if str(properties.get("font_size", "")) in ["$font_size.title", "$font_size.heading"] else "default"
 	var font_path := str(theme.resolve(properties.get("font", theme.data.get("fonts", {}).get(font_role, "")), ""))
 	if native_type in ["Label", "RichTextLabel", "Button", "CheckBox", "CheckButton", "MenuButton", "LinkButton", "LineEdit", "TextEdit"] and font_path.begins_with("res://"):
-		var font_id := _add_external_resource(font_path, "FontFile")
-		var font_theme_key := "normal_font" if native_type == "RichTextLabel" else "font"
-		lines.append("theme_override_fonts/%s = ExtResource(\"%s\")" % [font_theme_key, font_id])
+		var font_id := _register_external_resource(font_path, "FontFile", "font", node_id)
+		if not font_id.is_empty():
+			var font_theme_key := "normal_font" if native_type == "RichTextLabel" else "font"
+			lines.append("theme_override_fonts/%s = ExtResource(\"%s\")" % [font_theme_key, font_id])
 	for font_property in ["font_size", "outline_size"]:
 		if properties.has(font_property):
 			var resolved_font_size: Variant = theme.resolve(properties[font_property], properties[font_property])
@@ -466,9 +487,9 @@ func _emit_properties(node: Dictionary, native_type: String, node_id: String, li
 			if native_type == "RichTextLabel" and color_property in ["color", "font_color"]:
 				theme_color_name = "default_color"
 			lines.append("theme_override_colors/%s = %s" % [theme_color_name, _color_literal(color_value, Color.WHITE)])
-	_emit_godot_overrides(properties, native_type, lines, allow_unsafe)
+	_emit_godot_overrides(properties, native_type, node_id, lines)
 
-func _emit_godot_overrides(properties: Dictionary, native_type: String, lines: Array[String], allow_unsafe: bool = false) -> void:
+func _emit_godot_overrides(properties: Dictionary, native_type: String, node_id: String, lines: Array[String]) -> void:
 	var overrides: Variant = properties.get("godot_overrides", {})
 	if not overrides is Dictionary:
 		return
@@ -504,49 +525,65 @@ func _emit_godot_overrides(properties: Dictionary, native_type: String, lines: A
 		var name := str(property_name)
 		if name.is_empty() or typed_properties.has(name):
 			continue
-		if not UIForgePropertyGuard.validate_override(name, native_type, allow_unsafe).is_empty():
+		var override_diagnostic := UIForgePropertyGuard.validate_override(name, native_type, false)
+		if not override_diagnostic.is_empty():
+			override_diagnostic["node"] = node_id
+			compile_errors.append(override_diagnostic)
 			continue
-		var literal := _godot_override_literal(name, overrides[property_name], allow_unsafe)
-		if not literal.is_empty():
+		var literal := _godot_override_literal(name, overrides[property_name], node_id)
+		if literal == null:
+			continue
+		if not str(literal).is_empty():
 			lines.append("%s = %s" % [name, literal])
 
-func _godot_override_literal(property_name: String, value: Variant, allow_unsafe: bool = false) -> String:
+func _godot_override_literal(property_name: String, value: Variant, node_id: String) -> Variant:
 	if value is Dictionary:
 		var tagged_type := str(value.get("$type", ""))
 		if not tagged_type.is_empty():
-			return _typed_godot_literal(tagged_type, value.get("value", value.get("values", [])), property_name, allow_unsafe)
+			return _typed_godot_literal(tagged_type, value.get("value", value.get("values", [])), property_name, node_id)
 		var resource_path := str(value.get("$resource", value.get("resource", "")))
 		if not resource_path.is_empty() and resource_path.begins_with("res://"):
 			var resource_type := UIForgeResourceGuard.infer_type(property_name, "")
-			if value is Dictionary and value.has("type"):
+			if value.has("type"):
 				resource_type = UIForgeResourceGuard.canonical_type(str(value.get("type", resource_type)))
-			if not UIForgeResourceGuard.validate_external(resource_path, resource_type, property_name, allow_unsafe).is_empty():
-				return ""
-			var resource_id := _add_external_resource(resource_path, resource_type)
+			var resource_diagnostic := UIForgeResourceGuard.validate_external(resource_path, resource_type, property_name, node_id)
+			if not resource_diagnostic.is_empty():
+				compile_errors.append(resource_diagnostic)
+				return null
+			var resource_id := _register_external_resource(resource_path, resource_type, property_name, node_id)
+			if resource_id.is_empty():
+				return null
 			return "ExtResource(\"%s\")" % resource_id
 		var node_path := str(value.get("$node_path", ""))
 		if not node_path.is_empty():
 			return "NodePath(%s)" % _quote(node_path)
 		var entries: Array[String] = []
 		for key in value:
-			entries.append("%s: %s" % [_quote(str(key)), _godot_override_literal(property_name, value[key], allow_unsafe)])
+			var nested := _godot_override_literal(property_name, value[key], node_id)
+			if nested == null:
+				return null
+			entries.append("%s: %s" % [_quote(str(key)), nested])
 		return "{%s}" % ", ".join(entries)
 	if value is String:
 		var string_value := str(value)
 		if string_value.begins_with("res://") and _looks_like_resource_property(property_name):
 			var inferred_type := UIForgeResourceGuard.infer_type(property_name, "")
-			if not UIForgeResourceGuard.validate_external(string_value, inferred_type, property_name, allow_unsafe).is_empty():
-				return _quote(string_value)
-			var inferred_id := _add_external_resource(string_value, inferred_type)
+			var inferred_diagnostic := UIForgeResourceGuard.validate_external(string_value, inferred_type, property_name, node_id)
+			if not inferred_diagnostic.is_empty():
+				compile_errors.append(inferred_diagnostic)
+				return null
+			var inferred_id := _register_external_resource(string_value, inferred_type, property_name, node_id)
+			if inferred_id.is_empty():
+				return null
 			return "ExtResource(\"%s\")" % inferred_id
 		if property_name.to_lower().contains("color"):
 			return _color_literal(string_value, Color.WHITE)
 		return _quote(string_value)
 	if value is Array:
-		return _array_literal(value, property_name, allow_unsafe)
+		return _array_literal(value, property_name, node_id)
 	return _variant_literal(value)
 
-func _typed_godot_literal(type_name: String, payload: Variant, property_name: String, allow_unsafe: bool = false) -> String:
+func _typed_godot_literal(type_name: String, payload: Variant, property_name: String, node_id: String) -> String:
 	var values: Array = payload if payload is Array else []
 	match type_name:
 		"Color":
@@ -581,7 +618,7 @@ func _typed_godot_literal(type_name: String, payload: Variant, property_name: St
 		"Transform3D":
 			if values.size() >= 12:
 				var basis_values := values.slice(0, 9)
-				return "Transform3D(%s, Vector3(%s, %s, %s))" % [_typed_godot_literal("Basis", basis_values, property_name, allow_unsafe), _number(values[9]), _number(values[10]), _number(values[11])]
+				return "Transform3D(%s, Vector3(%s, %s, %s))" % [_typed_godot_literal("Basis", basis_values, property_name, node_id), _number(values[9]), _number(values[10]), _number(values[11])]
 		"Array[NodePath]":
 			var node_paths: Array[String] = []
 			for entry in values:
@@ -589,13 +626,16 @@ func _typed_godot_literal(type_name: String, payload: Variant, property_name: St
 				node_paths.append("NodePath(%s)" % _quote(path))
 			return "[%s]" % ", ".join(node_paths)
 		"PackedByteArray", "PackedInt32Array", "PackedInt64Array", "PackedFloat32Array", "PackedFloat64Array", "PackedStringArray", "PackedVector2Array", "PackedVector3Array", "PackedColorArray":
-			return "%s(%s)" % [type_name, _array_literal(values, property_name, allow_unsafe)]
-	return _array_literal(values, property_name, allow_unsafe) if payload is Array else _variant_literal(payload)
+			return "%s(%s)" % [type_name, _array_literal(values, property_name, node_id)]
+	return _array_literal(values, property_name, node_id) if payload is Array else _variant_literal(payload)
 
-func _array_literal(values: Array, property_name: String, allow_unsafe: bool = false) -> String:
+func _array_literal(values: Array, property_name: String, node_id: String) -> String:
 	var entries: Array[String] = []
 	for entry in values:
-		entries.append(_godot_override_literal(property_name, entry, allow_unsafe))
+		var nested := _godot_override_literal(property_name, entry, node_id)
+		if nested == null:
+			return ""
+		entries.append(str(nested))
 	return "[%s]" % ", ".join(entries)
 
 func _looks_like_resource_property(property_name: String) -> bool:
@@ -628,8 +668,9 @@ func _emit_styles(node: Dictionary, native_type: String, node_id: String, lines:
 		var skin_style := _make_style(node_id, str(key), str(native_skin.styles[key]), {})
 		lines.append("theme_override_styles/%s = SubResource(\"%s\")" % [key, skin_style])
 	for key in native_skin.get("icons", {}):
-		var skin_icon := _add_external_resource(str(native_skin.icons[key]), "Texture2D")
-		lines.append("theme_override_icons/%s = ExtResource(\"%s\")" % [key, skin_icon])
+		var skin_icon := _register_external_resource(str(native_skin.icons[key]), "Texture2D", "theme_override_icons/%s" % key, node_id)
+		if not skin_icon.is_empty():
+			lines.append("theme_override_icons/%s = ExtResource(\"%s\")" % [key, skin_icon])
 	if native_type in ["HSeparator", "VSeparator"]:
 		var separator_id := _make_style(node_id, "normal", "separator", {})
 		lines.append("theme_override_styles/separator = SubResource(\"%s\")" % separator_id)
@@ -705,7 +746,9 @@ func _make_style(node_id: String, state: String, style_name: String, override: D
 	var id := "StyleBox_%s_%s" % [_resource_id_part(node_id), _resource_id_part(state)]
 	style_ids[cache_key] = id
 	if style.has("texture") and str(style.texture).begins_with("res://"):
-		var texture_id := _add_external_resource(str(style.texture), "Texture2D")
+		var texture_id := _register_external_resource(str(style.texture), "Texture2D", "style.texture", node_id)
+		if texture_id.is_empty():
+			return id
 		var texture_block := "[sub_resource type=\"StyleBoxTexture\" id=\"%s\"]\ntexture = ExtResource(\"%s\")" % [id, texture_id]
 		for margin in ["left", "top", "right", "bottom"]:
 			if style.has("texture_margin_%s" % margin):
@@ -744,7 +787,11 @@ func _make_style(node_id: String, state: String, style_name: String, override: D
 	subresource_lines.append(block.trim_suffix("\n"))
 	return id
 
-func _add_external_resource(path: String, type_name: String) -> String:
+func _register_external_resource(path: String, type_name: String, property_name: String, node_id: String) -> String:
+	var diagnostic := UIForgeResourceGuard.validate_external(path, type_name, property_name, node_id)
+	if not diagnostic.is_empty():
+		compile_errors.append(diagnostic)
+		return ""
 	var canonical_type := UIForgeResourceGuard.canonical_type(type_name)
 	var cache_key := UIForgeResourceGuard.cache_key(path, canonical_type)
 	if ext_resources.has(cache_key):

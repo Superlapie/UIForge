@@ -19,8 +19,8 @@ func _run() -> void:
 	_assert(not placed.is_empty(), "canvas_asset_drop_creates_node")
 	_assert(str(placed.get("properties", {}).get("texture", "")) == "res://examples/assets/uiforge_gem.svg", "placed_asset_reference_is_stable")
 	studio.canvas.select_node("")
-	_assert(studio.canvas._can_drop_data(Vector2.ZERO, {"aether_asset_path": "res://examples/assets/uiforge_gem.svg"}), "canvas_accepts_asset_drag_payload")
-	studio.canvas._drop_data(Vector2(120, 96), {"aether_asset_path": "res://examples/assets/uiforge_gem.svg"})
+	_assert(studio.canvas._can_drop_data(Vector2.ZERO, {"uiforge_asset_path": "res://examples/assets/uiforge_gem.svg"}), "canvas_accepts_asset_drag_payload")
+	studio.canvas._drop_data(Vector2(120, 96), {"uiforge_asset_path": "res://examples/assets/uiforge_gem.svg"})
 	_assert(not document.find_node("texture_uiforge_gem_2").is_empty(), "canvas_drop_payload_places_asset")
 	studio.canvas.select_node("texture_uiforge_gem")
 	_assert(studio.property_inspector.field_controls.size() > 40, "inspector_exposes_native_godot_properties")
@@ -41,7 +41,7 @@ func _run() -> void:
 	var nine_slice := studio.find_child("Nine-slice", true, false) as UIForgeNineSliceEditor
 	_assert(nine_slice != null, "nine_slice_editor_is_available")
 	if nine_slice != null:
-		nine_slice._drop_data(Vector2.ZERO, {"aether_asset_path": "res://examples/assets/uiforge_gem.svg"})
+		nine_slice._drop_data(Vector2.ZERO, {"uiforge_asset_path": "res://examples/assets/uiforge_gem.svg"})
 		nine_slice.style_name_field.text = "ornate_gem_frame"
 		nine_slice._save_style()
 		_assert(document.data.get("theme_overrides", {}).get("styles", {}).get("ornate_gem_frame", {}).get("texture", "") == "res://examples/assets/uiforge_gem.svg", "nine_slice_style_saved")

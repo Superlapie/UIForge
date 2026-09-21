@@ -23,7 +23,7 @@ func _run() -> void:
 	studio.canvas.zoom_to_fit()
 	await process_frame
 	await RenderingServer.frame_post_draw
-	DirAccess.make_dir_recursive_absolute("res://.aether/renders/atlas")
-	var result := root.get_texture().get_image().save_png("res://.aether/renders/atlas/studio.png")
-	print(JSON.stringify({"success": result == OK and studio.canvas.native_preview_valid, "image": ".aether/renders/atlas/studio.png"}))
+	DirAccess.make_dir_recursive_absolute("res://.uiforge/renders/atlas")
+	var result := root.get_texture().get_image().save_png("res://.uiforge/renders/atlas/studio.png")
+	print(JSON.stringify({"success": result == OK and studio.canvas.native_preview_valid, "image": ".uiforge/renders/atlas/studio.png"}))
 	quit(0 if result == OK and studio.canvas.native_preview_valid else 1)

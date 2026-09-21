@@ -18,6 +18,17 @@ jobs:
       - name: Run portable test suite
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
 
+  portable-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run filesystem/path portable tests
+        shell: bash
+        run: python3 -m unittest tests.test_batch2_1_security.Batch21SecurityTests.test_windows_absolute_paths_are_recognized tests.test_batch2_1_security.Batch21SecurityTests.test_allow_unsafe_is_rejected tests.test_batch2_1_security.Batch21SecurityTests.test_same_source_rebuild_after_source_edit_succeeds_without_force -v
+
   godot:
     runs-on: ubuntu-latest
     steps:

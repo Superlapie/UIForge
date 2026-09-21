@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "name": "godot_override_safe",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "override_root",
+    "type": "Panel",
+    "layout": {"position": [20, 20], "size": [300, 180]},
+    "properties": {
+      "godot_overrides": {
+        "mouse_filter": 0,
+        "theme_override_constants/separation": 8
+      }
+    },
+    "children": []
+  }
+}

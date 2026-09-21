@@ -10,17 +10,17 @@ const EXTENSIONS: Dictionary = {
 }
 
 static func workspace_root() -> String:
-	return ProjectSettings.globalize_path("res://").trim_suffix("/")
+	return ProjectSettings.globalize_path("res://").replace("\\", "/").trim_suffix("/")
 
 static func normalize_requested(path: String) -> String:
 	if path.is_empty():
 		return ""
 	var trimmed := path.strip_edges()
 	if trimmed.begins_with("res://") or trimmed.begins_with("user://"):
-		return ProjectSettings.globalize_path(trimmed)
-	if not trimmed.begins_with("/"):
-		return ProjectSettings.globalize_path("res://%s" % trimmed.replace("\\", "/"))
-	return _canonical_absolute(trimmed)
+		return ProjectSettings.globalize_path(trimmed).replace("\\", "/")
+	if trimmed.is_absolute_path():
+		return _godot_absolute(trimmed)
+	return ProjectSettings.globalize_path("res://%s" % trimmed.replace("\\", "/")).replace("\\", "/")
 
 static func validate_output(path: String, kind: ArtifactKind, allow_outside_project: bool) -> Dictionary:
 	var errors: Array = []
@@ -58,36 +58,55 @@ static func validate_source_read(path: String) -> Dictionary:
 		return {"ok": true, "normalized": checked.normalized, "project_relative": checked.project_relative, "errors": []}
 	return checked
 
-static func _canonical_absolute(path: String) -> String:
-	var value := path.strip_edges().replace("\\", "/")
-	var absolute := value.begins_with("/")
-	var parts: Array[String] = []
-	for part in value.split("/"):
-		if part.is_empty() or part == ".":
-			continue
-		if part == "..":
-			if not parts.is_empty():
-				parts.pop_back()
-			continue
-		parts.append(part)
-	var joined := "/".join(parts)
-	if absolute:
-		return "/%s" % joined
-	return joined
+static func resolve_real_path(absolute: String) -> String:
+	var path := _godot_absolute(absolute)
+	if path.is_empty():
+		return path
+	var cursor := path
+	var suffix := ""
+	while not cursor.is_empty() and not DirAccess.dir_exists_absolute(cursor) and not FileAccess.file_exists(cursor):
+		var base := cursor.get_file()
+		if base.is_empty():
+			break
+		suffix = "/%s%s" % [base, suffix]
+		cursor = cursor.get_base_dir()
+	if cursor.is_empty():
+		return path
+	var resolved_base := _realpath_directory(cursor)
+	if suffix.is_empty():
+		return resolved_base
+	return ("%s%s" % [resolved_base, suffix]).replace("\\", "/").simplify_path()
+
+static func _realpath_directory(dir_path: String) -> String:
+	var normalized := _godot_absolute(dir_path)
+	if OS.get_name() == "Windows":
+		return normalized.simplify_path()
+	var output: Array = []
+	var exit_code := OS.execute("realpath", ["-m", normalized], output, true, false)
+	if exit_code == 0 and not output.is_empty():
+		return str(output[0]).strip_edges().replace("\\", "/")
+	return normalized.simplify_path()
+
+static func _godot_absolute(path: String) -> String:
+	return path.replace("\\", "/").simplify_path()
 
 static func _is_within_workspace(absolute: String, workspace: String) -> bool:
-	var normalized := _canonical_absolute(absolute)
-	var root := _canonical_absolute(workspace)
+	var normalized := resolve_real_path(absolute).to_lower() if OS.get_name() == "Windows" else resolve_real_path(absolute)
+	var root := resolve_real_path(workspace).to_lower() if OS.get_name() == "Windows" else resolve_real_path(workspace)
 	if normalized == root:
 		return true
 	return normalized.begins_with("%s/" % root)
 
 static func _project_relative(absolute: String) -> String:
 	var project := workspace_root()
-	var normalized := _canonical_absolute(absolute)
-	if normalized.begins_with("%s/" % project):
-		var relative := normalized.substr(project.length() + 1)
+	var normalized := resolve_real_path(absolute)
+	var project_resolved := resolve_real_path(project)
+	if OS.get_name() == "Windows":
+		normalized = normalized.to_lower()
+		project_resolved = project_resolved.to_lower()
+	if normalized.begins_with("%s/" % project_resolved):
+		var relative := normalized.substr(project_resolved.length() + 1)
 		return "res://%s" % relative
-	if normalized == project:
+	if normalized == project_resolved:
 		return "res://"
 	return normalized
