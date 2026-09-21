@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "name": "foo_bar_pair",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "foo-bar_root",
+    "type": "Panel",
+    "layout": {"position": [10, 10], "size": [320, 160]},
+    "children": [
+      {
+        "id": "foo_bar_child",
+        "type": "Label",
+        "layout": {"position": [12, 12], "size": [180, 24]},
+        "properties": {"text": "foo-bar vs foo_bar"}
+      },
+      {
+        "id": "foo__bar_child",
+        "type": "Label",
+        "layout": {"position": [12, 44], "size": [180, 24]},
+        "properties": {"text": "double underscore"}
+      }
+    ]
+  }
+}

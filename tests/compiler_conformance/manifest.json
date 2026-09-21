@@ -1,8 +1,21 @@
 {
   "fixtures": [
     {"id": "minimal", "source": "res://tests/conformance/fixtures/minimal.ui.json"},
+    {"id": "hierarchy", "source": "res://tests/compiler_conformance/fixtures/hierarchy.ui.json"},
+    {"id": "sibling_order", "source": "res://tests/compiler_conformance/fixtures/sibling_order.ui.json"},
+    {"id": "custom_component", "source": "res://tests/compiler_conformance/fixtures/custom_component.ui.json"},
+    {"id": "nested_custom_component", "source": "res://tests/compiler_conformance/fixtures/nested_custom_component.ui.json"},
+    {"id": "text_button_props", "source": "res://tests/compiler_conformance/fixtures/text_button_props.ui.json"},
+    {"id": "numeric_slider", "source": "res://tests/compiler_conformance/fixtures/numeric_slider.ui.json"},
+    {"id": "layout_anchors", "source": "res://tests/compiler_conformance/fixtures/layout_anchors.ui.json"},
     {"id": "metadata_authored", "source": "res://tests/compiler_conformance/fixtures/metadata_authored.ui.json"},
+    {"id": "action_binding_effects", "source": "res://tests/compiler_conformance/fixtures/action_binding_effects.ui.json"},
+    {"id": "semantic_texture", "source": "res://tests/compiler_conformance/fixtures/semantic_texture.ui.json"},
+    {"id": "theme_overrides", "source": "res://tests/compiler_conformance/fixtures/theme_overrides.ui.json"},
     {"id": "godot_override_safe", "source": "res://tests/compiler_conformance/fixtures/godot_override_safe.ui.json"},
-    {"id": "foo_bar", "source": "res://tests/compiler_conformance/fixtures/foo-bar.ui.json"}
+    {"id": "decorations", "source": "res://tests/compiler_conformance/fixtures/decorations.ui.json"},
+    {"id": "item_grid", "source": "res://tests/compiler_conformance/fixtures/item_grid.ui.json"},
+    {"id": "foo_bar", "source": "res://tests/compiler_conformance/fixtures/foo-bar.ui.json"},
+    {"id": "foo_bar_pair", "source": "res://tests/compiler_conformance/fixtures/foo_bar_pair.ui.json"}
   ]
 }

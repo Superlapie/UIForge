@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "name": "numeric_slider",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "numeric_root",
+    "type": "Panel",
+    "layout": {"size": [420, 220]},
+    "children": [
+      {
+        "id": "amount_slider",
+        "type": "HSlider",
+        "layout": {"position": [20, 24], "size": [260, 32]},
+        "properties": {"value": 35, "min_value": 0, "max_value": 100, "step": 5}
+      },
+      {
+        "id": "progress_display",
+        "type": "ProgressDisplay",
+        "layout": {"position": [20, 72], "size": [260, 24]},
+        "properties": {"value": 62, "min_value": 0, "max_value": 100}
+      }
+    ]
+  }
+}

@@ -17,7 +17,7 @@
 [ext_resource type="Texture2D" path="res://examples/assets/ui/slot_frame.svg" id="Texture2D_8"]
 [ext_resource type="FontFile" path="res://examples/assets/fonts/SourceSans3-Regular.otf" id="FontFile_9"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__window_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f77696e646f77_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -30,7 +30,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__window_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f77696e646f77_id_686f766572"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -43,7 +43,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__window_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f77696e646f77_id_70726573736564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -56,7 +56,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__window_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f77696e646f77_id_64697361626c6564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -69,7 +69,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__close_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f636c6f7365_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_4")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -80,7 +80,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__close_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f636c6f7365_id_686f766572"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -91,7 +91,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__close_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f636c6f7365_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -102,7 +102,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__close_focus"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f636c6f7365_id_666f637573"]
 texture = ExtResource("Texture2D_7")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -113,7 +113,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__close_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f636c6f7365_id_64697361626c6564"]
 texture = ExtResource("Texture2D_4")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -125,7 +125,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_equipment__rule_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_65717569706d656e745f72756c65_id_6e6f726d616c"]
 bg_color = Color(0.501961, 0.439216, 0.298039, 0.333333)
 border_width_left = 0
 border_width_top = 0
@@ -141,7 +141,7 @@ content_margin_top = 0.0000
 content_margin_right = 0.0000
 content_margin_bottom = 1.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__head_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f68656164_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -154,76 +154,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__head_hover"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.823529, 0.917647, 1.000000, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__head_pressed"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__head_disabled"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.435294, 0.478431, 0.509804, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__head_selected"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__chest_normal"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__chest_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f68656164_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -237,7 +168,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__chest_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f68656164_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -251,7 +182,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__chest_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f68656164_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -265,7 +196,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__chest_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f68656164_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -279,7 +210,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__legs_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6368657374_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -292,7 +223,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__legs_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6368657374_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -306,7 +237,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__legs_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6368657374_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -320,7 +251,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__legs_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6368657374_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -334,7 +265,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__legs_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6368657374_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -348,7 +279,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__main__hand_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6c656773_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -361,7 +292,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__main__hand_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6c656773_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -375,7 +306,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__main__hand_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6c656773_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -389,7 +320,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__main__hand_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6c656773_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -403,7 +334,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__main__hand_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6c656773_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -417,7 +348,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__off__hand_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6d61696e5f68616e64_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -430,7 +361,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__off__hand_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6d61696e5f68616e64_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -444,7 +375,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__off__hand_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6d61696e5f68616e64_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -458,7 +389,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__off__hand_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6d61696e5f68616e64_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -472,7 +403,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__off__hand_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6d61696e5f68616e64_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -486,7 +417,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__feet_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6f66665f68616e64_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -499,7 +430,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__feet_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6f66665f68616e64_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -513,7 +444,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__feet_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6f66665f68616e64_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -527,7 +458,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__feet_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6f66665f68616e64_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -541,7 +472,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__feet_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f6f66665f68616e64_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -555,7 +486,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__ring_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f66656574_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -568,7 +499,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__ring_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f66656574_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -582,7 +513,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__ring_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f66656574_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -596,7 +527,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__ring_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f66656574_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -610,7 +541,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__ring_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f66656574_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -624,7 +555,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__amulet_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f72696e67_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -637,7 +568,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__amulet_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f72696e67_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -651,7 +582,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__amulet_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f72696e67_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -665,7 +596,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__amulet_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f72696e67_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -679,7 +610,76 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_equipment__amulet_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f72696e67_id_73656c6563746564"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f616d756c6574_id_6e6f726d616c"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f616d756c6574_id_686f766572"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.823529, 0.917647, 1.000000, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f616d756c6574_id_70726573736564"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f616d756c6574_id_64697361626c6564"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.435294, 0.478431, 0.509804, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_65717569706d656e745f616d756c6574_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -701,11 +701,12 @@ offset_left = 600.0000
 offset_top = 120.0000
 offset_right = 956.0000
 offset_bottom = 606.0000
-theme_override_styles/panel = SubResource("StyleBox_equipment__window_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f77696e646f77_id_6e6f726d616c")
 [node name="equipment_window__surface" type="TextureRect" parent="."]
 metadata/uiforge_id = "equipment_window__surface"
 metadata/uiforge_type = "Texture"
 metadata/uiforge_generated = true
+metadata/uiforge_decoration = true
 offset_left = 11.0000
 offset_top = 11.0000
 offset_right = -11.0000
@@ -746,11 +747,11 @@ offset_bottom = 42.0000
 text = "×"
 theme_override_fonts/font = ExtResource("FontFile_3")
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBox_equipment__close_normal")
-theme_override_styles/hover = SubResource("StyleBox_equipment__close_hover")
-theme_override_styles/pressed = SubResource("StyleBox_equipment__close_pressed")
-theme_override_styles/focus = SubResource("StyleBox_equipment__close_focus")
-theme_override_styles/disabled = SubResource("StyleBox_equipment__close_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_65717569706d656e745f636c6f7365_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_65717569706d656e745f636c6f7365_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_65717569706d656e745f636c6f7365_id_70726573736564")
+theme_override_styles/focus = SubResource("StyleBox_id_65717569706d656e745f636c6f7365_id_666f637573")
+theme_override_styles/disabled = SubResource("StyleBox_id_65717569706d656e745f636c6f7365_id_64697361626c6564")
 
 [node name="equipment_rule" type="HSeparator" parent="."]
 metadata/uiforge_id = "equipment_rule"
@@ -760,7 +761,7 @@ offset_left = 16.0000
 offset_top = 46.0000
 offset_right = 340.0000
 offset_bottom = 47.0000
-theme_override_styles/separator = SubResource("StyleBox_equipment__rule_normal")
+theme_override_styles/separator = SubResource("StyleBox_id_65717569706d656e745f72756c65_id_6e6f726d616c")
 
 [node name="equipment_stage" type="Control" parent="."]
 metadata/uiforge_id = "equipment_stage"
@@ -784,7 +785,7 @@ offset_top = 64.0000
 offset_right = 208.0000
 offset_bottom = 124.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__head_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f68656164_id_6e6f726d616c")
 
 [node name="equipment_head_icon_label" type="Label" parent="equipment_head"]
 metadata/uiforge_id = "equipment_head_icon_label"
@@ -813,7 +814,7 @@ offset_top = 148.0000
 offset_right = 208.0000
 offset_bottom = 208.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__chest_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f6368657374_id_6e6f726d616c")
 
 [node name="equipment_chest_icon_label" type="Label" parent="equipment_chest"]
 metadata/uiforge_id = "equipment_chest_icon_label"
@@ -842,7 +843,7 @@ offset_top = 232.0000
 offset_right = 208.0000
 offset_bottom = 292.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__legs_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f6c656773_id_6e6f726d616c")
 
 [node name="equipment_legs_icon_label" type="Label" parent="equipment_legs"]
 metadata/uiforge_id = "equipment_legs_icon_label"
@@ -871,7 +872,7 @@ offset_top = 148.0000
 offset_right = 106.0000
 offset_bottom = 208.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__main__hand_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f6d61696e5f68616e64_id_6e6f726d616c")
 
 [node name="equipment_main_hand_icon_label" type="Label" parent="equipment_main_hand"]
 metadata/uiforge_id = "equipment_main_hand_icon_label"
@@ -900,7 +901,7 @@ offset_top = 148.0000
 offset_right = 310.0000
 offset_bottom = 208.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__off__hand_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f6f66665f68616e64_id_6e6f726d616c")
 
 [node name="equipment_off_hand_icon_label" type="Label" parent="equipment_off_hand"]
 metadata/uiforge_id = "equipment_off_hand_icon_label"
@@ -929,7 +930,7 @@ offset_top = 316.0000
 offset_right = 208.0000
 offset_bottom = 376.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__feet_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f66656574_id_6e6f726d616c")
 
 [node name="equipment_feet_icon_label" type="Label" parent="equipment_feet"]
 metadata/uiforge_id = "equipment_feet_icon_label"
@@ -958,7 +959,7 @@ offset_top = 316.0000
 offset_right = 106.0000
 offset_bottom = 376.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__ring_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f72696e67_id_6e6f726d616c")
 
 [node name="equipment_ring_icon_label" type="Label" parent="equipment_ring"]
 metadata/uiforge_id = "equipment_ring_icon_label"
@@ -987,7 +988,7 @@ offset_top = 64.0000
 offset_right = 310.0000
 offset_bottom = 124.0000
 custom_minimum_size = Vector2(60.0000, 60.0000)
-theme_override_styles/panel = SubResource("StyleBox_equipment__amulet_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_65717569706d656e745f616d756c6574_id_6e6f726d616c")
 
 [node name="equipment_amulet_icon_label" type="Label" parent="equipment_amulet"]
 metadata/uiforge_id = "equipment_amulet_icon_label"

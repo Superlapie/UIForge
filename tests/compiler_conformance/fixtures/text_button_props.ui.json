@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "text_button_props",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "text_button_root",
+    "type": "Panel",
+    "layout": {"size": [420, 220]},
+    "children": [
+      {
+        "id": "title_label",
+        "type": "Label",
+        "layout": {"position": [16, 16], "size": [220, 32]},
+        "properties": {"text": "Title"}
+      },
+      {
+        "id": "apply_button",
+        "type": "PrimaryButton",
+        "layout": {"position": [16, 64], "size": [180, 40]},
+        "properties": {"text": "Apply", "disabled": false, "toggle_mode": true},
+        "action": "demo.apply"
+      }
+    ]
+  }
+}

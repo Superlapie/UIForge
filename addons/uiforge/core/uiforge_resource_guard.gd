@@ -51,7 +51,7 @@ static func validate_external(path: String, requested_type: String, property_nam
 static func types_compatible(actual: String, requested: String) -> bool:
 	if actual == requested:
 		return true
-	if ClassDB.is_parent_class(actual, requested) or ClassDB.is_parent_class(requested, actual):
+	if ClassDB.is_parent_class(actual, requested):
 		return true
 	var allowed: Variant = FALLBACK_COMPATIBILITY.get(requested, [])
 	if actual in allowed:

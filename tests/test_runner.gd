@@ -17,12 +17,19 @@ func _run() -> void:
 	_test_transactional_cli_mutations()
 	_test_canvas_drag_release()
 	_test_material_system()
+	_test_resource_guard_direction()
 	if failures.is_empty():
-		print(JSON.stringify({"success": true, "passed": 11, "failed": 0}))
+		print(JSON.stringify({"success": true, "passed": 12, "failed": 0}))
 		quit(0)
 	else:
-		print(JSON.stringify({"success": false, "passed": 11 - failures.size(), "failed": failures.size(), "failures": failures}, "\t"))
+		print(JSON.stringify({"success": false, "passed": 12 - failures.size(), "failed": failures.size(), "failures": failures}, "\t"))
 		quit(1)
+
+func _test_resource_guard_direction() -> void:
+	_assert(UIForgeResourceGuard.types_compatible("ShaderMaterial", "Material"), "shader_material_allows_material_request")
+	_assert(not UIForgeResourceGuard.types_compatible("Material", "ShaderMaterial"), "material_rejects_shader_material_request")
+	_assert(UIForgeResourceGuard.types_compatible("CompressedTexture2D", "Texture2D"), "compressed_texture_allows_texture2d_request")
+	_assert(not UIForgeResourceGuard.types_compatible("Texture2D", "CompressedTexture2D"), "texture2d_rejects_compressed_request")
 
 func _test_material_system() -> void:
 	var loaded := UIForgeSerializer.load_document("res://examples/specs/bank.ui.json")

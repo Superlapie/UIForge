@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "name": "action_binding_effects",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "action_root",
+    "type": "Panel",
+    "layout": {"size": [420, 220]},
+    "children": [
+      {
+        "id": "bound_label",
+        "type": "Label",
+        "layout": {"position": [16, 16], "size": [220, 28]},
+        "properties": {"text": "Bound"},
+        "binding": "demo.value"
+      },
+      {
+        "id": "effect_button",
+        "type": "PrimaryButton",
+        "layout": {"position": [16, 56], "size": [180, 40]},
+        "properties": {"text": "Go"},
+        "action": "demo.go",
+        "transitions": {"hover": {"preset": "hover", "duration": 0.1}},
+        "effects": ["hover_highlight"]
+      }
+    ]
+  }
+}

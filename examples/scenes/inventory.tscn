@@ -18,7 +18,7 @@
 [ext_resource type="FontFile" path="res://examples/assets/fonts/SourceSans3-Regular.otf" id="FontFile_9"]
 [ext_resource type="Texture2D" path="res://examples/assets/ui/icons/coin.svg" id="Texture2D_10"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__window_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f77696e646f77_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -31,7 +31,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__window_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f77696e646f77_id_686f766572"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -44,7 +44,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__window_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f77696e646f77_id_70726573736564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -57,7 +57,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__window_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f77696e646f77_id_64697361626c6564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -70,7 +70,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__close_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f636c6f7365_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_4")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -81,7 +81,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__close_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f636c6f7365_id_686f766572"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -92,7 +92,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__close_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f636c6f7365_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -103,7 +103,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__close_focus"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f636c6f7365_id_666f637573"]
 texture = ExtResource("Texture2D_7")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -114,7 +114,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__close_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f636c6f7365_id_64697361626c6564"]
 texture = ExtResource("Texture2D_4")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -126,7 +126,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_inventory__header__rule_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_696e76656e746f72795f6865616465725f72756c65_id_6e6f726d616c"]
 bg_color = Color(0.501961, 0.439216, 0.298039, 0.333333)
 border_width_left = 0
 border_width_top = 0
@@ -142,7 +142,7 @@ content_margin_top = 0.0000
 content_margin_right = 0.0000
 content_margin_bottom = 1.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_inventory__grid__panel_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_696e76656e746f72795f677269645f70616e656c_id_6e6f726d616c"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -158,7 +158,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_inventory__grid__panel_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_696e76656e746f72795f677269645f70616e656c_id_686f766572"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -174,7 +174,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_inventory__grid__panel_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_696e76656e746f72795f677269645f70616e656c_id_70726573736564"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -190,7 +190,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_inventory__grid__panel_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_696e76656e746f72795f677269645f70616e656c_id_64697361626c6564"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -206,7 +206,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__01_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3031_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -219,76 +219,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__01_hover"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.823529, 0.917647, 1.000000, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__01_pressed"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__01_disabled"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.435294, 0.478431, 0.509804, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__01_selected"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__02_normal"]
-texture = ExtResource("Texture2D_8")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__02_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3031_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -302,7 +233,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__02_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3031_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -316,7 +247,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__02_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3031_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -330,7 +261,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__02_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3031_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -344,7 +275,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__03_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3032_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -357,7 +288,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__03_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3032_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -371,7 +302,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__03_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3032_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -385,7 +316,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__03_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3032_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -399,7 +330,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__03_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3032_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -413,7 +344,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__04_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3033_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -426,7 +357,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__04_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3033_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -440,7 +371,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__04_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3033_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -454,7 +385,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__04_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3033_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -468,7 +399,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__04_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3033_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -482,7 +413,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__05_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3034_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -495,7 +426,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__05_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3034_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -509,7 +440,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__05_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3034_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -523,7 +454,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__05_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3034_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -537,7 +468,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__05_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3034_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -551,7 +482,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__06_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3035_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -564,7 +495,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__06_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3035_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -578,7 +509,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__06_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3035_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -592,7 +523,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__06_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3035_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -606,7 +537,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__06_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3035_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -620,7 +551,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__07_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3036_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -633,7 +564,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__07_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3036_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -647,7 +578,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__07_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3036_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -661,7 +592,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__07_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3036_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -675,7 +606,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__07_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3036_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -689,7 +620,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__08_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3037_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -702,7 +633,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__08_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3037_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -716,7 +647,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__08_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3037_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -730,7 +661,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__08_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3037_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -744,7 +675,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__08_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3037_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -758,7 +689,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__09_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3038_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -771,7 +702,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__09_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3038_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -785,7 +716,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__09_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3038_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -799,7 +730,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__09_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3038_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -813,7 +744,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__09_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3038_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -827,7 +758,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__10_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3039_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -840,7 +771,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__10_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3039_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -854,7 +785,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__10_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3039_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -868,7 +799,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__10_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3039_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -882,7 +813,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__10_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3039_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -896,7 +827,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__11_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3130_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -909,7 +840,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__11_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3130_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -923,7 +854,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__11_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3130_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -937,7 +868,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__11_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3130_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -951,7 +882,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__11_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3130_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -965,7 +896,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__12_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3131_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -978,7 +909,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__12_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3131_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -992,7 +923,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__12_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3131_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1006,7 +937,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__12_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3131_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1020,7 +951,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__12_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3131_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1034,7 +965,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__13_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3132_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1047,7 +978,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__13_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3132_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1061,7 +992,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__13_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3132_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1075,7 +1006,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__13_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3132_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1089,7 +1020,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__13_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3132_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1103,7 +1034,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__14_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3133_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1116,7 +1047,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__14_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3133_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1130,7 +1061,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__14_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3133_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1144,7 +1075,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__14_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3133_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1158,7 +1089,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__14_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3133_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1172,7 +1103,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__15_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3134_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1185,7 +1116,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__15_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3134_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1199,7 +1130,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__15_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3134_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1213,7 +1144,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__15_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3134_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1227,7 +1158,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__15_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3134_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1241,7 +1172,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__16_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3135_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1254,7 +1185,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__16_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3135_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1268,7 +1199,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__16_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3135_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1282,7 +1213,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__16_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3135_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1296,7 +1227,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__16_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3135_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1310,7 +1241,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__17_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3136_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1323,7 +1254,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__17_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3136_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1337,7 +1268,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__17_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3136_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1351,7 +1282,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__17_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3136_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1365,7 +1296,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__17_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3136_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1379,7 +1310,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__18_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3137_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1392,7 +1323,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__18_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3137_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1406,7 +1337,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__18_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3137_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1420,7 +1351,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__18_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3137_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1434,7 +1365,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__18_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3137_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1448,7 +1379,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__19_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3138_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1461,7 +1392,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__19_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3138_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1475,7 +1406,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__19_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3138_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1489,7 +1420,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__19_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3138_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1503,7 +1434,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__19_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3138_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1517,7 +1448,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__20_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3139_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1530,7 +1461,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__20_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3139_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1544,7 +1475,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__20_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3139_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1558,7 +1489,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__20_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3139_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1572,7 +1503,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__20_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3139_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1586,7 +1517,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__21_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3230_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1599,7 +1530,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__21_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3230_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1613,7 +1544,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__21_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3230_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1627,7 +1558,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__21_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3230_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1641,7 +1572,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__21_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3230_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1655,7 +1586,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__22_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3231_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1668,7 +1599,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__22_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3231_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1682,7 +1613,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__22_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3231_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1696,7 +1627,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__22_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3231_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1710,7 +1641,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__22_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3231_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1724,7 +1655,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__23_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3232_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1737,7 +1668,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__23_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3232_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1751,7 +1682,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__23_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3232_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1765,7 +1696,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__23_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3232_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1779,7 +1710,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__23_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3232_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1793,7 +1724,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__24_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3233_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1806,7 +1737,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__24_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3233_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1820,7 +1751,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__24_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3233_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1834,7 +1765,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__24_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3233_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1848,7 +1779,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__24_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3233_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1862,7 +1793,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__25_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3234_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1875,7 +1806,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__25_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3234_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1889,7 +1820,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__25_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3234_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1903,7 +1834,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__25_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3234_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1917,7 +1848,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__25_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3234_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1931,7 +1862,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__26_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3235_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1944,7 +1875,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__26_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3235_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1958,7 +1889,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__26_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3235_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1972,7 +1903,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__26_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3235_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1986,7 +1917,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__26_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3235_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2000,7 +1931,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__27_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3236_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2013,7 +1944,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__27_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3236_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2027,7 +1958,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__27_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3236_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2041,7 +1972,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__27_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3236_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2055,7 +1986,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__27_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3236_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2069,7 +2000,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__28_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3237_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2082,7 +2013,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__28_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3237_id_686f766572"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2096,7 +2027,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__28_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3237_id_70726573736564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2110,7 +2041,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__28_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3237_id_64697361626c6564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2124,7 +2055,76 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_inventory__grid__slot__28_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3237_id_73656c6563746564"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3238_id_6e6f726d616c"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3238_id_686f766572"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.823529, 0.917647, 1.000000, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3238_id_70726573736564"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3238_id_64697361626c6564"]
+texture = ExtResource("Texture2D_8")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.435294, 0.478431, 0.509804, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_696e76656e746f72795f677269645f736c6f745f3238_id_73656c6563746564"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -2146,11 +2146,12 @@ offset_left = 180.0000
 offset_top = 150.0000
 offset_right = 420.0000
 offset_bottom = 600.0000
-theme_override_styles/panel = SubResource("StyleBox_inventory__window_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f77696e646f77_id_6e6f726d616c")
 [node name="inventory_window__surface" type="TextureRect" parent="."]
 metadata/uiforge_id = "inventory_window__surface"
 metadata/uiforge_type = "Texture"
 metadata/uiforge_generated = true
+metadata/uiforge_decoration = true
 offset_left = 11.0000
 offset_top = 11.0000
 offset_right = -11.0000
@@ -2191,11 +2192,11 @@ offset_bottom = 42.0000
 text = "×"
 theme_override_fonts/font = ExtResource("FontFile_3")
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBox_inventory__close_normal")
-theme_override_styles/hover = SubResource("StyleBox_inventory__close_hover")
-theme_override_styles/pressed = SubResource("StyleBox_inventory__close_pressed")
-theme_override_styles/focus = SubResource("StyleBox_inventory__close_focus")
-theme_override_styles/disabled = SubResource("StyleBox_inventory__close_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_696e76656e746f72795f636c6f7365_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_696e76656e746f72795f636c6f7365_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_696e76656e746f72795f636c6f7365_id_70726573736564")
+theme_override_styles/focus = SubResource("StyleBox_id_696e76656e746f72795f636c6f7365_id_666f637573")
+theme_override_styles/disabled = SubResource("StyleBox_id_696e76656e746f72795f636c6f7365_id_64697361626c6564")
 
 [node name="inventory_header_rule" type="HSeparator" parent="."]
 metadata/uiforge_id = "inventory_header_rule"
@@ -2205,7 +2206,7 @@ offset_left = 16.0000
 offset_top = 46.0000
 offset_right = 224.0000
 offset_bottom = 47.0000
-theme_override_styles/separator = SubResource("StyleBox_inventory__header__rule_normal")
+theme_override_styles/separator = SubResource("StyleBox_id_696e76656e746f72795f6865616465725f72756c65_id_6e6f726d616c")
 
 [node name="inventory_grid_panel" type="Panel" parent="."]
 metadata/uiforge_id = "inventory_grid_panel"
@@ -2215,7 +2216,7 @@ offset_left = 16.0000
 offset_top = 58.0000
 offset_right = 224.0000
 offset_bottom = 401.0000
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__panel_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f70616e656c_id_6e6f726d616c")
 
 [node name="inventory_grid" type="GridContainer" parent="inventory_grid_panel"]
 metadata/uiforge_id = "inventory_grid"
@@ -2234,196 +2235,196 @@ metadata/uiforge_id = "inventory_grid_slot_01"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__01_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3031_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_02" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_02"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__02_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3032_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_03" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_03"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__03_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3033_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_04" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_04"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__04_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3034_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_05" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_05"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__05_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3035_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_06" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_06"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__06_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3036_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_07" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_07"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__07_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3037_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_08" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_08"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__08_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3038_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_09" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_09"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__09_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3039_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_10" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_10"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__10_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3130_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_11" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_11"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__11_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3131_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_12" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_12"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__12_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3132_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_13" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_13"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__13_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3133_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_14" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_14"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__14_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3134_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_15" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_15"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__15_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3135_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_16" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_16"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__16_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3136_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_17" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_17"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__17_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3137_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_18" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_18"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__18_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3138_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_19" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_19"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__19_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3139_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_20" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_20"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__20_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3230_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_21" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_21"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__21_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3231_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_22" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_22"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__22_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3232_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_23" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_23"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__23_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3233_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_24" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_24"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__24_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3234_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_25" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_25"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__25_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3235_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_26" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_26"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__26_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3236_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_27" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_27"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__27_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3237_id_6e6f726d616c")
 
 [node name="inventory_grid_slot_28" type="Panel" parent="inventory_grid_panel/inventory_grid"]
 metadata/uiforge_id = "inventory_grid_slot_28"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(42.0000, 42.0000)
-theme_override_styles/panel = SubResource("StyleBox_inventory__grid__slot__28_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_696e76656e746f72795f677269645f736c6f745f3238_id_6e6f726d616c")
 
 [node name="inventory_capacity" type="Label" parent="."]
 metadata/uiforge_id = "inventory_capacity"

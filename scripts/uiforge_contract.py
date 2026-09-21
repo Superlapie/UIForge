@@ -7,6 +7,9 @@ import hashlib
 import json
 import os
 import re
+import secrets
+import shutil
+import socket
 import time
 from pathlib import Path, PureWindowsPath
 from typing import Any, Callable
@@ -41,6 +44,9 @@ FALLBACK_COMPATIBILITY: dict[str, set[str]] = {
     "StyleBoxFlat": {"StyleBoxTexture", "StyleBoxEmpty"},
 }
 LOCK_STALE_SECONDS = 300
+NEW_LOCK_GRACE_SECONDS = 5
+GODOT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_]+$")
+SCENE_ID_PATTERN = re.compile(r'id="([^"]+)"')
 
 
 def workspace_root() -> Path:
@@ -184,7 +190,7 @@ def parse_scene_header(text: str | bytes | None) -> dict[str, Any]:
         raw = text
     if not raw:
         return {"ok": True, "header": header, "errors": errors}
-    duplicate_versions = duplicate_sources = duplicate_hashes = 0
+    duplicate_versions = duplicate_sources = duplicate_hashes = duplicate_generators = duplicate_schemas = 0
     comment_lines = 0
     for line in raw.splitlines():
         trimmed = line.strip()
@@ -194,7 +200,12 @@ def parse_scene_header(text: str | bytes | None) -> dict[str, Any]:
         if comment_lines > MAX_HEADER_LINES:
             errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", "Provenance preamble exceeds supported size."))
             break
-        if trimmed == f"; {HEADER_VERSION}":
+        if trimmed.startswith("; UIFORGE_GENERATED_V") and trimmed != f"; {HEADER_VERSION}":
+            duplicate_versions += 1
+            header["is_uiforge"] = True
+            header["version"] = trimmed[2:].strip()
+            errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", f"Unsupported provenance version '{header['version']}'."))
+        elif trimmed == f"; {HEADER_VERSION}":
             duplicate_versions += 1
             header["is_uiforge"] = True
             header["version"] = HEADER_VERSION
@@ -205,14 +216,16 @@ def parse_scene_header(text: str | bytes | None) -> dict[str, Any]:
             duplicate_hashes += 1
             header["source_hash"] = trimmed.split(":", 1)[1].strip()
         elif trimmed.startswith("; uiforge_generator:"):
+            duplicate_generators += 1
             header["generator"] = trimmed.split(":", 1)[1].strip()
         elif trimmed.startswith("; uiforge_schema:"):
+            duplicate_schemas += 1
             schema_text = trimmed.split(":", 1)[1].strip()
             if not schema_text.isdigit():
                 errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", "Malformed uiforge_schema value."))
             else:
                 header["schema"] = int(schema_text)
-    if duplicate_versions > 1 or duplicate_sources > 1 or duplicate_hashes > 1:
+    if duplicate_versions > 1 or duplicate_sources > 1 or duplicate_hashes > 1 or duplicate_generators > 1 or duplicate_schemas > 1:
         errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", "Duplicate provenance header fields."))
     if header.get("is_uiforge"):
         errors.extend(validate_provenance(header))
@@ -308,28 +321,87 @@ def unique_temp_path(absolute: Path, extension: str = "") -> Path:
     return absolute.parent / f".uiforge_tmp_{stem}_{nonce}{suffix}"
 
 
-def _lock_is_stale(lock_path: Path) -> bool:
+def _lock_dir(target_absolute: Path) -> Path:
+    return target_absolute.with_name(target_absolute.name + ".uiforge_lock")
+
+
+def _write_lock_meta(lock_dir: Path, owner_nonce: str) -> None:
+    payload = {
+        "owner_nonce": owner_nonce,
+        "pid": os.getpid(),
+        "started": time.time(),
+        "hostname": socket.gethostname(),
+    }
+    (lock_dir / "owner.json").write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _read_lock_meta(lock_dir: Path) -> dict[str, Any]:
+    owner_path = lock_dir / "owner.json"
+    if not owner_path.exists():
+        return {}
     try:
-        payload = json.loads(lock_path.read_text(encoding="utf-8"))
+        payload = json.loads(owner_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _remove_lock_dir(lock_dir: Path) -> None:
+    if lock_dir.exists():
+        shutil.rmtree(lock_dir, ignore_errors=True)
+
+
+def _pid_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if os.name == "nt":
         return True
-    started = float(payload.get("started", 0))
-    if started <= 0:
-        return True
-    return time.time() - started > LOCK_STALE_SECONDS
+    return Path(f"/proc/{pid}").exists()
+
+
+def _lock_is_stale(lock_dir: Path) -> bool:
+    if not lock_dir.exists():
+        return False
+    meta = _read_lock_meta(lock_dir)
+    started = float(meta.get("started", 0))
+    age = time.time() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
+    if age < NEW_LOCK_GRACE_SECONDS:
+        return False
+    if meta:
+        pid = int(meta.get("pid", 0))
+        if pid > 0 and _pid_alive(pid) and age < LOCK_STALE_SECONDS:
+            return False
+    if age < LOCK_STALE_SECONDS and not meta:
+        return False
+    return True
+
+
+def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
+    if not _lock_is_stale(lock_dir):
+        return False
+    reclaim_path = lock_dir.with_name(f"{lock_dir.name}.reclaim_{secrets.token_hex(8)}")
+    try:
+        os.replace(lock_dir, reclaim_path)
+    except OSError:
+        return False
+    _remove_lock_dir(reclaim_path)
+    return True
 
 
 def acquire_lock(target_absolute: Path) -> dict[str, Any]:
-    lock_path = target_absolute.with_name(target_absolute.name + ".uiforge_lock")
+    lock_dir = _lock_dir(target_absolute)
+    owner_nonce = secrets.token_hex(16)
     for attempt in range(4):
         try:
-            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                handle.write(json.dumps({"pid": os.getpid(), "started": time.time()}))
-            return {"ok": True, "lock_path": lock_path}
+            lock_dir.mkdir()
+            try:
+                _write_lock_meta(lock_dir, owner_nonce)
+            except OSError:
+                _remove_lock_dir(lock_dir)
+                raise
+            return {"ok": True, "lock_path": lock_dir, "owner_nonce": owner_nonce}
         except FileExistsError:
-            if _lock_is_stale(lock_path):
-                lock_path.unlink(missing_ok=True)
+            if _try_reclaim_stale_lock(lock_dir):
                 continue
             time.sleep(0.025 * (attempt + 1))
         except OSError as exc:
@@ -351,16 +423,32 @@ def acquire_lock(target_absolute: Path) -> dict[str, Any]:
     }
 
 
-def release_lock(lock_path: Path | None) -> None:
-    if lock_path is not None:
-        lock_path.unlink(missing_ok=True)
+def release_lock(lock_path: Path | None, owner_nonce: str = "") -> None:
+    if lock_path is None or not owner_nonce or not lock_path.exists():
+        return
+    meta = _read_lock_meta(lock_path)
+    if meta.get("owner_nonce") != owner_nonce:
+        return
+    _remove_lock_dir(lock_path)
 
 
 def replace_file(source_absolute: Path, dest_absolute: Path) -> None:
     dest_absolute.parent.mkdir(parents=True, exist_ok=True)
-    if dest_absolute.exists():
-        dest_absolute.unlink()
-    os.replace(source_absolute, dest_absolute)
+    if not dest_absolute.exists():
+        os.replace(source_absolute, dest_absolute)
+        return
+    backup_path = dest_absolute.with_name(dest_absolute.name + ".uiforge_replace_backup")
+    if backup_path.exists():
+        backup_path.unlink()
+    os.replace(dest_absolute, backup_path)
+    try:
+        os.replace(source_absolute, dest_absolute)
+    except OSError:
+        if backup_path.exists():
+            os.replace(backup_path, dest_absolute)
+        raise
+    if backup_path.exists():
+        backup_path.unlink()
 
 
 def write_text_atomically(
@@ -385,6 +473,7 @@ def write_text_atomically(
             temp_path.unlink(missing_ok=True)
             return {"success": False, "committed": False, "errors": lock.get("errors", [])}
         lock_path = lock.get("lock_path")
+        owner_nonce = str(lock.get("owner_nonce", ""))
         try:
             if source_identity_value:
                 commit_check = check_commit_replace_allowed(target_path, source_identity_value, force)
@@ -392,7 +481,7 @@ def write_text_atomically(
                     return {"success": False, "committed": False, "errors": commit_check.get("errors", [])}
             replace_file(temp_path, absolute)
         finally:
-            release_lock(lock_path)
+            release_lock(lock_path, owner_nonce)
     except OSError as exc:
         temp_path.unlink(missing_ok=True)
         return {"success": False, "committed": False, "errors": [{"code": "FILE_WRITE_FAILED", "message": str(exc)}]}
@@ -426,32 +515,84 @@ def _cleanup_txn(paths: dict[str, Path]) -> None:
         paths[key].unlink(missing_ok=True)
 
 
-def _source_content_valid(path: Path) -> bool:
+def _file_text_hash(path: Path) -> str:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    return f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
+
+
+def _json_revision_from_text(text: str) -> str:
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return ""
+    if isinstance(payload, dict):
+        return content_hash(payload)
+    return ""
+
+
+def _json_revision_from_file(path: Path) -> str:
+    try:
+        return _json_revision_from_text(path.read_text(encoding="utf-8"))
+    except OSError:
+        return ""
+
+
+def _pending_may_promote(absolute: Path, paths: dict[str, Path], meta: dict[str, Any]) -> bool:
+    if not meta:
         return False
-    return isinstance(payload, dict)
+    if str(meta.get("target", "")) != str(absolute):
+        return False
+    if not paths["pending"].exists():
+        return False
+    pending_hash = _file_text_hash(paths["pending"])
+    if str(meta.get("pending_hash", "")) != pending_hash:
+        return False
+    stage = str(meta.get("stage", ""))
+    if stage != "commit" and absolute.exists():
+        return False
+    if pending_hash and not str(meta.get("new_revision", "")):
+        return False
+    return True
+
+
+def _cleanup_completed_transaction(absolute: Path, paths: dict[str, Path]) -> None:
+    if not absolute.exists():
+        return
+    meta = _read_txn_meta(paths["meta"])
+    if not meta:
+        if paths["backup"].exists():
+            paths["backup"].unlink(missing_ok=True)
+        if paths["pending"].exists():
+            paths["pending"].unlink(missing_ok=True)
+        return
+    live_revision = _json_revision_from_file(absolute)
+    if str(meta.get("new_revision", "")) == live_revision and str(meta.get("stage", "")) == "commit":
+        if paths["backup"].exists():
+            paths["backup"].unlink(missing_ok=True)
+        _cleanup_txn(paths)
 
 
 def recover_interrupted_source(absolute: Path) -> None:
     paths = _transaction_paths(absolute)
     meta = _read_txn_meta(paths["meta"])
     if paths["pending"].exists():
-        promote = False
-        if not absolute.exists():
-            promote = _source_content_valid(paths["pending"])
-        elif meta.get("stage") == "commit":
-            promote = _source_content_valid(paths["pending"])
-        if promote:
+        if _pending_may_promote(absolute, paths, meta):
             if absolute.exists():
                 absolute.unlink()
-            replace_file(paths["pending"], absolute)
+            try:
+                replace_file(paths["pending"], absolute)
+            except OSError:
+                if paths["backup"].exists() and not absolute.exists():
+                    replace_file(paths["backup"], absolute)
         else:
             paths["pending"].unlink(missing_ok=True)
     if not absolute.exists() and paths["backup"].exists():
         replace_file(paths["backup"], absolute)
     _cleanup_txn(paths)
+    _cleanup_completed_transaction(absolute, paths)
 
 
 def write_source_atomically(target_path: str | Path, content: str, expected_revision: str = "") -> dict[str, Any]:
@@ -461,6 +602,7 @@ def write_source_atomically(target_path: str | Path, content: str, expected_revi
     if not lock.get("ok"):
         return {"success": False, "committed": False, "errors": lock.get("errors", [])}
     lock_path = lock.get("lock_path")
+    owner_nonce = str(lock.get("owner_nonce", ""))
     paths = _transaction_paths(absolute)
     temp_path: Path | None = None
     try:
@@ -482,15 +624,33 @@ def write_source_atomically(target_path: str | Path, content: str, expected_revi
         temp_path = unique_temp_path(absolute, ".ui.json")
         temp_path.write_text(content, encoding="utf-8")
         txn_id = f"{time.time_ns()}_{os.getpid()}"
-        _write_txn_meta(paths["meta"], {"transaction_id": txn_id, "expected_revision": expected_revision, "stage": "pending", "target": str(absolute)})
+        new_revision = _json_revision_from_text(content)
+        pending_hash = _file_text_hash(temp_path)
+        _write_txn_meta(paths["meta"], {
+            "transaction_id": txn_id,
+            "target": str(absolute),
+            "expected_revision": expected_revision,
+            "new_revision": new_revision,
+            "pending_hash": pending_hash,
+            "stage": "pending",
+        })
         if absolute.exists():
             paths["backup"].unlink(missing_ok=True)
             replace_file(absolute, paths["backup"])
         replace_file(temp_path, paths["pending"])
-        _write_txn_meta(paths["meta"], {"transaction_id": txn_id, "expected_revision": expected_revision, "stage": "commit", "target": str(absolute)})
+        temp_path = None
+        _write_txn_meta(paths["meta"], {
+            "transaction_id": txn_id,
+            "target": str(absolute),
+            "expected_revision": expected_revision,
+            "new_revision": new_revision,
+            "pending_hash": pending_hash,
+            "stage": "commit",
+        })
         replace_file(paths["pending"], absolute)
         paths["backup"].unlink(missing_ok=True)
         _cleanup_txn(paths)
+        _cleanup_completed_transaction(absolute, paths)
     except OSError as exc:
         if paths["backup"].exists() and not absolute.exists():
             replace_file(paths["backup"], absolute)
@@ -500,8 +660,20 @@ def write_source_atomically(target_path: str | Path, content: str, expected_revi
         _cleanup_txn(paths)
         return {"success": False, "committed": False, "errors": [{"code": "FILE_WRITE_FAILED", "message": str(exc)}]}
     finally:
-        release_lock(lock_path)
+        release_lock(lock_path, owner_nonce)
     return {"success": True, "committed": True, "path": str(target_path), "errors": []}
+
+
+def validate_scene_text_ids(text: str) -> dict[str, Any]:
+    errors: list[dict[str, Any]] = []
+    for match in SCENE_ID_PATTERN.finditer(text):
+        resource_id = match.group(1)
+        if GODOT_ID_PATTERN.fullmatch(resource_id) is None:
+            errors.append({
+                "code": "SCENE_RESOURCE_ID_INVALID",
+                "message": f"Generated scene contains invalid Godot resource id '{resource_id}'.",
+            })
+    return {"ok": not errors, "errors": errors}
 
 
 def verify_scene_syntax(temp_path: Path) -> dict[str, Any]:
@@ -511,6 +683,9 @@ def verify_scene_syntax(temp_path: Path) -> dict[str, Any]:
         return {"ok": False, "errors": [{"code": "VERIFY_READ_FAILED", "message": str(exc)}]}
     if "[gd_scene" not in text:
         return {"ok": False, "errors": [{"code": "SCENE_SYNTAX_INVALID", "message": "Generated scene is missing [gd_scene] header."}]}
+    id_check = validate_scene_text_ids(text)
+    if not id_check.get("ok", False):
+        return {"ok": False, "errors": id_check.get("errors", [])}
     parsed = parse_scene_header(text)
     if not parsed.get("ok", False):
         return {"ok": False, "errors": parsed.get("errors", [{"code": "SCENE_PROVENANCE_INVALID", "message": "Generated scene has invalid provenance."}])}
@@ -555,7 +730,7 @@ def resource_id_part(value: str) -> str:
     canonical = str(value)
     if not canonical:
         return "node"
-    return canonical.replace("_", "__").replace("-", "_-")
+    return f"id_{canonical.encode('utf-8').hex()}"
 
 
 def validate_external_resource(path: str, resource_type: str, property_name: str, node_id: str = "") -> dict[str, Any]:

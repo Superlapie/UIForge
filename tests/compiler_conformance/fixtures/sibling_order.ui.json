@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "sibling_order",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "order_root",
+    "type": "Panel",
+    "layout": {"position": [10, 10], "size": [220, 180]},
+    "children": [
+      {"id": "first", "type": "Label", "layout": {"size": [180, 24]}, "properties": {"text": "First"}},
+      {"id": "second", "type": "Label", "layout": {"size": [180, 24]}, "properties": {"text": "Second"}},
+      {"id": "third", "type": "Label", "layout": {"size": [180, 24]}, "properties": {"text": "Third"}}
+    ]
+  }
+}

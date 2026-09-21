@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "semantic_texture",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "texture_root",
+    "type": "Panel",
+    "layout": {"size": [320, 240]},
+    "children": [
+      {
+        "id": "gem_texture",
+        "type": "Texture",
+        "layout": {"position": [24, 24], "size": [96, 96]},
+        "properties": {"texture": "res://examples/assets/uiforge_gem.svg", "expand_mode": 1, "stretch_mode": 5}
+      }
+    ]
+  }
+}

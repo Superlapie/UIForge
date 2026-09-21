@@ -21,7 +21,7 @@
 [ext_resource type="Texture2D" path="res://examples/assets/ui/slider_thumb.svg" id="Texture2D_12"]
 [ext_resource type="Texture2D" path="res://examples/assets/ui/button_enamel.svg" id="Texture2D_13"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__window_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f77696e646f77_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -34,7 +34,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__window_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f77696e646f77_id_686f766572"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -47,7 +47,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__window_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f77696e646f77_id_70726573736564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -60,7 +60,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__window_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f77696e646f77_id_64697361626c6564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -73,7 +73,7 @@ content_margin_top = 28.0000
 content_margin_right = 30.0000
 content_margin_bottom = 28.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__close_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636c6f7365_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -84,7 +84,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__close_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636c6f7365_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -95,7 +95,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__close_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636c6f7365_id_70726573736564"]
 texture = ExtResource("Texture2D_7")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -106,7 +106,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__close_focus"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636c6f7365_id_666f637573"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -117,7 +117,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__close_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636c6f7365_id_64697361626c6564"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -129,7 +129,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__rule_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f72756c65_id_6e6f726d616c"]
 bg_color = Color(0.501961, 0.439216, 0.298039, 0.333333)
 border_width_left = 0
 border_width_top = 0
@@ -145,7 +145,7 @@ content_margin_top = 0.0000
 content_margin_right = 0.0000
 content_margin_bottom = 1.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__gameplay_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f67616d65706c6179_id_6e6f726d616c"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -161,7 +161,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__gameplay_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f67616d65706c6179_id_686f766572"]
 bg_color = Color(0.133333, 0.239216, 0.305882, 0.533333)
 border_width_left = 1
 border_width_top = 1
@@ -177,7 +177,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__gameplay_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f67616d65706c6179_id_70726573736564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -193,7 +193,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__gameplay_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f67616d65706c6179_id_64697361626c6564"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -209,7 +209,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__gameplay_selected"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f67616d65706c6179_id_73656c6563746564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -225,7 +225,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__interface_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f696e74657266616365_id_6e6f726d616c"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -241,7 +241,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__interface_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f696e74657266616365_id_686f766572"]
 bg_color = Color(0.133333, 0.239216, 0.305882, 0.533333)
 border_width_left = 1
 border_width_top = 1
@@ -257,7 +257,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__interface_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f696e74657266616365_id_70726573736564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -273,7 +273,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__interface_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f696e74657266616365_id_64697361626c6564"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -289,7 +289,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__interface_selected"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f696e74657266616365_id_73656c6563746564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -305,7 +305,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__graphics_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f6772617068696373_id_6e6f726d616c"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -321,7 +321,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__graphics_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f6772617068696373_id_686f766572"]
 bg_color = Color(0.133333, 0.239216, 0.305882, 0.533333)
 border_width_left = 1
 border_width_top = 1
@@ -337,7 +337,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__graphics_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f6772617068696373_id_70726573736564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -353,7 +353,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__graphics_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f6772617068696373_id_64697361626c6564"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -369,7 +369,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__graphics_selected"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f6772617068696373_id_73656c6563746564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -385,7 +385,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__audio_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f617564696f_id_6e6f726d616c"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -401,7 +401,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__audio_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f617564696f_id_686f766572"]
 bg_color = Color(0.133333, 0.239216, 0.305882, 0.533333)
 border_width_left = 1
 border_width_top = 1
@@ -417,7 +417,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__audio_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f617564696f_id_70726573736564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -433,7 +433,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__audio_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f617564696f_id_64697361626c6564"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -449,7 +449,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__audio_selected"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f617564696f_id_73656c6563746564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -465,7 +465,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__controls_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f636f6e74726f6c73_id_6e6f726d616c"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -481,7 +481,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__controls_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f636f6e74726f6c73_id_686f766572"]
 bg_color = Color(0.133333, 0.239216, 0.305882, 0.533333)
 border_width_left = 1
 border_width_top = 1
@@ -497,7 +497,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__controls_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f636f6e74726f6c73_id_70726573736564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -513,7 +513,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__controls_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f636f6e74726f6c73_id_64697361626c6564"]
 bg_color = Color(0.078431, 0.129412, 0.164706, 0.376471)
 border_width_left = 1
 border_width_top = 1
@@ -529,7 +529,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__controls_selected"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f636f6e74726f6c73_id_73656c6563746564"]
 bg_color = Color(0.156863, 0.278431, 0.349020, 0.733333)
 border_width_left = 1
 border_width_top = 1
@@ -545,7 +545,7 @@ content_margin_top = 6.0000
 content_margin_right = 12.0000
 content_margin_bottom = 6.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__content_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636f6e74656e74_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_9")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -558,7 +558,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__content_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636f6e74656e74_id_686f766572"]
 texture = ExtResource("Texture2D_9")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -571,7 +571,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__content_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636f6e74656e74_id_70726573736564"]
 texture = ExtResource("Texture2D_9")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -584,7 +584,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__content_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f636f6e74656e74_id_64697361626c6564"]
 texture = ExtResource("Texture2D_9")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -597,7 +597,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__content__rule_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f636f6e74656e745f72756c65_id_6e6f726d616c"]
 bg_color = Color(0.501961, 0.439216, 0.298039, 0.333333)
 border_width_left = 0
 border_width_top = 0
@@ -613,7 +613,7 @@ content_margin_top = 0.0000
 content_margin_right = 0.0000
 content_margin_bottom = 1.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__damage__numbers_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_6e6f726d616c"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -629,7 +629,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__damage__numbers_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_686f766572"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.070588)
 border_width_left = 0
 border_width_top = 0
@@ -645,7 +645,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__damage__numbers_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_70726573736564"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.039216)
 border_width_left = 0
 border_width_top = 0
@@ -661,7 +661,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__damage__numbers_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_64697361626c6564"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -677,7 +677,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__player__names_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_6e6f726d616c"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -693,7 +693,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__player__names_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_686f766572"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.070588)
 border_width_left = 0
 border_width_top = 0
@@ -709,7 +709,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__player__names_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_70726573736564"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.039216)
 border_width_left = 0
 border_width_top = 0
@@ -725,7 +725,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__player__names_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_64697361626c6564"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -741,7 +741,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__tooltips_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f746f6f6c74697073_id_6e6f726d616c"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -757,7 +757,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__tooltips_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f746f6f6c74697073_id_686f766572"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.070588)
 border_width_left = 0
 border_width_top = 0
@@ -773,7 +773,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__tooltips_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f746f6f6c74697073_id_70726573736564"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.039216)
 border_width_left = 0
 border_width_top = 0
@@ -789,7 +789,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__tooltips_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f746f6f6c74697073_id_64697361626c6564"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -805,7 +805,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__camera__slider_slider"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f63616d6572615f736c69646572_id_736c69646572"]
 bg_color = Color(0.027451, 0.050980, 0.074510, 1.000000)
 border_width_left = 1
 border_width_top = 1
@@ -821,7 +821,7 @@ content_margin_top = 3.0000
 content_margin_right = 2.0000
 content_margin_bottom = 3.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__camera__slider_grabber__area"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f63616d6572615f736c69646572_id_677261626265725f61726561"]
 bg_color = Color(0.321569, 0.517647, 0.631373, 1.000000)
 border_width_left = 0
 border_width_top = 0
@@ -833,7 +833,7 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__camera__slider_grabber__area__highlight"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f63616d6572615f736c69646572_id_677261626265725f617265615f686967686c69676874"]
 bg_color = Color(0.321569, 0.517647, 0.631373, 1.000000)
 border_width_left = 0
 border_width_top = 0
@@ -845,7 +845,7 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__language_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6c616e6775616765_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -856,7 +856,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__language_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6c616e6775616765_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -867,7 +867,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__language_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6c616e6775616765_id_70726573736564"]
 texture = ExtResource("Texture2D_7")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -878,7 +878,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__language_focus"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6c616e6775616765_id_666f637573"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -889,7 +889,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__language_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6c616e6775616765_id_64697361626c6564"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -901,7 +901,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__safe__zone_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_6e6f726d616c"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -917,7 +917,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__safe__zone_hover"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_686f766572"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.070588)
 border_width_left = 0
 border_width_top = 0
@@ -933,7 +933,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__safe__zone_pressed"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_70726573736564"]
 bg_color = Color(0.470588, 0.596078, 0.674510, 0.039216)
 border_width_left = 0
 border_width_top = 0
@@ -949,7 +949,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_settings__safe__zone_disabled"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_64697361626c6564"]
 bg_color = Color(0.000000, 0.000000, 0.000000, 0.000000)
 border_width_left = 0
 border_width_top = 0
@@ -965,7 +965,7 @@ content_margin_top = 4.0000
 content_margin_right = 4.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__reset_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f7265736574_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -976,7 +976,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__reset_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f7265736574_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -987,7 +987,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__reset_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f7265736574_id_70726573736564"]
 texture = ExtResource("Texture2D_7")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -998,7 +998,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__reset_focus"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f7265736574_id_666f637573"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -1009,7 +1009,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__reset_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f7265736574_id_64697361626c6564"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -1021,7 +1021,7 @@ content_margin_top = 8.0000
 content_margin_right = 12.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__apply_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6170706c79_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_13")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -1032,7 +1032,7 @@ content_margin_top = 9.0000
 content_margin_right = 14.0000
 content_margin_bottom = 9.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__apply_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6170706c79_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -1043,7 +1043,7 @@ content_margin_top = 9.0000
 content_margin_right = 14.0000
 content_margin_bottom = 9.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__apply_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6170706c79_id_70726573736564"]
 texture = ExtResource("Texture2D_7")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -1054,7 +1054,7 @@ content_margin_top = 9.0000
 content_margin_right = 14.0000
 content_margin_bottom = 9.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__apply_focus"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6170706c79_id_666f637573"]
 texture = ExtResource("Texture2D_8")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -1065,7 +1065,7 @@ content_margin_top = 9.0000
 content_margin_right = 14.0000
 content_margin_bottom = 9.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_settings__apply_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_73657474696e67735f6170706c79_id_64697361626c6564"]
 texture = ExtResource("Texture2D_5")
 texture_margin_left = 12.0000
 texture_margin_top = 10.0000
@@ -1085,11 +1085,12 @@ offset_left = 140.0000
 offset_top = 160.0000
 offset_right = 740.0000
 offset_bottom = 620.0000
-theme_override_styles/panel = SubResource("StyleBox_settings__window_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_73657474696e67735f77696e646f77_id_6e6f726d616c")
 [node name="settings_window__surface" type="TextureRect" parent="."]
 metadata/uiforge_id = "settings_window__surface"
 metadata/uiforge_type = "Texture"
 metadata/uiforge_generated = true
+metadata/uiforge_decoration = true
 offset_left = 11.0000
 offset_top = 11.0000
 offset_right = -11.0000
@@ -1143,11 +1144,11 @@ offset_bottom = 42.0000
 text = "×"
 theme_override_fonts/font = ExtResource("FontFile_3")
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBox_settings__close_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__close_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__close_pressed")
-theme_override_styles/focus = SubResource("StyleBox_settings__close_focus")
-theme_override_styles/disabled = SubResource("StyleBox_settings__close_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f636c6f7365_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f636c6f7365_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f636c6f7365_id_70726573736564")
+theme_override_styles/focus = SubResource("StyleBox_id_73657474696e67735f636c6f7365_id_666f637573")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f636c6f7365_id_64697361626c6564")
 
 [node name="settings_rule" type="HSeparator" parent="."]
 metadata/uiforge_id = "settings_rule"
@@ -1157,7 +1158,7 @@ offset_left = 16.0000
 offset_top = 48.0000
 offset_right = 584.0000
 offset_bottom = 49.0000
-theme_override_styles/separator = SubResource("StyleBox_settings__rule_normal")
+theme_override_styles/separator = SubResource("StyleBox_id_73657474696e67735f72756c65_id_6e6f726d616c")
 
 [node name="settings_sidebar" type="VBoxContainer" parent="."]
 metadata/uiforge_id = "settings_sidebar"
@@ -1180,11 +1181,11 @@ toggle_mode = true
 button_pressed = true
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__gameplay_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__gameplay_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__gameplay_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__gameplay_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_settings__gameplay_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f67616d65706c6179_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f67616d65706c6179_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f67616d65706c6179_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f67616d65706c6179_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f67616d65706c6179_id_73656c6563746564")
 
 [node name="settings_interface" type="Button" parent="settings_sidebar"]
 metadata/uiforge_id = "settings_interface"
@@ -1195,11 +1196,11 @@ custom_minimum_size = Vector2(122.0000, 32.0000)
 text = "Interface"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__interface_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__interface_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__interface_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__interface_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_settings__interface_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f696e74657266616365_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f696e74657266616365_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f696e74657266616365_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f696e74657266616365_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f696e74657266616365_id_73656c6563746564")
 
 [node name="settings_graphics" type="Button" parent="settings_sidebar"]
 metadata/uiforge_id = "settings_graphics"
@@ -1210,11 +1211,11 @@ custom_minimum_size = Vector2(122.0000, 32.0000)
 text = "Graphics"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__graphics_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__graphics_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__graphics_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__graphics_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_settings__graphics_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f6772617068696373_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f6772617068696373_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f6772617068696373_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f6772617068696373_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f6772617068696373_id_73656c6563746564")
 
 [node name="settings_audio" type="Button" parent="settings_sidebar"]
 metadata/uiforge_id = "settings_audio"
@@ -1225,11 +1226,11 @@ custom_minimum_size = Vector2(122.0000, 32.0000)
 text = "Audio"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__audio_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__audio_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__audio_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__audio_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_settings__audio_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f617564696f_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f617564696f_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f617564696f_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f617564696f_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f617564696f_id_73656c6563746564")
 
 [node name="settings_controls" type="Button" parent="settings_sidebar"]
 metadata/uiforge_id = "settings_controls"
@@ -1240,11 +1241,11 @@ custom_minimum_size = Vector2(122.0000, 32.0000)
 text = "Controls"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__controls_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__controls_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__controls_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__controls_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_settings__controls_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f636f6e74726f6c73_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f636f6e74726f6c73_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f636f6e74726f6c73_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f636f6e74726f6c73_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f636f6e74726f6c73_id_73656c6563746564")
 
 [node name="settings_content" type="Panel" parent="."]
 metadata/uiforge_id = "settings_content"
@@ -1254,12 +1255,13 @@ offset_left = 152.0000
 offset_top = 62.0000
 offset_right = 584.0000
 offset_bottom = 398.0000
-theme_override_styles/panel = SubResource("StyleBox_settings__content_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_73657474696e67735f636f6e74656e74_id_6e6f726d616c")
 
 [node name="settings_content__surface" type="TextureRect" parent="settings_content"]
 metadata/uiforge_id = "settings_content__surface"
 metadata/uiforge_type = "Texture"
 metadata/uiforge_generated = true
+metadata/uiforge_decoration = true
 offset_left = 11.0000
 offset_top = 11.0000
 offset_right = -11.0000
@@ -1296,7 +1298,7 @@ offset_left = 16.0000
 offset_top = 44.0000
 offset_right = 416.0000
 offset_bottom = 45.0000
-theme_override_styles/separator = SubResource("StyleBox_settings__content__rule_normal")
+theme_override_styles/separator = SubResource("StyleBox_id_73657474696e67735f636f6e74656e745f72756c65_id_6e6f726d616c")
 
 [node name="settings_damage_numbers" type="CheckBox" parent="settings_content"]
 metadata/uiforge_id = "settings_damage_numbers"
@@ -1315,10 +1317,10 @@ theme_override_icons/checked = ExtResource("Texture2D_10")
 theme_override_icons/unchecked = ExtResource("Texture2D_11")
 theme_override_icons/checked_disabled = ExtResource("Texture2D_10")
 theme_override_icons/unchecked_disabled = ExtResource("Texture2D_11")
-theme_override_styles/normal = SubResource("StyleBox_settings__damage__numbers_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__damage__numbers_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__damage__numbers_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__damage__numbers_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f64616d6167655f6e756d62657273_id_64697361626c6564")
 
 [node name="settings_player_names" type="CheckBox" parent="settings_content"]
 metadata/uiforge_id = "settings_player_names"
@@ -1337,10 +1339,10 @@ theme_override_icons/checked = ExtResource("Texture2D_10")
 theme_override_icons/unchecked = ExtResource("Texture2D_11")
 theme_override_icons/checked_disabled = ExtResource("Texture2D_10")
 theme_override_icons/unchecked_disabled = ExtResource("Texture2D_11")
-theme_override_styles/normal = SubResource("StyleBox_settings__player__names_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__player__names_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__player__names_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__player__names_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f706c617965725f6e616d6573_id_64697361626c6564")
 
 [node name="settings_tooltips" type="CheckBox" parent="settings_content"]
 metadata/uiforge_id = "settings_tooltips"
@@ -1359,10 +1361,10 @@ theme_override_icons/checked = ExtResource("Texture2D_10")
 theme_override_icons/unchecked = ExtResource("Texture2D_11")
 theme_override_icons/checked_disabled = ExtResource("Texture2D_10")
 theme_override_icons/unchecked_disabled = ExtResource("Texture2D_11")
-theme_override_styles/normal = SubResource("StyleBox_settings__tooltips_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__tooltips_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__tooltips_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__tooltips_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f746f6f6c74697073_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f746f6f6c74697073_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f746f6f6c74697073_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f746f6f6c74697073_id_64697361626c6564")
 
 [node name="settings_camera_label" type="Label" parent="settings_content"]
 metadata/uiforge_id = "settings_camera_label"
@@ -1405,9 +1407,9 @@ value = 0.0000
 min_value = 0.0000
 max_value = 1.0000
 step = 0.0100
-theme_override_styles/slider = SubResource("StyleBox_settings__camera__slider_slider")
-theme_override_styles/grabber_area = SubResource("StyleBox_settings__camera__slider_grabber__area")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBox_settings__camera__slider_grabber__area__highlight")
+theme_override_styles/slider = SubResource("StyleBox_id_73657474696e67735f63616d6572615f736c69646572_id_736c69646572")
+theme_override_styles/grabber_area = SubResource("StyleBox_id_73657474696e67735f63616d6572615f736c69646572_id_677261626265725f61726561")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBox_id_73657474696e67735f63616d6572615f736c69646572_id_677261626265725f617265615f686967686c69676874")
 theme_override_icons/grabber = ExtResource("Texture2D_12")
 theme_override_icons/grabber_highlight = ExtResource("Texture2D_12")
 
@@ -1437,11 +1439,11 @@ offset_bottom = 250.0000
 text = "SELECT LANGUAGE"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__language_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__language_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__language_pressed")
-theme_override_styles/focus = SubResource("StyleBox_settings__language_focus")
-theme_override_styles/disabled = SubResource("StyleBox_settings__language_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f6c616e6775616765_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f6c616e6775616765_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f6c616e6775616765_id_70726573736564")
+theme_override_styles/focus = SubResource("StyleBox_id_73657474696e67735f6c616e6775616765_id_666f637573")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f6c616e6775616765_id_64697361626c6564")
 
 [node name="settings_safe_zone" type="CheckBox" parent="settings_content"]
 metadata/uiforge_id = "settings_safe_zone"
@@ -1460,10 +1462,10 @@ theme_override_icons/checked = ExtResource("Texture2D_10")
 theme_override_icons/unchecked = ExtResource("Texture2D_11")
 theme_override_icons/checked_disabled = ExtResource("Texture2D_10")
 theme_override_icons/unchecked_disabled = ExtResource("Texture2D_11")
-theme_override_styles/normal = SubResource("StyleBox_settings__safe__zone_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__safe__zone_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__safe__zone_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_settings__safe__zone_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f736166655f7a6f6e65_id_64697361626c6564")
 
 [node name="settings_wiring_hint" type="Label" parent="settings_content"]
 metadata/uiforge_id = "settings_wiring_hint"
@@ -1492,11 +1494,11 @@ offset_bottom = 444.0000
 text = "RESET"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__reset_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__reset_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__reset_pressed")
-theme_override_styles/focus = SubResource("StyleBox_settings__reset_focus")
-theme_override_styles/disabled = SubResource("StyleBox_settings__reset_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f7265736574_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f7265736574_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f7265736574_id_70726573736564")
+theme_override_styles/focus = SubResource("StyleBox_id_73657474696e67735f7265736574_id_666f637573")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f7265736574_id_64697361626c6564")
 
 [node name="settings_apply" type="Button" parent="."]
 metadata/uiforge_id = "settings_apply"
@@ -1510,9 +1512,9 @@ offset_bottom = 444.0000
 text = "APPLY"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBox_settings__apply_normal")
-theme_override_styles/hover = SubResource("StyleBox_settings__apply_hover")
-theme_override_styles/pressed = SubResource("StyleBox_settings__apply_pressed")
-theme_override_styles/focus = SubResource("StyleBox_settings__apply_focus")
-theme_override_styles/disabled = SubResource("StyleBox_settings__apply_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_73657474696e67735f6170706c79_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_73657474696e67735f6170706c79_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_73657474696e67735f6170706c79_id_70726573736564")
+theme_override_styles/focus = SubResource("StyleBox_id_73657474696e67735f6170706c79_id_666f637573")
+theme_override_styles/disabled = SubResource("StyleBox_id_73657474696e67735f6170706c79_id_64697361626c6564")
 

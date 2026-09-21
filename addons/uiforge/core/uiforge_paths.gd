@@ -80,6 +80,8 @@ static func resolve_real_path(absolute: String) -> String:
 static func _realpath_directory(dir_path: String) -> String:
 	var normalized := _godot_absolute(dir_path)
 	if OS.get_name() == "Windows":
+		# Windows junction/reparse targets are not fully canonicalized here; portable Python
+		# resolve_real_path() remains the stronger containment layer for symlink escapes.
 		return normalized.simplify_path()
 	var output: Array = []
 	var exit_code := OS.execute("realpath", ["-m", normalized], output, true, false)

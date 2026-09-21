@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "item_grid",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "grid_root",
+    "type": "Panel",
+    "layout": {"size": [420, 280]},
+    "children": [
+      {
+        "id": "inventory_grid",
+        "type": "ItemGrid",
+        "layout": {"position": [16, 16], "size": [240, 180]},
+        "properties": {"columns": 4}
+      }
+    ]
+  }
+}

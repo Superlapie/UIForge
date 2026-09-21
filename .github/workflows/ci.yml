@@ -9,8 +9,8 @@ jobs:
   portable:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install optional schema validator
@@ -21,18 +21,18 @@ jobs:
   portable-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Run filesystem/path portable tests
+      - name: Run Windows filesystem and trust tests
         shell: bash
-        run: python3 -m unittest tests.test_batch2_1_security.Batch21SecurityTests.test_windows_absolute_paths_are_recognized tests.test_batch2_1_security.Batch21SecurityTests.test_allow_unsafe_is_rejected tests.test_batch2_1_security.Batch21SecurityTests.test_same_source_rebuild_after_source_edit_succeeds_without_force -v
+        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security -v
 
   godot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y xvfb unzip wget
       - name: Install Godot 4.7.2
@@ -42,4 +42,6 @@ jobs:
           sudo mv Godot_v4.7.2-stable_linux.x86_64 /usr/local/bin/godot
           godot --version
       - name: Run native test suite
+        env:
+          GODOT_BIN: godot
         run: PATH="$HOME/.local/bin:$PATH" ./scripts/test

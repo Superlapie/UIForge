@@ -845,10 +845,7 @@ func _quote(value: String) -> String:
 	return JSON.stringify(value)
 
 func _resource_id_part(value: String) -> String:
-	var canonical := str(value)
-	if canonical.is_empty():
-		return "node"
-	return canonical.replace("_", "__").replace("-", "_-")
+	return UIForgeIdentifiers.encode_resource_id_part(value)
 
 func _safe_id(value: String) -> String:
 	return _resource_id_part(value)

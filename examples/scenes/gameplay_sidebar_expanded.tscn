@@ -34,7 +34,7 @@
 [ext_resource type="Texture2D" path="res://examples/assets/ui/icons/sidebar_social.svg" id="Texture2D_25"]
 [ext_resource type="Texture2D" path="res://examples/assets/ui/icons/sidebar_settings.svg" id="Texture2D_26"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_gameplay__sidebar__expanded_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_67616d65706c61795f736964656261725f657870616e646564_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -47,7 +47,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_gameplay__sidebar__expanded_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_67616d65706c61795f736964656261725f657870616e646564_id_686f766572"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -60,7 +60,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_gameplay__sidebar__expanded_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_67616d65706c61795f736964656261725f657870616e646564_id_70726573736564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -73,7 +73,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_gameplay__sidebar__expanded_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_67616d65706c61795f736964656261725f657870616e646564_id_64697361626c6564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -86,7 +86,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e74_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_2")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -99,7 +99,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e74_id_686f766572"]
 texture = ExtResource("Texture2D_2")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -112,7 +112,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e74_id_70726573736564"]
 texture = ExtResource("Texture2D_2")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -125,7 +125,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e74_id_64697361626c6564"]
 texture = ExtResource("Texture2D_2")
 texture_margin_left = 36.0000
 texture_margin_top = 36.0000
@@ -138,7 +138,7 @@ content_margin_top = 14.0000
 content_margin_right = 16.0000
 content_margin_bottom = 14.0000
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_sidebar__content__rule_normal"]
+[sub_resource type="StyleBoxFlat" id="StyleBox_id_736964656261725f636f6e74656e745f72756c65_id_6e6f726d616c"]
 bg_color = Color(0.501961, 0.439216, 0.298039, 0.333333)
 border_width_left = 0
 border_width_top = 0
@@ -154,7 +154,7 @@ content_margin_top = 0.0000
 content_margin_right = 0.0000
 content_margin_bottom = 1.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__01_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3031_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -167,76 +167,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__01_hover"]
-texture = ExtResource("Texture2D_6")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.823529, 0.917647, 1.000000, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__01_pressed"]
-texture = ExtResource("Texture2D_6")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__01_disabled"]
-texture = ExtResource("Texture2D_6")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.435294, 0.478431, 0.509804, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__01_selected"]
-texture = ExtResource("Texture2D_6")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__02_normal"]
-texture = ExtResource("Texture2D_6")
-texture_margin_left = 10.0000
-texture_margin_top = 10.0000
-texture_margin_right = 10.0000
-texture_margin_bottom = 10.0000
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0
-content_margin_left = 8.0000
-content_margin_top = 8.0000
-content_margin_right = 8.0000
-content_margin_bottom = 8.0000
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__02_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3031_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -250,7 +181,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__02_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3031_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -264,7 +195,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__02_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3031_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -278,7 +209,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__02_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3031_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -292,7 +223,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__03_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3032_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -305,7 +236,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__03_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3032_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -319,7 +250,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__03_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3032_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -333,7 +264,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__03_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3032_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -347,7 +278,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__03_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3032_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -361,7 +292,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__04_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3033_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -374,7 +305,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__04_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3033_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -388,7 +319,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__04_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3033_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -402,7 +333,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__04_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3033_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -416,7 +347,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__04_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3033_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -430,7 +361,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__05_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3034_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -443,7 +374,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__05_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3034_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -457,7 +388,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__05_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3034_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -471,7 +402,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__05_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3034_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -485,7 +416,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__05_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3034_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -499,7 +430,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__06_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3035_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -512,7 +443,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__06_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3035_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -526,7 +457,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__06_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3035_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -540,7 +471,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__06_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3035_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -554,7 +485,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__06_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3035_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -568,7 +499,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__07_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3036_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -581,7 +512,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__07_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3036_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -595,7 +526,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__07_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3036_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -609,7 +540,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__07_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3036_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -623,7 +554,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__07_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3036_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -637,7 +568,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__08_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3037_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -650,7 +581,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__08_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3037_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -664,7 +595,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__08_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3037_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -678,7 +609,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__08_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3037_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -692,7 +623,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__08_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3037_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -706,7 +637,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__09_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3038_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -719,7 +650,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__09_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3038_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -733,7 +664,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__09_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3038_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -747,7 +678,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__09_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3038_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -761,7 +692,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__09_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3038_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -775,7 +706,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__10_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3039_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -788,7 +719,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__10_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3039_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -802,7 +733,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__10_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3039_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -816,7 +747,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__10_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3039_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -830,7 +761,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__10_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3039_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -844,7 +775,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__11_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3130_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -857,7 +788,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__11_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3130_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -871,7 +802,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__11_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3130_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -885,7 +816,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__11_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3130_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -899,7 +830,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__11_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3130_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -913,7 +844,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__12_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3131_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -926,7 +857,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__12_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3131_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -940,7 +871,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__12_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3131_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -954,7 +885,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__12_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3131_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -968,7 +899,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__12_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3131_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -982,7 +913,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__13_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3132_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -995,7 +926,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__13_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3132_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1009,7 +940,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__13_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3132_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1023,7 +954,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__13_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3132_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1037,7 +968,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__13_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3132_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1051,7 +982,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__14_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3133_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1064,7 +995,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__14_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3133_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1078,7 +1009,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__14_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3133_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1092,7 +1023,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__14_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3133_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1106,7 +1037,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__14_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3133_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1120,7 +1051,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__15_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3134_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1133,7 +1064,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__15_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3134_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1147,7 +1078,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__15_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3134_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1161,7 +1092,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__15_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3134_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1175,7 +1106,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__15_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3134_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1189,7 +1120,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__16_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3135_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1202,7 +1133,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__16_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3135_id_686f766572"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1216,7 +1147,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__16_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3135_id_70726573736564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1230,7 +1161,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__16_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3135_id_64697361626c6564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1244,7 +1175,7 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__content__inventory__slot__16_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3135_id_73656c6563746564"]
 texture = ExtResource("Texture2D_6")
 texture_margin_left = 10.0000
 texture_margin_top = 10.0000
@@ -1258,7 +1189,76 @@ content_margin_top = 8.0000
 content_margin_right = 8.0000
 content_margin_bottom = 8.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__rail_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3136_id_6e6f726d616c"]
+texture = ExtResource("Texture2D_6")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3136_id_686f766572"]
+texture = ExtResource("Texture2D_6")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.823529, 0.917647, 1.000000, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3136_id_70726573736564"]
+texture = ExtResource("Texture2D_6")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3136_id_64697361626c6564"]
+texture = ExtResource("Texture2D_6")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.435294, 0.478431, 0.509804, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3136_id_73656c6563746564"]
+texture = ExtResource("Texture2D_6")
+texture_margin_left = 10.0000
+texture_margin_top = 10.0000
+texture_margin_right = 10.0000
+texture_margin_bottom = 10.0000
+axis_stretch_horizontal = 0
+axis_stretch_vertical = 0
+modulate_color = Color(0.721569, 0.835294, 0.929412, 1.000000)
+content_margin_left = 8.0000
+content_margin_top = 8.0000
+content_margin_right = 8.0000
+content_margin_bottom = 8.0000
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f7261696c_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1271,7 +1271,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__rail_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f7261696c_id_686f766572"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1284,7 +1284,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__rail_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f7261696c_id_70726573736564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1297,7 +1297,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__rail_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f7261696c_id_64697361626c6564"]
 texture = ExtResource("Texture2D_1")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1310,7 +1310,7 @@ content_margin_top = 10.0000
 content_margin_right = 10.0000
 content_margin_bottom = 10.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__toggle__expanded_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_13")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1321,7 +1321,7 @@ content_margin_top = 4.0000
 content_margin_right = 5.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__toggle__expanded_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_686f766572"]
 texture = ExtResource("Texture2D_14")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1332,7 +1332,7 @@ content_margin_top = 4.0000
 content_margin_right = 5.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__toggle__expanded_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_70726573736564"]
 texture = ExtResource("Texture2D_15")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1343,7 +1343,7 @@ content_margin_top = 4.0000
 content_margin_right = 5.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__toggle__expanded_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_64697361626c6564"]
 texture = ExtResource("Texture2D_13")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1354,7 +1354,7 @@ content_margin_top = 4.0000
 content_margin_right = 5.0000
 content_margin_bottom = 4.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__inventory_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1365,7 +1365,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__inventory_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1376,7 +1376,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__inventory_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1387,7 +1387,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__inventory_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1398,7 +1398,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__inventory_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1409,7 +1409,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__equipment_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1420,7 +1420,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__equipment_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1431,7 +1431,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__equipment_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1442,7 +1442,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__equipment_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1453,7 +1453,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__equipment_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1464,7 +1464,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__prayer_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1475,7 +1475,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__prayer_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1486,7 +1486,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__prayer_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1497,7 +1497,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__prayer_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1508,7 +1508,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__prayer_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1519,7 +1519,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__magic_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1530,7 +1530,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__magic_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1541,7 +1541,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__magic_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1552,7 +1552,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__magic_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1563,7 +1563,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__magic_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1574,7 +1574,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__skills_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1585,7 +1585,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__skills_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1596,7 +1596,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__skills_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1607,7 +1607,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__skills_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1618,7 +1618,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__skills_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1629,7 +1629,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__quests_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1640,7 +1640,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__quests_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1651,7 +1651,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__quests_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1662,7 +1662,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__quests_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1673,7 +1673,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__quests_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1684,7 +1684,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__social_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1695,7 +1695,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__social_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1706,7 +1706,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__social_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1717,7 +1717,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__social_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1728,7 +1728,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__social_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1739,7 +1739,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__settings_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_6e6f726d616c"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1750,7 +1750,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__settings_hover"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_686f766572"]
 texture = ExtResource("Texture2D_17")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1761,7 +1761,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__settings_pressed"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_70726573736564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1772,7 +1772,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__settings_disabled"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_64697361626c6564"]
 texture = ExtResource("Texture2D_16")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1783,7 +1783,7 @@ content_margin_top = 5.0000
 content_margin_right = 5.0000
 content_margin_bottom = 5.0000
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_sidebar__expanded__tab__settings_selected"]
+[sub_resource type="StyleBoxTexture" id="StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_73656c6563746564"]
 texture = ExtResource("Texture2D_18")
 texture_margin_left = 8.0000
 texture_margin_top = 8.0000
@@ -1803,7 +1803,7 @@ offset_left = 1590.0000
 offset_top = 150.0000
 offset_right = 1908.0000
 offset_bottom = 762.0000
-theme_override_styles/panel = SubResource("StyleBox_gameplay__sidebar__expanded_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_67616d65706c61795f736964656261725f657870616e646564_id_6e6f726d616c")
 [node name="sidebar_content" type="Panel" parent="."]
 metadata/uiforge_id = "sidebar_content"
 metadata/uiforge_type = "SimplePanel"
@@ -1812,12 +1812,13 @@ offset_left = 8.0000
 offset_top = 10.0000
 offset_right = 226.0000
 offset_bottom = 602.0000
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e74_id_6e6f726d616c")
 
 [node name="sidebar_content__surface" type="TextureRect" parent="sidebar_content"]
 metadata/uiforge_id = "sidebar_content__surface"
 metadata/uiforge_type = "Texture"
 metadata/uiforge_generated = true
+metadata/uiforge_decoration = true
 offset_left = 11.0000
 offset_top = 11.0000
 offset_right = -11.0000
@@ -1855,7 +1856,7 @@ offset_left = 14.0000
 offset_top = 44.0000
 offset_right = 202.0000
 offset_bottom = 45.0000
-theme_override_styles/separator = SubResource("StyleBox_sidebar__content__rule_normal")
+theme_override_styles/separator = SubResource("StyleBox_id_736964656261725f636f6e74656e745f72756c65_id_6e6f726d616c")
 
 [node name="sidebar_content_hint" type="Label" parent="sidebar_content"]
 metadata/uiforge_id = "sidebar_content_hint"
@@ -1888,7 +1889,7 @@ metadata/uiforge_id = "sidebar_content_inventory_slot_01"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__01_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3031_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_01_icon" type="TextureRect" parent="sidebar_content/sidebar_content_inventory/sidebar_content_inventory_slot_01"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_01_icon"
@@ -1922,7 +1923,7 @@ metadata/uiforge_id = "sidebar_content_inventory_slot_02"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__02_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3032_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_02_icon" type="TextureRect" parent="sidebar_content/sidebar_content_inventory/sidebar_content_inventory_slot_02"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_02_icon"
@@ -1956,7 +1957,7 @@ metadata/uiforge_id = "sidebar_content_inventory_slot_03"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__03_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3033_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_03_icon" type="TextureRect" parent="sidebar_content/sidebar_content_inventory/sidebar_content_inventory_slot_03"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_03_icon"
@@ -1990,7 +1991,7 @@ metadata/uiforge_id = "sidebar_content_inventory_slot_04"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__04_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3034_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_04_icon" type="TextureRect" parent="sidebar_content/sidebar_content_inventory/sidebar_content_inventory_slot_04"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_04_icon"
@@ -2024,7 +2025,7 @@ metadata/uiforge_id = "sidebar_content_inventory_slot_05"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__05_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3035_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_05_icon" type="TextureRect" parent="sidebar_content/sidebar_content_inventory/sidebar_content_inventory_slot_05"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_05_icon"
@@ -2058,7 +2059,7 @@ metadata/uiforge_id = "sidebar_content_inventory_slot_06"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__06_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3036_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_06_icon" type="TextureRect" parent="sidebar_content/sidebar_content_inventory/sidebar_content_inventory_slot_06"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_06_icon"
@@ -2092,70 +2093,70 @@ metadata/uiforge_id = "sidebar_content_inventory_slot_07"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__07_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3037_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_08" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_08"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__08_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3038_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_09" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_09"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__09_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3039_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_10" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_10"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__10_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3130_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_11" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_11"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__11_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3131_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_12" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_12"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__12_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3132_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_13" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_13"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__13_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3133_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_14" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_14"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__14_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3134_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_15" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_15"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__15_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3135_id_6e6f726d616c")
 
 [node name="sidebar_content_inventory_slot_16" type="Panel" parent="sidebar_content/sidebar_content_inventory"]
 metadata/uiforge_id = "sidebar_content_inventory_slot_16"
 metadata/uiforge_type = "ItemSlot"
 metadata/uiforge_generated = true
 custom_minimum_size = Vector2(40.0000, 40.0000)
-theme_override_styles/panel = SubResource("StyleBox_sidebar__content__inventory__slot__16_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f636f6e74656e745f696e76656e746f72795f736c6f745f3136_id_6e6f726d616c")
 
 [node name="sidebar_content_status" type="Label" parent="sidebar_content"]
 metadata/uiforge_id = "sidebar_content_status"
@@ -2179,7 +2180,7 @@ offset_left = 232.0000
 offset_top = 0.0000
 offset_right = 310.0000
 offset_bottom = 612.0000
-theme_override_styles/panel = SubResource("StyleBox_sidebar__rail_normal")
+theme_override_styles/panel = SubResource("StyleBox_id_736964656261725f7261696c_id_6e6f726d616c")
 
 [node name="sidebar_toggle_expanded" type="Button" parent="sidebar_rail"]
 metadata/uiforge_id = "sidebar_toggle_expanded"
@@ -2195,10 +2196,10 @@ tooltip_text = "Collapse interface sidebar"
 accessibility_name = "Collapse interface sidebar"
 theme_override_fonts/font = ExtResource("FontFile_4")
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBox_sidebar__toggle__expanded_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__toggle__expanded_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__toggle__expanded_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__toggle__expanded_disabled")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f746f67676c655f657870616e646564_id_64697361626c6564")
 
 [node name="sidebar_expanded_tab_inventory" type="Button" parent="sidebar_rail"]
 metadata/uiforge_id = "sidebar_expanded_tab_inventory"
@@ -2215,11 +2216,11 @@ tooltip_text = "Inventory (I)"
 focus_mode = 2
 accessibility_name = "Inventory"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__inventory_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__inventory_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__inventory_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__inventory_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__inventory_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f696e76656e746f7279_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_inventory_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_inventory"]
 metadata/uiforge_id = "sidebar_expanded_tab_inventory_glyph"
@@ -2263,11 +2264,11 @@ tooltip_text = "Equipment"
 focus_mode = 2
 accessibility_name = "Equipment"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__equipment_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__equipment_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__equipment_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__equipment_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__equipment_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f65717569706d656e74_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_equipment_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_equipment"]
 metadata/uiforge_id = "sidebar_expanded_tab_equipment_glyph"
@@ -2311,11 +2312,11 @@ tooltip_text = "Prayer"
 focus_mode = 2
 accessibility_name = "Prayer"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__prayer_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__prayer_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__prayer_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__prayer_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__prayer_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f707261796572_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_prayer_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_prayer"]
 metadata/uiforge_id = "sidebar_expanded_tab_prayer_glyph"
@@ -2359,11 +2360,11 @@ tooltip_text = "Magic"
 focus_mode = 2
 accessibility_name = "Magic"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__magic_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__magic_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__magic_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__magic_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__magic_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f6d61676963_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_magic_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_magic"]
 metadata/uiforge_id = "sidebar_expanded_tab_magic_glyph"
@@ -2407,11 +2408,11 @@ tooltip_text = "Skills"
 focus_mode = 2
 accessibility_name = "Skills"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__skills_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__skills_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__skills_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__skills_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__skills_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736b696c6c73_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_skills_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_skills"]
 metadata/uiforge_id = "sidebar_expanded_tab_skills_glyph"
@@ -2456,11 +2457,11 @@ tooltip_text = "Quest journal (J)"
 focus_mode = 2
 accessibility_name = "Quest journal"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__quests_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__quests_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__quests_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__quests_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__quests_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f717565737473_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_quests_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_quests"]
 metadata/uiforge_id = "sidebar_expanded_tab_quests_glyph"
@@ -2504,11 +2505,11 @@ tooltip_text = "Social"
 focus_mode = 2
 accessibility_name = "Social"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__social_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__social_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__social_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__social_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__social_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f736f6369616c_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_social_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_social"]
 metadata/uiforge_id = "sidebar_expanded_tab_social_glyph"
@@ -2552,11 +2553,11 @@ tooltip_text = "Settings"
 focus_mode = 2
 accessibility_name = "Settings"
 theme_override_fonts/font = ExtResource("FontFile_5")
-theme_override_styles/normal = SubResource("StyleBox_sidebar__expanded__tab__settings_normal")
-theme_override_styles/hover = SubResource("StyleBox_sidebar__expanded__tab__settings_hover")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__settings_pressed")
-theme_override_styles/disabled = SubResource("StyleBox_sidebar__expanded__tab__settings_disabled")
-theme_override_styles/pressed = SubResource("StyleBox_sidebar__expanded__tab__settings_selected")
+theme_override_styles/normal = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_6e6f726d616c")
+theme_override_styles/hover = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_686f766572")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_70726573736564")
+theme_override_styles/disabled = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_64697361626c6564")
+theme_override_styles/pressed = SubResource("StyleBox_id_736964656261725f657870616e6465645f7461625f73657474696e6773_id_73656c6563746564")
 
 [node name="sidebar_expanded_tab_settings_glyph" type="TextureRect" parent="sidebar_rail/sidebar_expanded_tab_settings"]
 metadata/uiforge_id = "sidebar_expanded_tab_settings_glyph"

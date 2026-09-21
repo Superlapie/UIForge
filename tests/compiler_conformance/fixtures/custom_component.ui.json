@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "name": "custom_component",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "components": {
+    "BadgePanel": {
+      "base": "SimplePanel",
+      "node": {
+        "type": "Panel",
+        "properties": {"tooltip": "Badge panel"}
+      }
+    }
+  },
+  "root": {
+    "id": "custom_root",
+    "type": "ComponentInstance",
+    "component": "BadgePanel",
+    "layout": {"position": [20, 20], "size": [240, 120]},
+    "children": [
+      {
+        "id": "custom_child",
+        "type": "Label",
+        "layout": {"position": [12, 12], "size": [160, 24]},
+        "properties": {"text": "Custom"}
+      }
+    ]
+  }
+}

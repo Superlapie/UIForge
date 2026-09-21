@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "hierarchy",
+  "viewport": {"width": 800, "height": 600},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "hierarchy_root",
+    "type": "Panel",
+    "layout": {"size": [400, 300]},
+    "children": [
+      {
+        "id": "nested_panel",
+        "type": "Panel",
+        "layout": {"position": [12, 12], "size": [200, 120]},
+        "children": [
+          {
+            "id": "nested_label",
+            "type": "Label",
+            "layout": {"position": [8, 8], "size": [120, 24]},
+            "properties": {"text": "Nested"}
+          }
+        ]
+      }
+    ]
+  }
+}

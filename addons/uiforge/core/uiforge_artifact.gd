@@ -58,6 +58,8 @@ static func parse_scene_header(text: Variant) -> Dictionary:
 	var duplicate_versions := 0
 	var duplicate_sources := 0
 	var duplicate_hashes := 0
+	var duplicate_generators := 0
+	var duplicate_schemas := 0
 	var comment_lines := 0
 	for line in raw.split("\n", false):
 		var trimmed := str(line).strip_edges()
@@ -67,6 +69,11 @@ static func parse_scene_header(text: Variant) -> Dictionary:
 		if comment_lines > MAX_HEADER_LINES:
 			errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", "Provenance preamble exceeds supported size."))
 			break
+		if trimmed.begins_with("; UIFORGE_GENERATED_V") and trimmed != "; %s" % HEADER_VERSION:
+			header["is_uiforge"] = true
+			header["version"] = trimmed.substr(2).strip_edges()
+			errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", "Unsupported provenance version '%s'." % header["version"]))
+			continue
 		if trimmed == "; %s" % HEADER_VERSION:
 			duplicate_versions += 1
 			header["is_uiforge"] = true
@@ -81,15 +88,17 @@ static func parse_scene_header(text: Variant) -> Dictionary:
 			header["source_hash"] = trimmed.substr("; uiforge_source_hash:".length()).strip_edges()
 			continue
 		if trimmed.begins_with("; uiforge_generator:"):
+			duplicate_generators += 1
 			header["generator"] = trimmed.substr("; uiforge_generator:".length()).strip_edges()
 			continue
 		if trimmed.begins_with("; uiforge_schema:"):
+			duplicate_schemas += 1
 			var schema_text := trimmed.substr("; uiforge_schema:".length()).strip_edges()
 			if not schema_text.is_valid_int():
 				errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", "Malformed uiforge_schema value."))
 			else:
 				header["schema"] = int(schema_text)
-	if duplicate_versions > 1 or duplicate_sources > 1 or duplicate_hashes > 1:
+	if duplicate_versions > 1 or duplicate_sources > 1 or duplicate_hashes > 1 or duplicate_generators > 1 or duplicate_schemas > 1:
 		errors.append(_parse_error("OUTPUT_PROVENANCE_INVALID", "Duplicate provenance header fields."))
 	if header.get("is_uiforge", false):
 		errors.append_array(validate_provenance(header))

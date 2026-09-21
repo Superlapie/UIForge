@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "layout_anchors",
+  "viewport": {"width": 800, "height": 600},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "layout_root",
+    "type": "Control",
+    "layout": {"size": [800, 600], "anchors_preset": "full_rect"},
+    "children": [
+      {
+        "id": "anchored_panel",
+        "type": "Panel",
+        "layout": {
+          "anchors_preset": "center",
+          "position": [300, 200],
+          "size": [200, 120]
+        },
+        "children": []
+      }
+    ]
+  }
+}

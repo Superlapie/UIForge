@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "decorations",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "decor_root",
+    "type": "Panel",
+    "layout": {"size": [420, 280]},
+    "decorations": {
+      "corner_gem": {
+        "texture": "res://examples/assets/uiforge_gem.svg",
+        "position": [320, 16],
+        "size": [48, 48]
+      }
+    },
+    "children": [
+      {
+        "id": "decor_label",
+        "type": "Label",
+        "layout": {"position": [16, 16], "size": [180, 24]},
+        "properties": {"text": "Decorated"}
+      }
+    ]
+  }
+}

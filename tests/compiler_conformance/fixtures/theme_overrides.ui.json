@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "name": "theme_overrides",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "theme_root",
+    "type": "Panel",
+    "layout": {"size": [320, 200]},
+    "children": [
+      {
+        "id": "styled_label",
+        "type": "Label",
+        "layout": {"position": [16, 16], "size": [220, 32]},
+        "properties": {
+          "text": "Styled",
+          "godot_overrides": {
+            "theme_override_colors/font_color": "$colors.gold",
+            "theme_override_constants/outline_size": 2
+          }
+        }
+      }
+    ]
+  }
+}

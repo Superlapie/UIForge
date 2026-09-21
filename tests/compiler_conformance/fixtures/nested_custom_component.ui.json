@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "nested_custom_component",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "components": {
+    "OuterPanel": {
+      "base": "SimplePanel",
+      "node": {"type": "Panel"}
+    },
+    "InnerBadge": {
+      "base": "OuterPanel",
+      "node": {
+        "type": "Panel",
+        "children": [
+          {"id": "inner_label", "type": "Label", "layout": {"position": [8, 8], "size": [120, 24]}, "properties": {"text": "Inner"}}
+        ]
+      }
+    }
+  },
+  "root": {
+    "id": "nested_custom_root",
+    "type": "ComponentInstance",
+    "component": "InnerBadge",
+    "layout": {"position": [16, 16], "size": [260, 140]}
+  }
+}
