@@ -7,7 +7,7 @@ var studio: Control
 
 func _enter_tree() -> void:
 	studio = STUDIO_SCRIPT.new()
-	studio.name = "AetherUIStudio"
+	studio.name = "UIForgeStudio"
 	studio.set_meta("aether_editor_plugin", true)
 	if studio.has_method("set_editor_undo_redo"):
 		studio.set_editor_undo_redo(get_undo_redo())

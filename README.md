@@ -1,10 +1,19 @@
 # UIForge
 
-UIForge is a Godot-native production tool for authoring sophisticated game interfaces. It has one canonical source format: readable `*.ui.json` documents. The visual editor, AI workflow, validator, compiler, and renderer all operate on that same document.
+UIForge is a community-built, AI-first Godot production tool for authoring sophisticated game interfaces. It has one canonical source format: readable `*.ui.json` documents. The visual editor, AI workflow, validator, compiler, and renderer all operate on that same document.
 
 The current `aether_ui` addon path and class namespace are retained for compatibility with existing projects and generated scenes.
 
 It is deliberately not a web editor, Figma bridge, marketplace, or custom runtime renderer. Compiled output is ordinary Godot `.tscn` content with stable node names and metadata for GDScript or C# gameplay code.
+
+## Community project
+
+UIForge is maintained in the open so humans and AI agents can build reliable, reusable Godot interfaces together.
+
+- **AI-first by contract:** agents can discover capabilities, inspect documents, make stable-ID edits, validate, and compile through the CLI.
+- **Human-editable by design:** every interface remains readable JSON with ordinary Godot scene output.
+- **Good pull requests are welcome:** see [CONTRIBUTING.md](CONTRIBUTING.md) for the quality bar and contribution workflow.
+- **Questions and ideas:** use [GitHub Discussions](https://github.com/Superlapie/UIForge/discussions); use [Issues](https://github.com/Superlapie/UIForge/issues) for reproducible bugs and focused requests.
 
 ## Populated reference atlas
 
@@ -67,3 +76,12 @@ The original screens in `examples/specs` are compact, atlas-style UI skeletons: 
 With Godot installed, this runs the Godot-native test runner. Without Godot it runs the portable fallback suite, covering JSON round trips, diagnostics, stable-ID operations, capabilities, and compilation of all six original examples plus the populated atlas templates.
 
 More detail is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/EDITOR_GUIDE.md](docs/EDITOR_GUIDE.md), and [docs/GAME_INTEGRATION.md](docs/GAME_INTEGRATION.md).
+
+## License
+
+UIForge uses dual licensing:
+
+- **Noncommercial use** is free under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+- **Commercial use** requires a separate license. See [COMMERCIAL.md](COMMERCIAL.md) for the scope and contact process.
+
+Contributions are accepted under the same terms described in [CONTRIBUTING.md](CONTRIBUTING.md).

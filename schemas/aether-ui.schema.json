@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://internal/aether-ui/schema/1",
-	"title": "Aether UI Document",
+	"title": "UIForge Document",
 	"description": "Canonical, human-readable source format for native Godot game UI.",
 	"type": "object",
 	"additionalProperties": false,

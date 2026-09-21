@@ -57,7 +57,7 @@ static func create_default(document_name: String = "untitled") -> AetherDocument
 		"name": document_name,
 		"viewport": {"width": 1920, "height": 1080},
 		"theme": "dark_fantasy",
-		"metadata": {"created_by": "aether_ui"},
+		"metadata": {"created_by": "uiforge"},
 		"root": {
 			"id": "%s_root" % document_name.to_snake_case(),
 			"type": "WindowFrame",

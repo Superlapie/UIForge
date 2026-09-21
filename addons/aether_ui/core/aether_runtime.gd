@@ -1,4 +1,4 @@
-class_name AetherRuntime
+class_name UIForgeRuntime
 extends RefCounted
 
 ## Small language-neutral helpers for generated scenes. Gameplay code remains in the game.

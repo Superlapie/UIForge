@@ -9,17 +9,17 @@ Assume `examples/scenes/inventory.tscn` was built from `examples/specs/inventory
 ```gdscript
 extends Control
 
-const AetherRuntime = preload("res://addons/aether_ui/core/aether_runtime.gd")
+const UIForgeRuntime = preload("res://addons/aether_ui/core/aether_runtime.gd")
 const INVENTORY_SCENE = preload("res://examples/scenes/inventory.tscn")
 
 func open_inventory() -> void:
 	var inventory := INVENTORY_SCENE.instantiate()
 	$UI.add_child(inventory)
-	AetherRuntime.connect_action(inventory, "inventory_close", _on_inventory_close)
-	AetherRuntime.set_text(inventory, "inventory_capacity", "23 / 28 SLOTS")
+	UIForgeRuntime.connect_action(inventory, "inventory_close", _on_inventory_close)
+	UIForgeRuntime.set_text(inventory, "inventory_capacity", "23 / 28 SLOTS")
 
 func _on_inventory_close() -> void:
-	var inventory := AetherRuntime.find_by_id($UI, "inventory_window")
+	var inventory := UIForgeRuntime.find_by_id($UI, "inventory_window")
 	if inventory != null:
 		inventory.queue_free()
 ```
@@ -71,9 +71,9 @@ const HUD_SCENE = preload("res://examples/scenes/combat_hud.tscn")
 func create_hud() -> Control:
 	var hud := HUD_SCENE.instantiate()
 	$UI.add_child(hud)
-	AetherRuntime.set_value(hud, "health_bar", 0.74)
-	AetherRuntime.set_text(hud, "health_label", "740 / 1000")
-	AetherRuntime.connect_action(hud, "action_slot_1", _on_hotbar_1)
+	UIForgeRuntime.set_value(hud, "health_bar", 0.74)
+	UIForgeRuntime.set_text(hud, "health_label", "740 / 1000")
+	UIForgeRuntime.connect_action(hud, "action_slot_1", _on_hotbar_1)
 	return hud
 ~~~
 
@@ -92,8 +92,8 @@ The authored preview ratios are visual-only. Replace them immediately from clien
 
 The source document's `binding` and `action` values become `metadata/aether_binding` and `metadata/aether_action`. They are identifiers, not scripts. The game may map them to its own event bus, controller, or C# services.
 
-Lightweight motion is likewise data-only. A node’s `transitions` map becomes `metadata/aether_transitions`; a UI controller can read it with `AetherRuntime.transition_config(node)` and call `AetherRuntime.play_transition(control, "panel_reveal")`. This helper is optional and does not add gameplay logic to generated scenes.
+Lightweight motion is likewise data-only. A node’s `transitions` map becomes `metadata/aether_transitions`; a UI controller can read it with `UIForgeRuntime.transition_config(node)` and call `UIForgeRuntime.play_transition(control, "panel_reveal")`. This helper is optional and does not add gameplay logic to generated scenes.
 
-Effect references are data-only as well: `effects` becomes `metadata/aether_effects`, and `AetherRuntime.effect_config(node)` exposes the decoded name/object/array to a game-owned visual controller. Project-owned materials remain ordinary Godot resources.
+Effect references are data-only as well: `effects` becomes `metadata/aether_effects`, and `UIForgeRuntime.effect_config(node)` exposes the decoded name/object/array to a game-owned visual controller. Project-owned materials remain ordinary Godot resources.
 
 For repeated data such as inventory slots, keep the generated layout and style, then populate the ordinary generated children or use a game-owned controller. Do not add MMO networking logic to the document compiler.

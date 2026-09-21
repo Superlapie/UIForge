@@ -67,7 +67,7 @@ Every command prints JSON. A failure has `success: false` and structured `errors
 
 Use `$colors.text_primary`, `$spacing.md`, `$font_size.heading`, and other tokens from the active theme rather than arbitrary hex values. Semantic components automatically select coherent styles. A node may also use `states` for `hover`, `pressed`, `focused`, `disabled`, and `selected`.
 
-Use `transitions` for lightweight runtime motion. The compiler preserves the configuration as `metadata/aether_transitions`, and `AetherRuntime.play_transition()` provides the corresponding Tween helper. Supported presets are `fade`, `scale`, `slide`, `hover`, `button_press`, and `panel_reveal`.
+Use `transitions` for lightweight runtime motion. The compiler preserves the configuration as `metadata/aether_transitions`, and `UIForgeRuntime.play_transition()` provides the corresponding Tween helper. Supported presets are `fade`, `scale`, `slide`, `hover`, `button_press`, and `panel_reveal`.
 
 Use `effects` for restrained reusable visual effect references. Values may be a theme effect name, an object, or an array; the compiler preserves them as `metadata/aether_effects`. The included theme exposes `hover_highlight` and `gold_glow`. Use `properties.material` or `properties.godot_overrides` for project-owned `ShaderMaterial` resources when a custom shader is needed.
 
