@@ -1,0 +1,10 @@
+{
+	"schema_version": 1,
+	"name": "invalid_duplicate",
+	"viewport": {"width": 1920, "height": 1080},
+	"theme": "dark_fantasy",
+	"root": {"id": "root", "type": "WindowFrame", "children": [
+		{"id": "duplicate", "type": "Label"},
+		{"id": "duplicate", "type": "Button"}
+	]}
+}

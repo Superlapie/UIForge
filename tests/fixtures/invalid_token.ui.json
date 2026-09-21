@@ -1,0 +1,9 @@
+{
+	"schema_version": 1,
+	"name": "invalid_token",
+	"viewport": {"width": 1920, "height": 1080},
+	"theme": "dark_fantasy",
+	"root": {"id": "root", "type": "WindowFrame", "children": [
+		{"id": "bad_style", "type": "Panel", "properties": {"color": "$colors.does_not_exist"}}
+	]}
+}

@@ -1,0 +1,493 @@
+{
+	"schema_version": 1,
+	"name": "settings",
+	"viewport": {
+		"width": 1920,
+		"height": 1080,
+		"scale_mode": "fit",
+		"safe_zone": 0.04
+	},
+	"theme": "dark_fantasy",
+	"metadata": {
+		"screen": "settings",
+		"preview_mode": "skeleton",
+		"runtime_note": "The game owns persistence, localization, input mapping, and option application."
+	},
+	"mock_data": {
+		"preview_mode": "empty_controls",
+		"seed": 23
+	},
+	"root": {
+		"id": "settings_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				140,
+				160
+			],
+			"size": [
+				600,
+				460
+			]
+		},
+		"children": [
+			{
+				"id": "settings_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						12
+					],
+					"size": [
+						490,
+						28
+					]
+				},
+				"properties": {
+					"text": "Settings",
+					"font_size": "$font_size.heading",
+					"color": "$colors.gold"
+				}
+			},
+			{
+				"id": "settings_subtitle",
+				"type": "Label",
+				"layout": {
+					"position": [
+						0,
+						0
+					],
+					"size": [
+						0,
+						0
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_secondary",
+					"visible": false
+				}
+			},
+			{
+				"id": "settings_close",
+				"type": "SecondaryButton",
+				"layout": {
+					"position": [
+						552,
+						10
+					],
+					"size": [
+						32,
+						32
+					]
+				},
+				"properties": {
+					"text": "×",
+					"font_size": "$font_size.heading"
+				},
+				"action": "settings.close"
+			},
+			{
+				"id": "settings_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						16,
+						48
+					],
+					"size": [
+						568,
+						1
+					]
+				}
+			},
+			{
+				"id": "settings_sidebar",
+				"type": "SidebarNavigation",
+				"layout": {
+					"position": [
+						16,
+						62
+					],
+					"size": [
+						122,
+						336
+					]
+				},
+				"children": [
+					{
+						"id": "settings_gameplay",
+						"type": "SidebarEntry",
+						"layout": {
+							"min_size": [
+								122,
+								32
+							]
+						},
+						"properties": {
+							"text": "Gameplay",
+							"font_size": "$font_size.caption",
+							"toggle_mode": true,
+							"button_pressed": true
+						},
+						"action": "settings.category.gameplay"
+					},
+					{
+						"id": "settings_interface",
+						"type": "SidebarEntry",
+						"layout": {
+							"min_size": [
+								122,
+								32
+							]
+						},
+						"properties": {
+							"text": "Interface",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.category.interface"
+					},
+					{
+						"id": "settings_graphics",
+						"type": "SidebarEntry",
+						"layout": {
+							"min_size": [
+								122,
+								32
+							]
+						},
+						"properties": {
+							"text": "Graphics",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.category.graphics"
+					},
+					{
+						"id": "settings_audio",
+						"type": "SidebarEntry",
+						"layout": {
+							"min_size": [
+								122,
+								32
+							]
+						},
+						"properties": {
+							"text": "Audio",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.category.audio"
+					},
+					{
+						"id": "settings_controls",
+						"type": "SidebarEntry",
+						"layout": {
+							"min_size": [
+								122,
+								32
+							]
+						},
+						"properties": {
+							"text": "Controls",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.category.controls"
+					}
+				],
+				"properties": {
+					"separation": 7
+				}
+			},
+			{
+				"id": "settings_content",
+				"type": "SectionPanel",
+				"layout": {
+					"position": [
+						152,
+						62
+					],
+					"size": [
+						432,
+						336
+					]
+				},
+				"children": [
+					{
+						"id": "settings_content_title",
+						"type": "Label",
+						"layout": {
+							"position": [
+								16,
+								12
+							],
+							"size": [
+								380,
+								24
+							]
+						},
+						"properties": {
+							"text": "GAMEPLAY",
+							"font_size": "$font_size.heading",
+							"color": "$colors.text_primary"
+						}
+					},
+					{
+						"id": "settings_content_rule",
+						"type": "Separator",
+						"layout": {
+							"position": [
+								16,
+								44
+							],
+							"size": [
+								400,
+								1
+							]
+						}
+					},
+					{
+						"id": "settings_damage_numbers",
+						"type": "CheckBox",
+						"layout": {
+							"position": [
+								16,
+								52
+							],
+							"size": [
+								400,
+								32
+							]
+						},
+						"properties": {
+							"text": "SHOW COMBAT NUMBERS",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.show_damage_numbers",
+						"binding": "settings.show_damage_numbers"
+					},
+					{
+						"id": "settings_player_names",
+						"type": "CheckBox",
+						"layout": {
+							"position": [
+								16,
+								86
+							],
+							"size": [
+								400,
+								32
+							]
+						},
+						"properties": {
+							"text": "SHOW PLAYER NAMES",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.show_player_names",
+						"binding": "settings.show_player_names"
+					},
+					{
+						"id": "settings_tooltips",
+						"type": "CheckBox",
+						"layout": {
+							"position": [
+								16,
+								120
+							],
+							"size": [
+								400,
+								32
+							]
+						},
+						"properties": {
+							"text": "DETAILED TOOLTIPS",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.detailed_tooltips",
+						"binding": "settings.detailed_tooltips"
+					},
+					{
+						"id": "settings_camera_label",
+						"type": "Label",
+						"layout": {
+							"position": [
+								16,
+								162
+							],
+							"size": [
+								270,
+								18
+							]
+						},
+						"properties": {
+							"text": "CAMERA DISTANCE",
+							"font_size": "$font_size.caption",
+							"color": "$colors.text_secondary"
+						}
+					},
+					{
+						"id": "settings_camera_value",
+						"type": "Label",
+						"layout": {
+							"position": [
+								344,
+								162
+							],
+							"size": [
+								72,
+								18
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.caption",
+							"color": "$colors.text_secondary",
+							"horizontal_alignment": "right"
+						},
+						"binding": "settings.camera_distance"
+					},
+					{
+						"id": "settings_camera_slider",
+						"type": "Slider",
+						"layout": {
+							"position": [
+								16,
+								183
+							],
+							"size": [
+								400,
+								32
+							]
+						},
+						"properties": {
+							"min_value": 0,
+							"max_value": 1,
+							"step": 0.01,
+							"value": 0
+						},
+						"binding": "settings.camera_distance"
+					},
+					{
+						"id": "settings_language_label",
+						"type": "Label",
+						"layout": {
+							"position": [
+								16,
+								224
+							],
+							"size": [
+								180,
+								18
+							]
+						},
+						"properties": {
+							"text": "LANGUAGE",
+							"font_size": "$font_size.caption",
+							"color": "$colors.text_secondary"
+						}
+					},
+					{
+						"id": "settings_language",
+						"type": "SecondaryButton",
+						"layout": {
+							"position": [
+								210,
+								218
+							],
+							"size": [
+								206,
+								32
+							]
+						},
+						"properties": {
+							"text": "SELECT LANGUAGE",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.language",
+						"binding": "settings.language"
+					},
+					{
+						"id": "settings_safe_zone",
+						"type": "CheckBox",
+						"layout": {
+							"position": [
+								16,
+								267
+							],
+							"size": [
+								400,
+								32
+							]
+						},
+						"properties": {
+							"text": "RESPECT SAFE ZONE",
+							"font_size": "$font_size.caption"
+						},
+						"action": "settings.safe_zone",
+						"binding": "settings.safe_zone"
+					},
+					{
+						"id": "settings_wiring_hint",
+						"type": "Label",
+						"layout": {
+							"position": [
+								0,
+								0
+							],
+							"size": [
+								0,
+								0
+							]
+						},
+						"properties": {
+							"text": "",
+							"font_size": "$font_size.micro",
+							"color": "$colors.text_muted",
+							"horizontal_alignment": "center",
+							"visible": false
+						},
+						"binding": "settings.runtime"
+					}
+				]
+			},
+			{
+				"id": "settings_reset",
+				"type": "SecondaryButton",
+				"layout": {
+					"position": [
+						16,
+						412
+					],
+					"size": [
+						130,
+						32
+					]
+				},
+				"properties": {
+					"text": "RESET",
+					"font_size": "$font_size.caption"
+				},
+				"action": "settings.reset"
+			},
+			{
+				"id": "settings_apply",
+				"type": "PrimaryButton",
+				"layout": {
+					"position": [
+						454,
+						412
+					],
+					"size": [
+						130,
+						32
+					]
+				},
+				"properties": {
+					"text": "APPLY",
+					"font_size": "$font_size.caption"
+				},
+				"action": "settings.apply"
+			}
+		]
+	}
+}

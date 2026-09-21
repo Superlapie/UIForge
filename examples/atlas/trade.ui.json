@@ -1,0 +1,607 @@
+{
+	"schema_version": 1,
+	"name": "trade",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 232,
+		"height": 169,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a",
+				"ink_d9d4c6": "#d9d4c6"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_enamel.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://examples/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_smoke.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Trade window",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer."
+	},
+	"root": {
+		"id": "trade_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				232,
+				169
+			]
+		},
+		"children": [
+			{
+				"id": "trade_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						177,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Trade Window",
+					"font_size": 13,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "trade_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						208,
+						1
+					]
+				}
+			},
+			{
+				"id": "trade_you",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						37
+					],
+					"size": [
+						94,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Your Offer",
+					"font_size": 10,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "trade_them",
+				"type": "Label",
+				"layout": {
+					"position": [
+						132,
+						37
+					],
+					"size": [
+						94,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Their Offer",
+					"font_size": 10,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "trade_your_slots",
+				"type": "Grid",
+				"layout": {
+					"position": [
+						14,
+						58
+					],
+					"size": [
+						84,
+						56
+					]
+				},
+				"properties": {
+					"columns": 3,
+					"gap": 3
+				},
+				"children": [
+					{
+						"id": "trade_your_slots_00",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"binding": "trade.your.slots.00"
+					},
+					{
+						"id": "trade_your_slots_01",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"binding": "trade.your.slots.01"
+					},
+					{
+						"id": "trade_your_slots_02",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"binding": "trade.your.slots.02"
+					},
+					{
+						"id": "trade_your_slots_03",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"binding": "trade.your.slots.03"
+					},
+					{
+						"id": "trade_your_slots_04",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"binding": "trade.your.slots.04"
+					},
+					{
+						"id": "trade_your_slots_05",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"binding": "trade.your.slots.05"
+					}
+				]
+			},
+			{
+				"id": "trade_their_slots",
+				"type": "Grid",
+				"layout": {
+					"position": [
+						136,
+						58
+					],
+					"size": [
+						56,
+						56
+					]
+				},
+				"properties": {
+					"columns": 2,
+					"gap": 3
+				},
+				"children": [
+					{
+						"id": "trade_their_slots_00",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"children": [
+							{
+								"id": "trade_their_slots_00_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										15,
+										15
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										0,
+										0,
+										362,
+										362
+									]
+								}
+							},
+							{
+								"id": "trade_their_slots_00_count",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										10
+									],
+									"size": [
+										20,
+										13
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "3",
+									"font_size": 9,
+									"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+									"color": "$atlas.ink_d9d4c6",
+									"clip_text": true
+								}
+							}
+						],
+						"binding": "trade.their.slots.00"
+					},
+					{
+						"id": "trade_their_slots_01",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"children": [
+							{
+								"id": "trade_their_slots_01_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										15,
+										15
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										362,
+										0,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "trade.their.slots.01"
+					},
+					{
+						"id": "trade_their_slots_02",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"children": [
+							{
+								"id": "trade_their_slots_02_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										15,
+										15
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										724,
+										0,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "trade.their.slots.02"
+					},
+					{
+						"id": "trade_their_slots_03",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								25,
+								25
+							]
+						},
+						"binding": "trade.their.slots.03"
+					}
+				]
+			},
+			{
+				"id": "trade_exchange",
+				"type": "Label",
+				"layout": {
+					"position": [
+						107,
+						76
+					],
+					"size": [
+						26,
+						30
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u2194",
+					"font_size": 21,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "trade_gold",
+				"type": "Label",
+				"layout": {
+					"position": [
+						15,
+						117
+					],
+					"size": [
+						207,
+						20
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u25c9  0                         200  \u25c9",
+					"font_size": 10,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "trade_accept",
+				"type": "PrimaryButton",
+				"layout": {
+					"position": [
+						14,
+						141
+					],
+					"size": [
+						95,
+						21
+					]
+				},
+				"properties": {
+					"text": "Accept",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "trade.accept"
+			},
+			{
+				"id": "trade_cancel",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						124,
+						141
+					],
+					"size": [
+						95,
+						21
+					]
+				},
+				"properties": {
+					"text": "Cancel",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "trade.cancel"
+			}
+		]
+	}
+}

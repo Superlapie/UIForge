@@ -1,0 +1,8 @@
+.godot/
+.aether/
+scripts/__pycache__/
+tests/__pycache__/
+*.uid
+.aether/renders/*_preview.tscn
+# PNGs are reproducible render outputs; keep the directory available locally.
+.aether/renders/*.png

@@ -1,0 +1,393 @@
+{
+	"schema_version": 1,
+	"name": "context_menu",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 132,
+		"height": 169,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/focus_ring.svg",
+				"texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_enamel.svg",
+				"hover_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_hover.svg",
+				"pressed_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/focus_ring.svg",
+				"texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_smoke.svg",
+				"hover_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_hover.svg",
+				"pressed_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Context menu",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer.",
+		"package_id": "zeal_ui_atlas",
+		"interface_id": "12_context_menu",
+		"display_name": "Context Menu",
+		"ai_description": "context actions for a selected world target",
+		"generated_scene": "scenes/12_context_menu.tscn"
+	},
+	"root": {
+		"id": "context_menu_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				132,
+				169
+			]
+		},
+		"children": [
+			{
+				"id": "context_menu_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						77,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Context Menu",
+					"font_size": 11,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "context_menu_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						108,
+						1
+					]
+				}
+			},
+			{
+				"id": "context_action_0",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						35
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Speak with Elira",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.0"
+			},
+			{
+				"id": "context_action_1",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						51
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Walk here",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.1"
+			},
+			{
+				"id": "context_action_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						67
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Examine",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.2"
+			},
+			{
+				"id": "context_action_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						83
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Follow",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.3"
+			},
+			{
+				"id": "context_action_4",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						99
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Trade",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.4"
+			},
+			{
+				"id": "context_action_5",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						115
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Invite to Party",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.5"
+			},
+			{
+				"id": "context_action_6",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						131
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Add Friend",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.6"
+			},
+			{
+				"id": "context_action_7",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						8,
+						147
+					],
+					"size": [
+						116,
+						16
+					]
+				},
+				"properties": {
+					"text": "Report Player",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "context.action.7"
+			}
+		]
+	}
+}

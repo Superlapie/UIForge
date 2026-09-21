@@ -1,0 +1,368 @@
+{
+	"schema_version": 1,
+	"name": "equipment",
+	"viewport": {
+		"width": 1920,
+		"height": 1080,
+		"scale_mode": "fit",
+		"safe_zone": 0.04
+	},
+	"theme": "dark_fantasy",
+	"metadata": {
+		"screen": "equipment",
+		"preview_mode": "skeleton",
+		"runtime_note": "The game supplies the live 3D character, equipment data, stats, and camera."
+	},
+	"mock_data": {
+		"preview_mode": "empty_slots",
+		"seed": 11
+	},
+	"root": {
+		"id": "equipment_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				600,
+				120
+			],
+			"size": [
+				356,
+				486
+			]
+		},
+		"children": [
+			{
+				"id": "equipment_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						18,
+						12
+					],
+					"size": [
+						270,
+						28
+					]
+				},
+				"properties": {
+					"text": "Equipment",
+					"font_size": "$font_size.heading",
+					"color": "$colors.gold"
+				}
+			},
+			{
+				"id": "equipment_close",
+				"type": "SecondaryButton",
+				"layout": {
+					"position": [
+						306,
+						10
+					],
+					"size": [
+						32,
+						32
+					]
+				},
+				"properties": {
+					"text": "×",
+					"font_size": "$font_size.heading"
+				},
+				"action": "equipment.close"
+			},
+			{
+				"id": "equipment_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						16,
+						46
+					],
+					"size": [
+						324,
+						1
+					]
+				}
+			},
+			{
+				"id": "equipment_stage",
+				"type": "Control",
+				"layout": {
+					"position": [
+						80,
+						64
+					],
+					"size": [
+						196,
+						340
+					]
+				},
+				"metadata": {
+					"runtime_anchor": "equipment.character_viewport",
+					"replace_with": "Node3D or SubViewport supplied by game",
+					"runtime_note": "Optional game-owned character preview; equipment slots remain usable without a model."
+				},
+				"children": []
+			},
+			{
+				"id": "equipment_head",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						148,
+						64
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "HEAD",
+					"show_label": true
+				},
+				"action": "equipment.slot.head"
+			},
+			{
+				"id": "equipment_chest",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						148,
+						148
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "CHEST",
+					"show_label": true
+				},
+				"action": "equipment.slot.chest"
+			},
+			{
+				"id": "equipment_legs",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						148,
+						232
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "LEGS",
+					"show_label": true
+				},
+				"action": "equipment.slot.legs"
+			},
+			{
+				"id": "equipment_main_hand",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						46,
+						148
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "MAIN",
+					"show_label": true
+				},
+				"action": "equipment.slot.main_hand"
+			},
+			{
+				"id": "equipment_off_hand",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						250,
+						148
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "OFF",
+					"show_label": true
+				},
+				"action": "equipment.slot.off_hand"
+			},
+			{
+				"id": "equipment_feet",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						148,
+						316
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "FEET",
+					"show_label": true
+				},
+				"action": "equipment.slot.feet"
+			},
+			{
+				"id": "equipment_ring",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						46,
+						316
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "RING",
+					"show_label": true
+				},
+				"action": "equipment.slot.ring"
+			},
+			{
+				"id": "equipment_amulet",
+				"type": "EquipmentSlot",
+				"layout": {
+					"position": [
+						250,
+						64
+					],
+					"size": [
+						60,
+						60
+					],
+					"min_size": [
+						60,
+						60
+					]
+				},
+				"properties": {
+					"label": "AMULET",
+					"show_label": true
+				},
+				"action": "equipment.slot.amulet"
+			},
+			{
+				"id": "equipment_stats",
+				"type": "Control",
+				"layout": {
+					"position": [
+						16,
+						414
+					],
+					"size": [
+						324,
+						52
+					]
+				},
+				"children": [
+					{
+						"id": "equipment_attack",
+						"type": "Label",
+						"layout": {
+							"position": [
+								0,
+								16
+							],
+							"size": [
+								106,
+								20
+							]
+						},
+						"properties": {
+							"text": "ATTACK  —",
+							"font_size": "$font_size.micro",
+							"color": "$colors.text_secondary"
+						},
+						"binding": "player.attack"
+					},
+					{
+						"id": "equipment_defence",
+						"type": "Label",
+						"layout": {
+							"position": [
+								108,
+								16
+							],
+							"size": [
+								106,
+								20
+							]
+						},
+						"properties": {
+							"text": "DEFENCE  —",
+							"font_size": "$font_size.micro",
+							"color": "$colors.text_secondary"
+						},
+						"binding": "player.defence"
+					},
+					{
+						"id": "equipment_power",
+						"type": "Label",
+						"layout": {
+							"position": [
+								216,
+								16
+							],
+							"size": [
+								106,
+								20
+							]
+						},
+						"properties": {
+							"text": "POWER  —",
+							"font_size": "$font_size.micro",
+							"color": "$colors.text_secondary"
+						},
+						"binding": "player.power"
+					}
+				]
+			}
+		]
+	}
+}

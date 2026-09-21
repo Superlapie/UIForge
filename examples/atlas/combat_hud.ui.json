@@ -1,0 +1,724 @@
+{
+	"schema_version": 1,
+	"name": "combat_hud",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 920,
+		"height": 128,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_enamel.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://examples/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_smoke.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Combat HUD / status bar",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer."
+	},
+	"root": {
+		"id": "combat_hud",
+		"type": "CombatHUD",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				920,
+				128
+			]
+		},
+		"metadata": {
+			"runtime_anchor": "hud.combat",
+			"safe_zone_edge": "bottom_center"
+		},
+		"children": [
+			{
+				"id": "health_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						22
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_heart.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "health_bar",
+				"type": "HealthBar",
+				"layout": {
+					"position": [
+						44,
+						25
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.74,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.health.ratio"
+			},
+			{
+				"id": "health_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						54,
+						26
+					],
+					"size": [
+						298,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u2014 / \u2014",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.health"
+			},
+			{
+				"id": "health_name",
+				"type": "Label",
+				"layout": {
+					"position": [
+						50,
+						10
+					],
+					"size": [
+						170,
+						14
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "HEALTH",
+					"font_size": "$font_size.micro",
+					"color": "$colors.health_bright"
+				}
+			},
+			{
+				"id": "run_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						46
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_run.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "run_bar",
+				"type": "RunBar",
+				"layout": {
+					"position": [
+						44,
+						49
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.86,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.run.ratio"
+			},
+			{
+				"id": "run_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						54,
+						50
+					],
+					"size": [
+						298,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u2014 / \u2014",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.run"
+			},
+			{
+				"id": "prayer_bar",
+				"type": "PrayerBar",
+				"layout": {
+					"position": [
+						558,
+						25
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.67,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.prayer.ratio"
+			},
+			{
+				"id": "prayer_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						568,
+						26
+					],
+					"size": [
+						298,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u2014 / \u2014",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.prayer"
+			},
+			{
+				"id": "prayer_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						878,
+						22
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						1086,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "prayer_name",
+				"type": "Label",
+				"layout": {
+					"position": [
+						694,
+						10
+					],
+					"size": [
+						170,
+						14
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "PRAYER",
+					"font_size": "$font_size.micro",
+					"color": "$colors.prayer_bright",
+					"horizontal_alignment": "right"
+				}
+			},
+			{
+				"id": "special_bar",
+				"type": "SpecialBar",
+				"layout": {
+					"position": [
+						558,
+						49
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.48,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.special.ratio"
+			},
+			{
+				"id": "special_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						568,
+						50
+					],
+					"size": [
+						298,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u2014 / \u2014",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.special"
+			},
+			{
+				"id": "special_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						878,
+						46
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_special.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "hud_medallion",
+				"type": "HUDMedallion",
+				"layout": {
+					"position": [
+						399,
+						0
+					],
+					"size": [
+						122,
+						122
+					]
+				},
+				"metadata": {
+					"runtime_anchor": "hud.compass_or_resource_orb"
+				},
+				"children": [
+					{
+						"id": "combat_level_label",
+						"type": "Label",
+						"layout": {
+							"position": [
+								39,
+								96
+							],
+							"size": [
+								44,
+								18
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"text": "\u2014",
+							"font_size": "$font_size.caption",
+							"color": "$colors.gold_bright",
+							"horizontal_alignment": "center",
+							"vertical_alignment": "center"
+						},
+						"binding": "player.combat_level"
+					},
+					{
+						"id": "medallion_action",
+						"type": "Button",
+						"style": {
+							"background": "$colors.transparent",
+							"border": "$colors.transparent",
+							"border_width": 0,
+							"radius": "$radius.pill"
+						},
+						"layout": {
+							"position": [
+								26,
+								25
+							],
+							"size": [
+								70,
+								70
+							]
+						},
+						"properties": {
+							"text": "",
+							"tooltip": "Open compass or combat HUD"
+						},
+						"action": "hud.medallion.activate"
+					}
+				]
+			},
+			{
+				"id": "action_slot_1",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						218,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "1",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 1"
+				},
+				"action": "hotbar.slot.1",
+				"binding": "hotbar.slot.1"
+			},
+			{
+				"id": "action_slot_2",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						256,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "2",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 2"
+				},
+				"action": "hotbar.slot.2",
+				"binding": "hotbar.slot.2"
+			},
+			{
+				"id": "action_slot_3",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						294,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "3",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 3"
+				},
+				"action": "hotbar.slot.3",
+				"binding": "hotbar.slot.3"
+			},
+			{
+				"id": "action_slot_4",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						332,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "4",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 4"
+				},
+				"action": "hotbar.slot.4",
+				"binding": "hotbar.slot.4"
+			},
+			{
+				"id": "action_slot_5",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						552,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "5",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 5"
+				},
+				"action": "hotbar.slot.5",
+				"binding": "hotbar.slot.5"
+			},
+			{
+				"id": "action_slot_6",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						590,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "6",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 6"
+				},
+				"action": "hotbar.slot.6",
+				"binding": "hotbar.slot.6"
+			},
+			{
+				"id": "action_slot_7",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						628,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "7",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 7"
+				},
+				"action": "hotbar.slot.7",
+				"binding": "hotbar.slot.7"
+			},
+			{
+				"id": "action_slot_8",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						666,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "8",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 8"
+				},
+				"action": "hotbar.slot.8",
+				"binding": "hotbar.slot.8"
+			}
+		]
+	}
+}

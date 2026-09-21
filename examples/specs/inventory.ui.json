@@ -1,0 +1,207 @@
+{
+	"metadata": {
+		"preview_mode": "skeleton",
+		"runtime_note": "Populate slots and currencies from the game layer.",
+		"screen": "inventory"
+	},
+	"mock_data": {
+		"preview_mode": "empty_slots",
+		"seed": 42
+	},
+	"name": "inventory",
+	"root": {
+		"children": [
+			{
+				"id": "inventory_title",
+				"layout": {
+					"position": [
+						18,
+						12
+					],
+					"size": [
+						170,
+						28
+					]
+				},
+				"properties": {
+					"color": "$colors.gold",
+					"font_size": "$font_size.heading",
+					"text": "Backpack"
+				},
+				"type": "Label"
+			},
+			{
+				"action": "inventory.close",
+				"id": "inventory_close",
+				"layout": {
+					"position": [
+						194,
+						10
+					],
+					"size": [
+						32,
+						32
+					]
+				},
+				"properties": {
+					"font_size": "$font_size.heading",
+					"text": "×"
+				},
+				"type": "SecondaryButton"
+			},
+			{
+				"id": "inventory_header_rule",
+				"layout": {
+					"position": [
+						16,
+						46
+					],
+					"size": [
+						208,
+						1
+					]
+				},
+				"type": "Separator"
+			},
+			{
+				"children": [
+					{
+						"id": "inventory_grid",
+						"layout": {
+							"position": [
+								0,
+								0
+							],
+							"size": [
+								189,
+								336
+							]
+						},
+						"mock_data": {
+							"item_count": 28,
+							"occupied_slots": 0
+						},
+						"properties": {
+							"columns": 4,
+							"gap": "$spacing.sm",
+							"slot_size": "$slot_size.sm"
+						},
+						"type": "ItemGrid"
+					}
+				],
+				"id": "inventory_grid_panel",
+				"layout": {
+					"position": [
+						16,
+						58
+					],
+					"size": [
+						208,
+						343
+					]
+				},
+				"style": {
+					"background": "$colors.transparent",
+					"border": "$colors.transparent",
+					"border_width": 0
+				},
+				"type": "SimplePanel"
+			},
+			{
+				"binding": "inventory.capacity",
+				"id": "inventory_capacity",
+				"layout": {
+					"position": [
+						18,
+						414
+					],
+					"size": [
+						150,
+						20
+					]
+				},
+				"properties": {
+					"color": "$colors.text_secondary",
+					"font_size": "$font_size.caption",
+					"text": "— / —"
+				},
+				"type": "Label"
+			},
+			{
+				"children": [
+					{
+						"id": "inventory_gold_icon",
+						"layout": {
+							"position": [
+								0,
+								5
+							],
+							"size": [
+								20,
+								20
+							]
+						},
+						"properties": {
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture": "res://examples/assets/ui/icons/coin.svg"
+						},
+						"type": "Texture"
+					},
+					{
+						"binding": "player.currency.gold",
+						"id": "inventory_gold",
+						"layout": {
+							"position": [
+								26,
+								5
+							],
+							"size": [
+								80,
+								20
+							]
+						},
+						"properties": {
+							"color": "$colors.gold",
+							"font_size": "$font_size.micro",
+							"text": "— GOLD"
+						},
+						"type": "Label"
+					}
+				],
+				"id": "inventory_footer",
+				"layout": {
+					"position": [
+						120,
+						409
+					],
+					"size": [
+						100,
+						32
+					]
+				},
+				"type": "Control"
+			}
+		],
+		"id": "inventory_window",
+		"layout": {
+			"position": [
+				180,
+				150
+			],
+			"size": [
+				240,
+				450
+			]
+		},
+		"type": "WindowFrame"
+	},
+	"schema_version": 1,
+	"theme": "dark_fantasy",
+	"viewport": {
+		"height": 1080,
+		"safe_zone": 0.04,
+		"scale_mode": "fit",
+		"width": 1920
+	}
+}

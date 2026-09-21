@@ -1,0 +1,305 @@
+{
+	"schema_version": 1,
+	"name": "bank",
+	"viewport": {
+		"width": 1920,
+		"height": 1080,
+		"scale_mode": "fit",
+		"safe_zone": 0.04
+	},
+	"theme": "dark_fantasy",
+	"metadata": {
+		"screen": "bank",
+		"preview_mode": "skeleton",
+		"runtime_note": "The game owns item data, filtering, sorting, and deposit/withdraw behavior."
+	},
+	"mock_data": {
+		"preview_mode": "empty_slots",
+		"seed": 7
+	},
+	"root": {
+		"id": "bank_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				100,
+				140
+			],
+			"size": [
+				480,
+				510
+			]
+		},
+		"children": [
+			{
+				"id": "bank_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						20,
+						12
+					],
+					"size": [
+						370,
+						28
+					]
+				},
+				"properties": {
+					"text": "Bank",
+					"font_size": "$font_size.heading",
+					"color": "$colors.gold"
+				}
+			},
+			{
+				"id": "bank_close",
+				"type": "SecondaryButton",
+				"layout": {
+					"position": [
+						430,
+						10
+					],
+					"size": [
+						32,
+						32
+					]
+				},
+				"properties": {
+					"text": "×",
+					"font_size": "$font_size.heading"
+				},
+				"action": "bank.close"
+			},
+			{
+				"id": "bank_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						18,
+						46
+					],
+					"size": [
+						444,
+						1
+					]
+				}
+			},
+			{
+				"id": "bank_sidebar",
+				"type": "HBox",
+				"layout": {
+					"position": [
+						20,
+						54
+					],
+					"size": [
+						260,
+						36
+					]
+				},
+				"children": [
+					{
+						"id": "bank_category_all",
+						"type": "SecondaryButton",
+						"layout": {
+							"min_size": [
+								44,
+								36
+							]
+						},
+						"properties": {
+							"text": "",
+							"icon": "res://examples/assets/ui/icons/coin.svg",
+							"expand_icon": true,
+							"tooltip": "ALL",
+							"godot_overrides": {
+								"theme_override_constants/icon_max_width": 22
+							}
+						},
+						"action": "bank.category.all",
+						"states": {}
+					},
+					{
+						"id": "bank_category_weapons",
+						"type": "SecondaryButton",
+						"layout": {
+							"min_size": [
+								44,
+								36
+							]
+						},
+						"properties": {
+							"text": "",
+							"icon": "res://examples/assets/ui/icons/sword.svg",
+							"expand_icon": true,
+							"tooltip": "WEAPONS",
+							"godot_overrides": {
+								"theme_override_constants/icon_max_width": 22
+							}
+						},
+						"action": "bank.category.weapons",
+						"states": {}
+					},
+					{
+						"id": "bank_category_armour",
+						"type": "SecondaryButton",
+						"layout": {
+							"min_size": [
+								44,
+								36
+							]
+						},
+						"properties": {
+							"text": "",
+							"icon": "res://examples/assets/ui/icons/shield.svg",
+							"expand_icon": true,
+							"tooltip": "ARMOUR",
+							"godot_overrides": {
+								"theme_override_constants/icon_max_width": 22
+							}
+						},
+						"action": "bank.category.armour",
+						"states": {}
+					},
+					{
+						"id": "bank_category_materials",
+						"type": "SecondaryButton",
+						"layout": {
+							"min_size": [
+								44,
+								36
+							]
+						},
+						"properties": {
+							"text": "",
+							"icon": "res://examples/assets/ui/icons/ore.svg",
+							"expand_icon": true,
+							"tooltip": "MATERIALS",
+							"godot_overrides": {
+								"theme_override_constants/icon_max_width": 22
+							}
+						},
+						"action": "bank.category.materials",
+						"states": {}
+					},
+					{
+						"id": "bank_category_consumables",
+						"type": "SecondaryButton",
+						"layout": {
+							"min_size": [
+								44,
+								36
+							]
+						},
+						"properties": {
+							"text": "",
+							"icon": "res://examples/assets/ui/icons/potion.svg",
+							"expand_icon": true,
+							"tooltip": "CONSUMABLES",
+							"godot_overrides": {
+								"theme_override_constants/icon_max_width": 22
+							}
+						},
+						"action": "bank.category.consumables",
+						"states": {}
+					}
+				],
+				"properties": {
+					"separation": 7
+				}
+			},
+			{
+				"id": "bank_content",
+				"type": "Control",
+				"layout": {
+					"position": [
+						20,
+						98
+					],
+					"size": [
+						440,
+						350
+					]
+				},
+				"children": [
+					{
+						"id": "bank_search",
+						"type": "SearchBox",
+						"layout": {
+							"position": [
+								0,
+								324
+							],
+							"size": [
+								280,
+								32
+							]
+						},
+						"properties": {
+							"placeholder": "SEARCH VAULT",
+							"font_size": "$font_size.micro"
+						},
+						"binding": "bank.search"
+					},
+					{
+						"id": "bank_grid_panel",
+						"type": "Control",
+						"layout": {
+							"position": [
+								0,
+								0
+							],
+							"size": [
+								424,
+								307
+							]
+						},
+						"children": [
+							{
+								"id": "bank_grid",
+								"type": "ItemGrid",
+								"layout": {
+									"position": [
+										0,
+										0
+									],
+									"size": [
+										413,
+										307
+									]
+								},
+								"properties": {
+									"columns": 8,
+									"slot_size": "$slot_size.sm",
+									"gap": "$spacing.md"
+								},
+								"mock_data": {
+									"item_count": 48,
+									"occupied_slots": 0
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "bank_deposit",
+				"type": "PrimaryButton",
+				"layout": {
+					"position": [
+						290,
+						462
+					],
+					"size": [
+						170,
+						32
+					]
+				},
+				"properties": {
+					"text": "Deposit inventory",
+					"font_size": "$font_size.caption"
+				},
+				"action": "bank.deposit"
+			}
+		]
+	}
+}

@@ -1,0 +1,561 @@
+{
+	"schema_version": 1,
+	"name": "combat_hud",
+	"viewport": {
+		"width": 1920,
+		"height": 1080,
+		"scale_mode": "fit",
+		"safe_zone": 0.02
+	},
+	"theme": "dark_fantasy",
+	"metadata": {
+		"screen": "combat_hud",
+		"preview_mode": "skeleton",
+		"runtime_note": "The game owns values, hotbar content, cooldowns, input bindings, and combat state."
+	},
+	"mock_data": {
+		"preview_mode": "styled_status",
+		"seed": 31
+	},
+	"root": {
+		"id": "combat_hud",
+		"type": "CombatHUD",
+		"layout": {
+			"position": [
+				500,
+				936
+			],
+			"size": [
+				920,
+				128
+			]
+		},
+		"metadata": {
+			"runtime_anchor": "hud.combat",
+			"safe_zone_edge": "bottom_center"
+		},
+		"children": [
+			{
+				"id": "health_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						22
+					],
+					"size": [
+						24,
+						24
+					]
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_heart.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "health_bar",
+				"type": "HealthBar",
+				"layout": {
+					"position": [
+						44,
+						25
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.74,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.health.ratio"
+			},
+			{
+				"id": "health_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						54,
+						26
+					],
+					"size": [
+						298,
+						16
+					]
+				},
+				"properties": {
+					"text": "— / —",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.health"
+			},
+			{
+				"id": "health_name",
+				"type": "Label",
+				"layout": {
+					"position": [
+						50,
+						10
+					],
+					"size": [
+						170,
+						14
+					]
+				},
+				"properties": {
+					"text": "HEALTH",
+					"font_size": "$font_size.micro",
+					"color": "$colors.health_bright"
+				}
+			},
+			{
+				"id": "run_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						46
+					],
+					"size": [
+						24,
+						24
+					]
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_run.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "run_bar",
+				"type": "RunBar",
+				"layout": {
+					"position": [
+						44,
+						49
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.86,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.run.ratio"
+			},
+			{
+				"id": "run_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						54,
+						50
+					],
+					"size": [
+						298,
+						16
+					]
+				},
+				"properties": {
+					"text": "— / —",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.run"
+			},
+			{
+				"id": "prayer_bar",
+				"type": "PrayerBar",
+				"layout": {
+					"position": [
+						558,
+						25
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.67,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.prayer.ratio"
+			},
+			{
+				"id": "prayer_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						568,
+						26
+					],
+					"size": [
+						298,
+						16
+					]
+				},
+				"properties": {
+					"text": "— / —",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.prayer"
+			},
+			{
+				"id": "prayer_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						878,
+						22
+					],
+					"size": [
+						24,
+						24
+					]
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_prayer.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "prayer_name",
+				"type": "Label",
+				"layout": {
+					"position": [
+						694,
+						10
+					],
+					"size": [
+						170,
+						14
+					]
+				},
+				"properties": {
+					"text": "PRAYER",
+					"font_size": "$font_size.micro",
+					"color": "$colors.prayer_bright",
+					"horizontal_alignment": "right"
+				}
+			},
+			{
+				"id": "special_bar",
+				"type": "SpecialBar",
+				"layout": {
+					"position": [
+						558,
+						49
+					],
+					"size": [
+						318,
+						18
+					]
+				},
+				"properties": {
+					"value": 0.48,
+					"min_value": 0,
+					"max_value": 1,
+					"show_percentage": false
+				},
+				"binding": "player.special.ratio"
+			},
+			{
+				"id": "special_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						568,
+						50
+					],
+					"size": [
+						298,
+						16
+					]
+				},
+				"properties": {
+					"text": "— / —",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_primary",
+					"horizontal_alignment": "center",
+					"vertical_alignment": "center"
+				},
+				"binding": "player.special"
+			},
+			{
+				"id": "special_icon",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						878,
+						46
+					],
+					"size": [
+						24,
+						24
+					]
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_special.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "hud_medallion",
+				"type": "HUDMedallion",
+				"layout": {
+					"position": [
+						399,
+						0
+					],
+					"size": [
+						122,
+						122
+					]
+				},
+				"metadata": {
+					"runtime_anchor": "hud.compass_or_resource_orb"
+				},
+				"children": [
+					{
+						"id": "combat_level_label",
+						"type": "Label",
+						"layout": {
+							"position": [
+								39,
+								96
+							],
+							"size": [
+								44,
+								18
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.caption",
+							"color": "$colors.gold_bright",
+							"horizontal_alignment": "center",
+							"vertical_alignment": "center"
+						},
+						"binding": "player.combat_level"
+					},
+					{
+						"id": "medallion_action",
+						"type": "Button",
+						"style": {
+							"background": "$colors.transparent",
+							"border": "$colors.transparent",
+							"border_width": 0,
+							"radius": "$radius.pill"
+						},
+						"layout": {
+							"position": [
+								26,
+								25
+							],
+							"size": [
+								70,
+								70
+							]
+						},
+						"properties": {
+							"text": "",
+							"tooltip": "Open compass or combat HUD"
+						},
+						"action": "hud.medallion.activate"
+					}
+				]
+			},
+			{
+				"id": "action_slot_1",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						218,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "1",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 1"
+				},
+				"action": "hotbar.slot.1",
+				"binding": "hotbar.slot.1"
+			},
+			{
+				"id": "action_slot_2",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						256,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "2",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 2"
+				},
+				"action": "hotbar.slot.2",
+				"binding": "hotbar.slot.2"
+			},
+			{
+				"id": "action_slot_3",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						294,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "3",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 3"
+				},
+				"action": "hotbar.slot.3",
+				"binding": "hotbar.slot.3"
+			},
+			{
+				"id": "action_slot_4",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						332,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "4",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 4"
+				},
+				"action": "hotbar.slot.4",
+				"binding": "hotbar.slot.4"
+			},
+			{
+				"id": "action_slot_5",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						552,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "5",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 5"
+				},
+				"action": "hotbar.slot.5",
+				"binding": "hotbar.slot.5"
+			},
+			{
+				"id": "action_slot_6",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						590,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "6",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 6"
+				},
+				"action": "hotbar.slot.6",
+				"binding": "hotbar.slot.6"
+			},
+			{
+				"id": "action_slot_7",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						628,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "7",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 7"
+				},
+				"action": "hotbar.slot.7",
+				"binding": "hotbar.slot.7"
+			},
+			{
+				"id": "action_slot_8",
+				"type": "ActionSlot",
+				"layout": {
+					"position": [
+						666,
+						82
+					],
+					"size": [
+						34,
+						34
+					]
+				},
+				"properties": {
+					"text": "8",
+					"font_size": "$font_size.micro",
+					"tooltip": "Action slot 8"
+				},
+				"action": "hotbar.slot.8",
+				"binding": "hotbar.slot.8"
+			}
+		]
+	}
+}

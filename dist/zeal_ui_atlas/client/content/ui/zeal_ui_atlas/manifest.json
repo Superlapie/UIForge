@@ -1,0 +1,185 @@
+{
+	"package_id": "zeal_ui_atlas",
+	"display_name": "Zeal UI Atlas",
+	"schema": "aether_ui_document_v1",
+	"install_root": "client/content/ui/zeal_ui_atlas",
+	"runtime_scene_contract": "Generated scenes are ordinary Godot scenes with stable aether_id metadata.",
+	"interfaces": [
+		{
+			"interface_id": "01_region_map_navigator",
+			"display_name": "Region Map / Navigator",
+			"description": "world navigation and destination selection",
+			"source": "interfaces/01_region_map_navigator.ui.json",
+			"scene": "scenes/01_region_map_navigator.tscn",
+			"entry_node": "region_map_window"
+		},
+		{
+			"interface_id": "02_backpack_inventory",
+			"display_name": "Backpack / Inventory",
+			"description": "item storage grid, categories, search, capacity and currencies",
+			"source": "interfaces/02_backpack_inventory.ui.json",
+			"scene": "scenes/02_backpack_inventory.tscn",
+			"entry_node": "backpack_window"
+		},
+		{
+			"interface_id": "03_equipment_loadout",
+			"display_name": "Equipment / Loadout",
+			"description": "paper doll equipment slots, character preview and combat stats",
+			"source": "interfaces/03_equipment_loadout.ui.json",
+			"scene": "scenes/03_equipment_loadout.tscn",
+			"entry_node": "loadout_window"
+		},
+		{
+			"interface_id": "04_bank_vault",
+			"display_name": "Bank / Vault",
+			"description": "large storage grid, categories, search and sorting",
+			"source": "interfaces/04_bank_vault.ui.json",
+			"scene": "scenes/04_bank_vault.tscn",
+			"entry_node": "vault_window"
+		},
+		{
+			"interface_id": "05_attributes_disciplines",
+			"display_name": "Attributes / Disciplines",
+			"description": "character progression disciplines and overall power",
+			"source": "interfaces/05_attributes_disciplines.ui.json",
+			"scene": "scenes/05_attributes_disciplines.tscn",
+			"entry_node": "attributes_window"
+		},
+		{
+			"interface_id": "06_codex_faith_powers",
+			"display_name": "Codex / Faith and Powers",
+			"description": "ability paths, unlocks and ability detail panel",
+			"source": "interfaces/06_codex_faith_powers.ui.json",
+			"scene": "scenes/06_codex_faith_powers.tscn",
+			"entry_node": "codex_window"
+		},
+		{
+			"interface_id": "07_quest_journal",
+			"display_name": "Quest Journal",
+			"description": "active quest list, quest detail, map banner and objectives",
+			"source": "interfaces/07_quest_journal.ui.json",
+			"scene": "scenes/07_quest_journal.tscn",
+			"entry_node": "journal_window"
+		},
+		{
+			"interface_id": "08_talent_constellation",
+			"display_name": "Talent Constellation",
+			"description": "connected talent nodes, unlock state and next-node detail",
+			"source": "interfaces/08_talent_constellation.ui.json",
+			"scene": "scenes/08_talent_constellation.tscn",
+			"entry_node": "talents_window"
+		},
+		{
+			"interface_id": "09_shop_trader",
+			"display_name": "Shop / Trader",
+			"description": "buy, sell and buyback item rows with merchant portrait",
+			"source": "interfaces/09_shop_trader.ui.json",
+			"scene": "scenes/09_shop_trader.tscn",
+			"entry_node": "shop_window"
+		},
+		{
+			"interface_id": "10_trade_window",
+			"display_name": "Trade Window",
+			"description": "two-party offers, currency and accept/cancel actions",
+			"source": "interfaces/10_trade_window.ui.json",
+			"scene": "scenes/10_trade_window.tscn",
+			"entry_node": "trade_window"
+		},
+		{
+			"interface_id": "11_chat_communication",
+			"display_name": "Chat / Communication",
+			"description": "channel tabs, message stream and chat input",
+			"source": "interfaces/11_chat_communication.ui.json",
+			"scene": "scenes/11_chat_communication.tscn",
+			"entry_node": "chat_window"
+		},
+		{
+			"interface_id": "12_context_menu",
+			"display_name": "Context Menu",
+			"description": "context actions for a selected world target",
+			"source": "interfaces/12_context_menu.ui.json",
+			"scene": "scenes/12_context_menu.tscn",
+			"entry_node": "context_menu_window"
+		},
+		{
+			"interface_id": "13_settings_options",
+			"display_name": "Settings / Options",
+			"description": "settings categories, toggles, slider and reset action",
+			"source": "interfaces/13_settings_options.ui.json",
+			"scene": "scenes/13_settings_options.tscn",
+			"entry_node": "options_window"
+		},
+		{
+			"interface_id": "14_social_friends_guild",
+			"display_name": "Social / Friends / Guild",
+			"description": "friends, guild and party tabs with roster",
+			"source": "interfaces/14_social_friends_guild.ui.json",
+			"scene": "scenes/14_social_friends_guild.tscn",
+			"entry_node": "social_window"
+		},
+		{
+			"interface_id": "15_character_profile",
+			"display_name": "Character Profile",
+			"description": "character identity, origin, playstyle and achievements",
+			"source": "interfaces/15_character_profile.ui.json",
+			"scene": "scenes/15_character_profile.tscn",
+			"entry_node": "profile_window"
+		},
+		{
+			"interface_id": "16_loot_rewards_summary",
+			"display_name": "Loot / Rewards Summary",
+			"description": "compact character reward summary",
+			"source": "interfaces/16_loot_rewards_summary.ui.json",
+			"scene": "scenes/16_loot_rewards_summary.tscn",
+			"entry_node": "rewards_window"
+		},
+		{
+			"interface_id": "17_loot_items_acquired",
+			"display_name": "Loot / Items Acquired",
+			"description": "acquired item cards, rarity and take-all action",
+			"source": "interfaces/17_loot_items_acquired.ui.json",
+			"scene": "scenes/17_loot_items_acquired.tscn",
+			"entry_node": "loot_window"
+		},
+		{
+			"interface_id": "18_combat_hud_status_bar",
+			"display_name": "Combat HUD / Status Bar",
+			"description": "health, prayer, run and action-slot HUD",
+			"source": "interfaces/18_combat_hud_status_bar.ui.json",
+			"scene": "scenes/18_combat_hud_status_bar.tscn",
+			"entry_node": "combat_hud"
+		},
+		{
+			"interface_id": "19_complete_ui_atlas",
+			"display_name": "Complete UI Atlas",
+			"description": "full reference composition containing every interface",
+			"source": "interfaces/19_complete_ui_atlas.ui.json",
+			"scene": "scenes/19_complete_ui_atlas.tscn",
+			"entry_node": "atlas_root"
+		},
+		{
+			"interface_id": "20_enemy_target_frame",
+			"display_name": "Enemy Target Frame / HP and Status Effects",
+			"description": "combat-only target identity, health ratio/value and status effect slots",
+			"source": "interfaces/20_enemy_target_frame.ui.json",
+			"scene": "scenes/20_enemy_target_frame.tscn",
+			"entry_node": "enemy_target_frame"
+		},
+		{
+			"interface_id": "21_gameplay_sidebar_collapsed",
+			"display_name": "Gameplay Sidebar / Collapsed Rail",
+			"description": "right-side compact navigation rail for existing game panels",
+			"source": "interfaces/21_gameplay_sidebar_collapsed.ui.json",
+			"scene": "scenes/21_gameplay_sidebar_collapsed.tscn",
+			"entry_node": "gameplay_sidebar_collapsed"
+		},
+		{
+			"interface_id": "22_gameplay_sidebar_expanded",
+			"display_name": "Gameplay Sidebar / Expanded Panel",
+			"description": "expanded right-side panel state with inventory surface and tab rail",
+			"source": "interfaces/22_gameplay_sidebar_expanded.ui.json",
+			"scene": "scenes/22_gameplay_sidebar_expanded.tscn",
+			"entry_node": "gameplay_sidebar_expanded"
+		}
+	]
+}

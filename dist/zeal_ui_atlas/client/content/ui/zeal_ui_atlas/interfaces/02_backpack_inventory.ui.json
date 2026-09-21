@@ -1,0 +1,1622 @@
+{
+	"schema_version": 1,
+	"name": "backpack",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 254,
+		"height": 326,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a",
+				"ink_d9d4c6": "#d9d4c6"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/focus_ring.svg",
+				"texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_enamel.svg",
+				"hover_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_hover.svg",
+				"pressed_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/focus_ring.svg",
+				"texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_smoke.svg",
+				"hover_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_hover.svg",
+				"pressed_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			},
+			"atlas_input": {
+				"background": "#080d10",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 2,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				}
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Backpack / inventory",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer.",
+		"package_id": "zeal_ui_atlas",
+		"interface_id": "02_backpack_inventory",
+		"display_name": "Backpack / Inventory",
+		"ai_description": "item storage grid, categories, search, capacity and currencies",
+		"generated_scene": "scenes/02_backpack_inventory.tscn"
+	},
+	"root": {
+		"id": "backpack_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				254,
+				326
+			]
+		},
+		"children": [
+			{
+				"id": "backpack_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						199,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u265c  Backpack",
+					"font_size": 13,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "backpack_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						230,
+						1
+					]
+				}
+			},
+			{
+				"id": "backpack_capacity",
+				"type": "Label",
+				"layout": {
+					"position": [
+						177,
+						12
+					],
+					"size": [
+						64,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "48 / 120",
+					"font_size": 10,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "backpack_slots",
+				"type": "Grid",
+				"layout": {
+					"position": [
+						47,
+						39
+					],
+					"size": [
+						195,
+						195
+					]
+				},
+				"properties": {
+					"columns": 5,
+					"gap": 3
+				},
+				"children": [
+					{
+						"id": "backpack_slots_00",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_00_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										0,
+										0,
+										362,
+										362
+									]
+								}
+							},
+							{
+								"id": "backpack_slots_00_count",
+								"type": "Label",
+								"layout": {
+									"position": [
+										13,
+										21
+									],
+									"size": [
+										20,
+										13
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "3",
+									"font_size": 9,
+									"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+									"color": "$atlas.ink_d9d4c6",
+									"clip_text": true
+								}
+							}
+						],
+						"binding": "backpack.slots.00"
+					},
+					{
+						"id": "backpack_slots_01",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_01_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										362,
+										0,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.01"
+					},
+					{
+						"id": "backpack_slots_02",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_02_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										724,
+										0,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.02"
+					},
+					{
+						"id": "backpack_slots_03",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_03_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										1086,
+										0,
+										362,
+										362
+									]
+								}
+							},
+							{
+								"id": "backpack_slots_03_count",
+								"type": "Label",
+								"layout": {
+									"position": [
+										13,
+										21
+									],
+									"size": [
+										20,
+										13
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "24",
+									"font_size": 9,
+									"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+									"color": "$atlas.ink_d9d4c6",
+									"clip_text": true
+								}
+							}
+						],
+						"binding": "backpack.slots.03"
+					},
+					{
+						"id": "backpack_slots_04",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_04_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										0,
+										362,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.04"
+					},
+					{
+						"id": "backpack_slots_05",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_05_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										362,
+										362,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.05"
+					},
+					{
+						"id": "backpack_slots_06",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_06_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										724,
+										362,
+										362,
+										362
+									]
+								}
+							},
+							{
+								"id": "backpack_slots_06_count",
+								"type": "Label",
+								"layout": {
+									"position": [
+										13,
+										21
+									],
+									"size": [
+										20,
+										13
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "45",
+									"font_size": 9,
+									"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+									"color": "$atlas.ink_d9d4c6",
+									"clip_text": true
+								}
+							}
+						],
+						"binding": "backpack.slots.06"
+					},
+					{
+						"id": "backpack_slots_07",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_07_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										1086,
+										362,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.07"
+					},
+					{
+						"id": "backpack_slots_08",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_08_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										0,
+										724,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.08"
+					},
+					{
+						"id": "backpack_slots_09",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_09_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										362,
+										724,
+										362,
+										362
+									]
+								}
+							},
+							{
+								"id": "backpack_slots_09_count",
+								"type": "Label",
+								"layout": {
+									"position": [
+										13,
+										21
+									],
+									"size": [
+										20,
+										13
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "66",
+									"font_size": 9,
+									"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+									"color": "$atlas.ink_d9d4c6",
+									"clip_text": true
+								}
+							}
+						],
+						"binding": "backpack.slots.09"
+					},
+					{
+						"id": "backpack_slots_10",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_10_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										724,
+										724,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.10"
+					},
+					{
+						"id": "backpack_slots_11",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_11_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										0,
+										0,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.11"
+					},
+					{
+						"id": "backpack_slots_12",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_12_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										362,
+										0,
+										362,
+										362
+									]
+								}
+							},
+							{
+								"id": "backpack_slots_12_count",
+								"type": "Label",
+								"layout": {
+									"position": [
+										13,
+										21
+									],
+									"size": [
+										20,
+										13
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "87",
+									"font_size": 9,
+									"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+									"color": "$atlas.ink_d9d4c6",
+									"clip_text": true
+								}
+							}
+						],
+						"binding": "backpack.slots.12"
+					},
+					{
+						"id": "backpack_slots_13",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_13_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										724,
+										0,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.13"
+					},
+					{
+						"id": "backpack_slots_14",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_14_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										1086,
+										0,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.14"
+					},
+					{
+						"id": "backpack_slots_15",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_15_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										0,
+										362,
+										362,
+										362
+									]
+								}
+							},
+							{
+								"id": "backpack_slots_15_count",
+								"type": "Label",
+								"layout": {
+									"position": [
+										13,
+										21
+									],
+									"size": [
+										20,
+										13
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "108",
+									"font_size": 9,
+									"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+									"color": "$atlas.ink_d9d4c6",
+									"clip_text": true
+								}
+							}
+						],
+						"binding": "backpack.slots.15"
+					},
+					{
+						"id": "backpack_slots_16",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"children": [
+							{
+								"id": "backpack_slots_16_icon",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										5,
+										4
+									],
+									"size": [
+										26,
+										26
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+									"ignore_texture_size": true,
+									"stretch_mode": 5,
+									"texture_region": [
+										362,
+										362,
+										362,
+										362
+									]
+								}
+							}
+						],
+						"binding": "backpack.slots.16"
+					},
+					{
+						"id": "backpack_slots_17",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.17"
+					},
+					{
+						"id": "backpack_slots_18",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.18"
+					},
+					{
+						"id": "backpack_slots_19",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.19"
+					},
+					{
+						"id": "backpack_slots_20",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.20"
+					},
+					{
+						"id": "backpack_slots_21",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.21"
+					},
+					{
+						"id": "backpack_slots_22",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.22"
+					},
+					{
+						"id": "backpack_slots_23",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.23"
+					},
+					{
+						"id": "backpack_slots_24",
+						"type": "ItemSlot",
+						"layout": {
+							"min_size": [
+								36,
+								36
+							]
+						},
+						"binding": "backpack.slots.24"
+					}
+				]
+			},
+			{
+				"id": "backpack_category_0",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						40
+					],
+					"size": [
+						28,
+						29
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "backpack.category.0"
+			},
+			{
+				"id": "backpack_category_icon_0",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						43
+					],
+					"size": [
+						21,
+						21
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						724,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_category_1",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						74
+					],
+					"size": [
+						28,
+						29
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "backpack.category.1"
+			},
+			{
+				"id": "backpack_category_icon_1",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						77
+					],
+					"size": [
+						21,
+						21
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						724,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_category_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						108
+					],
+					"size": [
+						28,
+						29
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "backpack.category.2"
+			},
+			{
+				"id": "backpack_category_icon_2",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						111
+					],
+					"size": [
+						21,
+						21
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						1086,
+						362,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_category_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						142
+					],
+					"size": [
+						28,
+						29
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "backpack.category.3"
+			},
+			{
+				"id": "backpack_category_icon_3",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						145
+					],
+					"size": [
+						21,
+						21
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						362,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_category_4",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						176
+					],
+					"size": [
+						28,
+						29
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "backpack.category.4"
+			},
+			{
+				"id": "backpack_category_icon_4",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						179
+					],
+					"size": [
+						21,
+						21
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_category_5",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						210
+					],
+					"size": [
+						28,
+						29
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "backpack.category.5"
+			},
+			{
+				"id": "backpack_category_icon_5",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						213
+					],
+					"size": [
+						21,
+						21
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						724,
+						362,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_search",
+				"type": "SearchBox",
+				"layout": {
+					"position": [
+						47,
+						266
+					],
+					"size": [
+						191,
+						22
+					]
+				},
+				"properties": {
+					"font_size": 10,
+					"placeholder": "Search items\u2026"
+				},
+				"style": "atlas_input"
+			},
+			{
+				"id": "backpack_footer_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						293
+					],
+					"size": [
+						230,
+						1
+					]
+				}
+			},
+			{
+				"id": "backpack_currency_0",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						13,
+						299
+					],
+					"size": [
+						16,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						362,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_amount_0",
+				"type": "Label",
+				"layout": {
+					"position": [
+						32,
+						299
+					],
+					"size": [
+						56,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "214,730",
+					"font_size": 10,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "backpack_currency_1",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						93,
+						299
+					],
+					"size": [
+						16,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_amount_1",
+				"type": "Label",
+				"layout": {
+					"position": [
+						112,
+						299
+					],
+					"size": [
+						56,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "1,280",
+					"font_size": 10,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "backpack_currency_2",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						173,
+						299
+					],
+					"size": [
+						16,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "backpack_amount_2",
+				"type": "Label",
+				"layout": {
+					"position": [
+						192,
+						299
+					],
+					"size": [
+						56,
+						16
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "340",
+					"font_size": 10,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			}
+		]
+	}
+}

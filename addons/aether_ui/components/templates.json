@@ -1,0 +1,90 @@
+{
+	"region_map": {
+		"title": "Region map / navigator",
+		"path": "res://examples/atlas/region_map.ui.json"
+	},
+	"inventory": {
+		"title": "Backpack / inventory",
+		"path": "res://examples/atlas/backpack.ui.json"
+	},
+	"equipment": {
+		"title": "Equipment / loadout",
+		"path": "res://examples/atlas/loadout.ui.json"
+	},
+	"bank": {
+		"title": "Bank / vault",
+		"path": "res://examples/atlas/vault.ui.json"
+	},
+	"attributes": {
+		"title": "Attributes / disciplines",
+		"path": "res://examples/atlas/attributes.ui.json"
+	},
+	"codex": {
+		"title": "Codex / faith and powers",
+		"path": "res://examples/atlas/codex.ui.json"
+	},
+	"quest_journal": {
+		"title": "Quest journal",
+		"path": "res://examples/atlas/journal.ui.json"
+	},
+	"talents": {
+		"title": "Talent constellation",
+		"path": "res://examples/atlas/talents.ui.json"
+	},
+	"shop": {
+		"title": "Shop / trader",
+		"path": "res://examples/atlas/shop.ui.json"
+	},
+	"trade": {
+		"title": "Trade window",
+		"path": "res://examples/atlas/trade.ui.json"
+	},
+	"chat": {
+		"title": "Chat / communication",
+		"path": "res://examples/atlas/chat.ui.json"
+	},
+	"context_menu": {
+		"title": "Context menu",
+		"path": "res://examples/atlas/context_menu.ui.json"
+	},
+	"settings": {
+		"title": "Settings / options",
+		"path": "res://examples/atlas/options.ui.json"
+	},
+	"social": {
+		"title": "Social / friends / guild",
+		"path": "res://examples/atlas/social.ui.json"
+	},
+	"profile": {
+		"title": "Character profile",
+		"path": "res://examples/atlas/profile.ui.json"
+	},
+	"rewards": {
+		"title": "Loot / rewards summary",
+		"path": "res://examples/atlas/rewards.ui.json"
+	},
+	"loot": {
+		"title": "Loot / items acquired",
+		"path": "res://examples/atlas/loot.ui.json"
+	},
+	"combat_hud": {
+		"title": "Combat HUD / status bar",
+		"path": "res://examples/atlas/combat_hud.ui.json"
+	},
+	"enemy_target_frame": {
+		"title": "Enemy target frame / HP and effects",
+		"path": "res://examples/specs/enemy_target_frame.ui.json"
+	},
+	"gameplay_sidebar": {
+		"title": "Gameplay sidebar / collapsed rail",
+		"path": "res://examples/specs/gameplay_sidebar.ui.json"
+	},
+	"gameplay_sidebar_expanded": {
+		"title": "Gameplay sidebar / expanded panel",
+		"path": "res://examples/specs/gameplay_sidebar_expanded.ui.json"
+	},
+	"ui_atlas": {
+		"title": "Complete UI atlas",
+		"path": "res://examples/atlas/ui_atlas.ui.json"
+	}
+}

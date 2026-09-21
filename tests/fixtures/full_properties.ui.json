@@ -1,0 +1,81 @@
+{
+	"schema_version": 1,
+	"name": "full_properties",
+	"viewport": {"width": 1280, "height": 720, "scale_mode": "fit"},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "properties_root",
+		"type": "Control",
+		"layout": {"size": [1280, 720], "anchors_preset": "full_rect"},
+		"decorations": {
+			"corner_gem": {"texture": "res://examples/assets/aether_gem.svg", "position": [1120, 28], "size": [64, 64]}
+		},
+		"children": [
+			{
+				"id": "properties_title",
+				"type": "Label",
+				"layout": {"position": [32, 24], "size": [480, 48], "min_size": [320, 32], "rotation_degrees": 1.5, "scale": [1, 1]},
+				"properties": {
+					"text": "PROPERTY COVERAGE",
+					"font_size": "$font_size.title",
+					"color": "$colors.gold",
+					"outline_size": 2,
+					"font_outline_color": "$colors.shadow",
+					"horizontal_alignment": 0,
+					"vertical_alignment": 1,
+					"autowrap": false,
+					"tooltip": "Common Label properties are serialized.",
+					"godot_overrides": {
+						"theme_override_constants/line_spacing": 2,
+						"theme_override_colors/font_shadow_color": "$colors.shadow"
+					}
+				}
+			},
+			{
+				"id": "color_backdrop",
+				"type": "ColorRect",
+				"layout": {"position": [32, 96], "size": [240, 120]},
+				"properties": {"color": "$colors.surface_alt", "modulate": "#ffffff", "opacity": 1.0}
+			},
+			{
+				"id": "gem_texture",
+				"type": "Texture",
+				"layout": {"position": [72, 120], "size": [96, 96], "min_size": [64, 64]},
+				"properties": {"texture": "res://examples/assets/aether_gem.svg", "expand_mode": 1, "stretch_mode": 5, "flip_h": false}
+			},
+			{
+				"id": "named_button",
+				"type": "PrimaryButton",
+				"layout": {"position": [320, 100], "size": [240, 48], "size_flags_horizontal": 3, "mouse_filter": 0},
+				"properties": {"text": "APPLY", "disabled": false, "toggle_mode": true, "button_pressed": false, "alignment": 1, "flat": false, "tooltip": "Apply the current changes."},
+				"action": "properties.apply",
+				"transitions": {"hover": {"preset": "hover", "duration": 0.12}, "press": {"preset": "button_press", "duration": 0.08}},
+				"effects": ["hover_highlight", {"preset": "gold_glow", "intensity": 0.6}]
+			},
+			{
+				"id": "search_input",
+				"type": "LineEdit",
+				"layout": {"position": [320, 172], "size": [300, 42]},
+				"properties": {"text": "search", "placeholder": "Search", "editable": true, "secret": false, "max_length": 64, "clear_button_enabled": true, "selecting_enabled": true, "font_size": "$font_size.body"}
+			},
+			{
+				"id": "amount_slider",
+				"type": "HSlider",
+				"layout": {"position": [320, 244], "size": [300, 32]},
+				"properties": {"value": 35, "min_value": 0, "max_value": 100, "step": 5, "editable": true, "tick_count": 5, "ticks_on_borders": true}
+			},
+			{
+				"id": "rarity_frame",
+				"type": "NinePatchRect",
+				"layout": {"position": [680, 96], "size": [360, 220]},
+				"properties": {"texture": "res://examples/assets/aether_gem.svg", "patch_margin_left": 12, "patch_margin_top": 12, "patch_margin_right": 12, "patch_margin_bottom": 12}
+			},
+			{
+				"id": "mode_dropdown",
+				"type": "OptionButton",
+				"layout": {"position": [320, 320], "size": [240, 42]},
+				"properties": {"tooltip": "Choose a mode", "focus_mode": 2}
+			}
+		]
+	}
+}

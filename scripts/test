@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PROJECT_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+run_native() {
+	cd "$PROJECT_DIR"
+	"$1" --headless --editor --path "$PROJECT_DIR" --quit
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/test_runner.gd
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/editor_workflow_runner.gd
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/atlas_workflow_runner.gd
+	"$PROJECT_DIR/scripts/ui" validate examples/specs/inventory.ui.json
+	"$PROJECT_DIR/scripts/ui" build-all examples/specs examples/scenes
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/scene_load_runner.gd
+	"$PROJECT_DIR/scripts/ui" render examples/specs/combat_hud.ui.json --viewport 1280x720 --output .aether/test/combat_hud_1280.png
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/render_output_runner.gd
+}
+if command -v godot >/dev/null 2>&1; then
+	run_native "$(command -v godot)"
+elif command -v godot4 >/dev/null 2>&1; then
+	run_native "$(command -v godot4)"
+else
+	exec python3 "$PROJECT_DIR/tests/test_fallback.py"
+fi

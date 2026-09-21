@@ -1,0 +1,2116 @@
+{
+	"schema_version": 1,
+	"name": "vault",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 350,
+		"height": 326,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a",
+				"ink_d9d4c6": "#d9d4c6"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_enamel.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://examples/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_smoke.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			},
+			"atlas_input": {
+				"background": "#080d10",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 2,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				}
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Bank / vault",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer."
+	},
+	"root": {
+		"id": "vault_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				350,
+				326
+			]
+		},
+		"children": [
+			{
+				"id": "vault_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						295,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u265c  Grand Vault",
+					"font_size": 13,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "vault_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						326,
+						1
+					]
+				}
+			},
+			{
+				"id": "vault_capacity",
+				"type": "Label",
+				"layout": {
+					"position": [
+						261,
+						12
+					],
+					"size": [
+						78,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "486 / 600",
+					"font_size": 10,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "vault_tab_0",
+				"type": "PrimaryButton",
+				"layout": {
+					"position": [
+						12,
+						39
+					],
+					"size": [
+						62,
+						23
+					]
+				},
+				"properties": {
+					"text": "All",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.tab.0"
+			},
+			{
+				"id": "vault_tab_1",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						78,
+						39
+					],
+					"size": [
+						62,
+						23
+					]
+				},
+				"properties": {
+					"text": "Gear",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.tab.1"
+			},
+			{
+				"id": "vault_tab_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						144,
+						39
+					],
+					"size": [
+						62,
+						23
+					]
+				},
+				"properties": {
+					"text": "Consumables",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.tab.2"
+			},
+			{
+				"id": "vault_tab_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						210,
+						39
+					],
+					"size": [
+						62,
+						23
+					]
+				},
+				"properties": {
+					"text": "Materials",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.tab.3"
+			},
+			{
+				"id": "vault_tab_4",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						276,
+						39
+					],
+					"size": [
+						62,
+						23
+					]
+				},
+				"properties": {
+					"text": "Misc",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.tab.4"
+			},
+			{
+				"id": "vault_scroll",
+				"type": "ScrollList",
+				"layout": {
+					"position": [
+						42,
+						68
+					],
+					"size": [
+						294,
+						224
+					]
+				},
+				"properties": {
+					"horizontal_scroll_mode": 0,
+					"vertical_scroll_mode": 1
+				},
+				"style": {
+					"background": "$colors.transparent",
+					"border_width": 0
+				},
+				"children": [
+					{
+						"id": "vault_slots",
+						"type": "Grid",
+						"layout": {
+							"position": [
+								0,
+								0
+							],
+							"size": [
+								282,
+								237
+							]
+						},
+						"properties": {
+							"columns": 6,
+							"gap": 3
+						},
+						"children": [
+							{
+								"id": "vault_slots_00",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_00_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												0,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_00_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "3",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.00"
+							},
+							{
+								"id": "vault_slots_01",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_01_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.01"
+							},
+							{
+								"id": "vault_slots_02",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_02_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.02"
+							},
+							{
+								"id": "vault_slots_03",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_03_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												1086,
+												0,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_03_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "24",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.03"
+							},
+							{
+								"id": "vault_slots_04",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_04_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.04"
+							},
+							{
+								"id": "vault_slots_05",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_05_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.05"
+							},
+							{
+								"id": "vault_slots_06",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_06_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												362,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_06_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "45",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.06"
+							},
+							{
+								"id": "vault_slots_07",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_07_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												1086,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.07"
+							},
+							{
+								"id": "vault_slots_08",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_08_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												724,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.08"
+							},
+							{
+								"id": "vault_slots_09",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_09_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												724,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_09_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "66",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.09"
+							},
+							{
+								"id": "vault_slots_10",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_10_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												724,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.10"
+							},
+							{
+								"id": "vault_slots_11",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_11_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.11"
+							},
+							{
+								"id": "vault_slots_12",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_12_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												0,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_12_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "87",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.12"
+							},
+							{
+								"id": "vault_slots_13",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_13_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.13"
+							},
+							{
+								"id": "vault_slots_14",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_14_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												1086,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.14"
+							},
+							{
+								"id": "vault_slots_15",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_15_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												362,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_15_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "108",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.15"
+							},
+							{
+								"id": "vault_slots_16",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_16_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.16"
+							},
+							{
+								"id": "vault_slots_17",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_17_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.17"
+							},
+							{
+								"id": "vault_slots_18",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_18_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												1086,
+												362,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_18_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "129",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.18"
+							},
+							{
+								"id": "vault_slots_19",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_19_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												724,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.19"
+							},
+							{
+								"id": "vault_slots_20",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_20_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												724,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.20"
+							},
+							{
+								"id": "vault_slots_21",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_21_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												724,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_21_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "150",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.21"
+							},
+							{
+								"id": "vault_slots_22",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_22_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.22"
+							},
+							{
+								"id": "vault_slots_23",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_23_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.23"
+							},
+							{
+								"id": "vault_slots_24",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_24_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												0,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_24_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "171",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.24"
+							},
+							{
+								"id": "vault_slots_25",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_25_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												1086,
+												0,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.25"
+							},
+							{
+								"id": "vault_slots_26",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_26_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												0,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.26"
+							},
+							{
+								"id": "vault_slots_27",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_27_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												362,
+												362,
+												362,
+												362
+											]
+										}
+									},
+									{
+										"id": "vault_slots_27_count",
+										"type": "Label",
+										"layout": {
+											"position": [
+												22,
+												30
+											],
+											"size": [
+												20,
+												13
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"text": "192",
+											"font_size": 9,
+											"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+											"color": "$atlas.ink_d9d4c6",
+											"clip_text": true
+										}
+									}
+								],
+								"binding": "vault.slots.27"
+							},
+							{
+								"id": "vault_slots_28",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_28_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												724,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.28"
+							},
+							{
+								"id": "vault_slots_29",
+								"type": "ItemSlot",
+								"layout": {
+									"min_size": [
+										45,
+										45
+									]
+								},
+								"children": [
+									{
+										"id": "vault_slots_29_icon",
+										"type": "Texture",
+										"layout": {
+											"position": [
+												5,
+												4
+											],
+											"size": [
+												35,
+												35
+											],
+											"mouse_filter": 2
+										},
+										"properties": {
+											"texture": "res://examples/assets/atlas/items.png",
+											"ignore_texture_size": true,
+											"stretch_mode": 5,
+											"texture_region": [
+												1086,
+												362,
+												362,
+												362
+											]
+										}
+									}
+								],
+								"binding": "vault.slots.29"
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "vault_category_0",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						69
+					],
+					"size": [
+						25,
+						28
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.category.0"
+			},
+			{
+				"id": "vault_category_icon_0",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						73
+					],
+					"size": [
+						18,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						724,
+						362,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "vault_category_1",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						106
+					],
+					"size": [
+						25,
+						28
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.category.1"
+			},
+			{
+				"id": "vault_category_icon_1",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						110
+					],
+					"size": [
+						18,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						362,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "vault_category_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						143
+					],
+					"size": [
+						25,
+						28
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.category.2"
+			},
+			{
+				"id": "vault_category_icon_2",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						147
+					],
+					"size": [
+						18,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						724,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "vault_category_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						180
+					],
+					"size": [
+						25,
+						28
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.category.3"
+			},
+			{
+				"id": "vault_category_icon_3",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						184
+					],
+					"size": [
+						18,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						1086,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "vault_category_4",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						217
+					],
+					"size": [
+						25,
+						28
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.category.4"
+			},
+			{
+				"id": "vault_category_icon_4",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						221
+					],
+					"size": [
+						18,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						1086,
+						362,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "vault_category_5",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						12,
+						254
+					],
+					"size": [
+						25,
+						28
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.category.5"
+			},
+			{
+				"id": "vault_category_icon_5",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						16,
+						258
+					],
+					"size": [
+						18,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						362,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "vault_search",
+				"type": "SearchBox",
+				"layout": {
+					"position": [
+						13,
+						298
+					],
+					"size": [
+						150,
+						20
+					]
+				},
+				"properties": {
+					"font_size": 10,
+					"placeholder": "Search vault\u2026"
+				},
+				"style": "atlas_input"
+			},
+			{
+				"id": "vault_sort",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						172,
+						298
+					],
+					"size": [
+						164,
+						20
+					]
+				},
+				"properties": {
+					"text": "Sort: Category  \u25be",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "vault.sort"
+			}
+		]
+	}
+}

@@ -1,0 +1,32 @@
+{
+	"schema_version": 1,
+	"name": "gameplay_sidebar",
+	"theme": "dark_fantasy",
+	"viewport": {"width": 1920, "height": 1080, "scale_mode": "fit", "safe_zone": 0.04},
+	"metadata": {
+		"screen": "gameplay_sidebar",
+		"display_name": "Gameplay Sidebar / Collapsed",
+		"runtime_anchor": "gameplay.sidebar.right",
+		"collapsed_width": 92,
+		"expanded_width": 330,
+		"toggle_action": "sidebar.toggle",
+		"runtime_note": "The game owns panel visibility and opens the existing inventory, equipment, prayer, magic, skills, quest and social surfaces."
+	},
+	"root": {
+		"id": "gameplay_sidebar_collapsed",
+		"type": "GameplaySidebar",
+		"layout": {"position": [1812, 176], "size": [92, 560]},
+		"binding": "ui.sidebar.expanded",
+		"children": [
+			{"id": "sidebar_toggle", "type": "GameplaySidebarToggle", "layout": {"position": [12, 10], "size": [68, 34]}, "properties": {"text": "‹", "font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/Cinzel.ttf", "font_size": "$font_size.heading", "tooltip": "Expand interface sidebar", "accessibility_name": "Expand interface sidebar"}, "action": "sidebar.toggle"},
+			{"id": "sidebar_tab_inventory", "type": "GameplaySidebarTab", "layout": {"position": [12, 54], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/coin.svg", "tooltip": "Inventory (I)", "accessibility_name": "Inventory", "focus_mode": 2}, "metadata": {"panel": "inventory", "shortcut": "I"}, "action": "sidebar.open_inventory"},
+			{"id": "sidebar_tab_equipment", "type": "GameplaySidebarTab", "layout": {"position": [12, 116], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/helm.svg", "tooltip": "Equipment", "accessibility_name": "Equipment", "focus_mode": 2}, "metadata": {"panel": "equipment"}, "action": "sidebar.open_equipment"},
+			{"id": "sidebar_tab_prayer", "type": "GameplaySidebarTab", "layout": {"position": [12, 178], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/hud_prayer.svg", "tooltip": "Prayer", "accessibility_name": "Prayer", "focus_mode": 2}, "metadata": {"panel": "prayer"}, "action": "sidebar.open_prayer"},
+			{"id": "sidebar_tab_magic", "type": "GameplaySidebarTab", "layout": {"position": [12, 240], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/gem.svg", "tooltip": "Magic", "accessibility_name": "Magic", "focus_mode": 2}, "metadata": {"panel": "magic"}, "action": "sidebar.open_magic"},
+			{"id": "sidebar_tab_skills", "type": "GameplaySidebarTab", "layout": {"position": [12, 302], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/herb.svg", "tooltip": "Skills", "accessibility_name": "Skills", "focus_mode": 2}, "metadata": {"panel": "skills"}, "action": "sidebar.open_skills"},
+			{"id": "sidebar_tab_quests", "type": "GameplaySidebarTab", "layout": {"position": [12, 364], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/scroll.svg", "tooltip": "Quest journal (J)", "accessibility_name": "Quest journal", "focus_mode": 2}, "metadata": {"panel": "quest_journal", "shortcut": "J"}, "action": "sidebar.open_quests"},
+			{"id": "sidebar_tab_social", "type": "GameplaySidebarTab", "layout": {"position": [12, 426], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/coin.svg", "tooltip": "Social", "accessibility_name": "Social", "focus_mode": 2}, "metadata": {"panel": "social"}, "action": "sidebar.open_social"},
+			{"id": "sidebar_tab_settings", "type": "GameplaySidebarTab", "layout": {"position": [12, 488], "size": [68, 56]}, "properties": {"icon": "res://client/content/ui/zeal_ui_atlas/assets/ui/icons/ring.svg", "tooltip": "Settings", "accessibility_name": "Settings", "focus_mode": 2}, "metadata": {"panel": "settings"}, "action": "sidebar.open_settings"}
+		]
+	}
+}

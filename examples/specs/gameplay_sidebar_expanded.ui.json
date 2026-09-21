@@ -1,0 +1,721 @@
+{
+	"schema_version": 1,
+	"name": "gameplay_sidebar_expanded",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 1920,
+		"height": 1080,
+		"scale_mode": "fit",
+		"safe_zone": 0.04
+	},
+	"metadata": {
+		"screen": "gameplay_sidebar_expanded",
+		"display_name": "Gameplay Sidebar / Expanded",
+		"runtime_anchor": "gameplay.sidebar.right",
+		"collapsed_width": 92,
+		"expanded_width": 330,
+		"toggle_action": "sidebar.toggle",
+		"active_panel": "inventory",
+		"active_panel_source": "examples/specs/inventory.ui.json"
+	},
+	"root": {
+		"id": "gameplay_sidebar_expanded",
+		"type": "GameplaySidebar",
+		"layout": {
+			"position": [
+				1590,
+				150
+			],
+			"size": [
+				318,
+				612
+			]
+		},
+		"binding": "ui.sidebar.expanded",
+		"children": [
+			{
+				"id": "sidebar_content",
+				"type": "SimplePanel",
+				"layout": {
+					"position": [
+						8,
+						10
+					],
+					"size": [
+						218,
+						592
+					]
+				},
+				"style": "panel",
+				"children": [
+					{
+						"id": "sidebar_content_title",
+						"type": "Label",
+						"layout": {
+							"position": [
+								14,
+								14
+							],
+							"size": [
+								188,
+								24
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"text": "Inventory",
+							"font": "res://examples/assets/fonts/Cinzel.ttf",
+							"font_size": "$font_size.heading",
+							"color": "$colors.gold"
+						}
+					},
+					{
+						"id": "sidebar_content_rule",
+						"type": "Separator",
+						"layout": {
+							"position": [
+								14,
+								44
+							],
+							"size": [
+								188,
+								1
+							]
+						}
+					},
+					{
+						"id": "sidebar_content_hint",
+						"type": "Label",
+						"layout": {
+							"position": [
+								14,
+								56
+							],
+							"size": [
+								188,
+								34
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"text": "Choose a tab to open\na gameplay surface.",
+							"font_size": "$font_size.caption",
+							"color": "$colors.text_secondary"
+						}
+					},
+					{
+						"id": "sidebar_content_inventory",
+						"type": "ItemGrid",
+						"layout": {
+							"position": [
+								14,
+								102
+							],
+							"size": [
+								188,
+								240
+							]
+						},
+						"properties": {
+							"columns": 4,
+							"slot_size": 40,
+							"gap": 7
+						},
+						"mock_data": {
+							"item_count": 16,
+							"occupied_slots": 6
+						}
+					},
+					{
+						"id": "sidebar_content_status",
+						"type": "Label",
+						"layout": {
+							"position": [
+								14,
+								520
+							],
+							"size": [
+								188,
+								26
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"text": "Press the active tab to close",
+							"font_size": "$font_size.micro",
+							"color": "$colors.text_muted"
+						}
+					}
+				]
+			},
+			{
+				"id": "sidebar_rail",
+				"type": "GameplaySidebar",
+				"layout": {
+					"position": [
+						232,
+						0
+					],
+					"size": [
+						78,
+						612
+					]
+				},
+				"children": [
+					{
+						"id": "sidebar_toggle_expanded",
+						"type": "GameplaySidebarToggle",
+						"layout": {
+							"position": [
+								6,
+								10
+							],
+							"size": [
+								66,
+								34
+							]
+						},
+						"properties": {
+							"text": "\u203a",
+							"font": "res://examples/assets/fonts/Cinzel.ttf",
+							"font_size": "$font_size.heading",
+							"tooltip": "Collapse interface sidebar",
+							"accessibility_name": "Collapse interface sidebar"
+						},
+						"action": "sidebar.toggle"
+					},
+					{
+						"id": "sidebar_expanded_tab_inventory",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								54
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Inventory (I)",
+							"accessibility_name": "Inventory",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "inventory",
+							"selected": true
+						},
+						"action": "sidebar.open_inventory",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_inventory_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_inventory.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_inventory_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Inventory",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					},
+					{
+						"id": "sidebar_expanded_tab_equipment",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								116
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Equipment",
+							"accessibility_name": "Equipment",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "equipment"
+						},
+						"action": "sidebar.open_equipment",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_equipment_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_equipment.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_equipment_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Equipment",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					},
+					{
+						"id": "sidebar_expanded_tab_prayer",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								178
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Prayer",
+							"accessibility_name": "Prayer",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "prayer"
+						},
+						"action": "sidebar.open_prayer",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_prayer_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_prayer.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_prayer_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Prayer",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					},
+					{
+						"id": "sidebar_expanded_tab_magic",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								240
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Magic",
+							"accessibility_name": "Magic",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "magic"
+						},
+						"action": "sidebar.open_magic",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_magic_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_magic.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_magic_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Magic",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					},
+					{
+						"id": "sidebar_expanded_tab_skills",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								302
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Skills",
+							"accessibility_name": "Skills",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "skills"
+						},
+						"action": "sidebar.open_skills",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_skills_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_skills.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_skills_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Skills",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					},
+					{
+						"id": "sidebar_expanded_tab_quests",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								364
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Quest journal (J)",
+							"accessibility_name": "Quest journal",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "quest_journal",
+							"shortcut": "J"
+						},
+						"action": "sidebar.open_quests",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_quests_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_quests.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_quests_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Quests",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					},
+					{
+						"id": "sidebar_expanded_tab_social",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								426
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Social",
+							"accessibility_name": "Social",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "social"
+						},
+						"action": "sidebar.open_social",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_social_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_social.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_social_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Social",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					},
+					{
+						"id": "sidebar_expanded_tab_settings",
+						"type": "GameplaySidebarTab",
+						"layout": {
+							"position": [
+								6,
+								488
+							],
+							"size": [
+								66,
+								56
+							]
+						},
+						"properties": {
+							"tooltip": "Settings",
+							"accessibility_name": "Settings",
+							"focus_mode": 2
+						},
+						"metadata": {
+							"panel": "settings"
+						},
+						"action": "sidebar.open_settings",
+						"children": [
+							{
+								"id": "sidebar_expanded_tab_settings_glyph",
+								"type": "Texture",
+								"layout": {
+									"position": [
+										19.0,
+										6
+									],
+									"size": [
+										28,
+										28
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"texture": "res://examples/assets/ui/icons/sidebar_settings.svg",
+									"expand_mode": 1,
+									"stretch_mode": 5
+								}
+							},
+							{
+								"id": "sidebar_expanded_tab_settings_caption",
+								"type": "Label",
+								"layout": {
+									"position": [
+										2,
+										36
+									],
+									"size": [
+										62,
+										14
+									],
+									"mouse_filter": 2
+								},
+								"properties": {
+									"text": "Settings",
+									"font_size": 10,
+									"color": "$colors.text_secondary",
+									"horizontal_alignment": "center"
+								}
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

@@ -1,0 +1,492 @@
+{
+	"schema_version": 1,
+	"name": "options",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 250,
+		"height": 169,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a",
+				"ink_d9d4c6": "#d9d4c6"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_enamel.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://examples/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_smoke.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Settings / options",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer."
+	},
+	"root": {
+		"id": "options_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				250,
+				169
+			]
+		},
+		"children": [
+			{
+				"id": "options_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						195,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Settings / Options",
+					"font_size": 13,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "options_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						226,
+						1
+					]
+				}
+			},
+			{
+				"id": "options_tab_0",
+				"type": "PrimaryButton",
+				"layout": {
+					"position": [
+						10,
+						35
+					],
+					"size": [
+						54,
+						23
+					]
+				},
+				"properties": {
+					"text": "Gameplay",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "options.tab.0"
+			},
+			{
+				"id": "options_tab_1",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						68,
+						35
+					],
+					"size": [
+						54,
+						23
+					]
+				},
+				"properties": {
+					"text": "Graphics",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "options.tab.1"
+			},
+			{
+				"id": "options_tab_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						126,
+						35
+					],
+					"size": [
+						54,
+						23
+					]
+				},
+				"properties": {
+					"text": "Audio",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "options.tab.2"
+			},
+			{
+				"id": "options_tab_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						184,
+						35
+					],
+					"size": [
+						54,
+						23
+					]
+				},
+				"properties": {
+					"text": "Controls",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "options.tab.3"
+			},
+			{
+				"id": "sensitivity_label",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						62
+					],
+					"size": [
+						137,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Camera Sensitivity",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "camera_sensitivity",
+				"type": "Slider",
+				"layout": {
+					"position": [
+						151,
+						66
+					],
+					"size": [
+						84,
+						13
+					]
+				},
+				"properties": {
+					"value": 50,
+					"max_value": 100
+				}
+			},
+			{
+				"id": "option_label_0",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						82
+					],
+					"size": [
+						136,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Mouse Look",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "option_toggle_0",
+				"type": "CheckButton",
+				"layout": {
+					"position": [
+						152,
+						81
+					],
+					"size": [
+						70,
+						18
+					]
+				},
+				"properties": {
+					"text": "",
+					"button_pressed": true,
+					"font_size": 9
+				},
+				"style": "atlas_text_panel"
+			},
+			{
+				"id": "option_label_1",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						100
+					],
+					"size": [
+						136,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Show Player Names",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "option_toggle_1",
+				"type": "CheckButton",
+				"layout": {
+					"position": [
+						152,
+						99
+					],
+					"size": [
+						70,
+						18
+					]
+				},
+				"properties": {
+					"text": "",
+					"button_pressed": true,
+					"font_size": 9
+				},
+				"style": "atlas_text_panel"
+			},
+			{
+				"id": "option_label_2",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						118
+					],
+					"size": [
+						136,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Show Damage Numbers",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "option_toggle_2",
+				"type": "CheckButton",
+				"layout": {
+					"position": [
+						152,
+						117
+					],
+					"size": [
+						70,
+						18
+					]
+				},
+				"properties": {
+					"text": "",
+					"button_pressed": true,
+					"font_size": 9
+				},
+				"style": "atlas_text_panel"
+			},
+			{
+				"id": "options_reset",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						64,
+						141
+					],
+					"size": [
+						171,
+						20
+					]
+				},
+				"properties": {
+					"text": "Reset to Default",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "options.reset"
+			}
+		]
+	}
+}

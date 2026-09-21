@@ -1,0 +1,492 @@
+{
+	"schema_version": 1,
+	"name": "chat",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 246,
+		"height": 169,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a",
+				"ink_d9d4c6": "#d9d4c6",
+				"ink_9eaaa9": "#9eaaa9",
+				"ink_97b993": "#97b993",
+				"ink_83b7dd": "#83b7dd"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_enamel.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://examples/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_smoke.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			},
+			"atlas_input": {
+				"background": "#080d10",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 2,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				}
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Chat / communication",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer."
+	},
+	"root": {
+		"id": "chat_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				246,
+				169
+			]
+		},
+		"children": [
+			{
+				"id": "chat_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						191,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Chat / Communication",
+					"font_size": 13,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "chat_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						222,
+						1
+					]
+				}
+			},
+			{
+				"id": "chat_tab_0",
+				"type": "PrimaryButton",
+				"layout": {
+					"position": [
+						10,
+						36
+					],
+					"size": [
+						42,
+						23
+					]
+				},
+				"properties": {
+					"text": "General",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "chat.tab.0"
+			},
+			{
+				"id": "chat_tab_1",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						56,
+						36
+					],
+					"size": [
+						42,
+						23
+					]
+				},
+				"properties": {
+					"text": "World",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "chat.tab.1"
+			},
+			{
+				"id": "chat_tab_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						102,
+						36
+					],
+					"size": [
+						42,
+						23
+					]
+				},
+				"properties": {
+					"text": "Trade",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "chat.tab.2"
+			},
+			{
+				"id": "chat_tab_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						148,
+						36
+					],
+					"size": [
+						42,
+						23
+					]
+				},
+				"properties": {
+					"text": "Guild",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "chat.tab.3"
+			},
+			{
+				"id": "chat_tab_4",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						194,
+						36
+					],
+					"size": [
+						42,
+						23
+					]
+				},
+				"properties": {
+					"text": "Party",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "chat.tab.4"
+			},
+			{
+				"id": "chat_message_0",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						65
+					],
+					"size": [
+						221,
+						12
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "[System] Welcome to Zeal.",
+					"font_size": 8,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "chat_message_1",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						77
+					],
+					"size": [
+						221,
+						12
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "[World] Kael: Such a beautiful city.",
+					"font_size": 8,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_9eaaa9",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "chat_message_2",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						89
+					],
+					"size": [
+						221,
+						12
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "[Trade] Mara: WTS Ironwood Plank x200",
+					"font_size": 8,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "chat_message_3",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						101
+					],
+					"size": [
+						221,
+						12
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "[Guild] Thorne: Cathedral run in 5?",
+					"font_size": 8,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_97b993",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "chat_message_4",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						113
+					],
+					"size": [
+						221,
+						12
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "[Party] Elira: Meet at the eastern gate.",
+					"font_size": 8,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_83b7dd",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "chat_message_5",
+				"type": "Label",
+				"layout": {
+					"position": [
+						13,
+						125
+					],
+					"size": [
+						221,
+						12
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "[World] Jyn: The future is brighter together.",
+					"font_size": 8,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_9eaaa9",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "chat_input",
+				"type": "LineEdit",
+				"layout": {
+					"position": [
+						12,
+						143
+					],
+					"size": [
+						220,
+						19
+					]
+				},
+				"properties": {
+					"font_size": 10,
+					"placeholder": "Type a message\u2026"
+				},
+				"style": "atlas_input"
+			}
+		]
+	}
+}

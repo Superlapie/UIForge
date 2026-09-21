@@ -1,0 +1,30 @@
+{
+	"schema_version": 1,
+	"name": "enemy_target_frame",
+	"theme": "dark_fantasy",
+	"viewport": {"width": 1920, "height": 1080, "scale_mode": "fit", "safe_zone": 0.04},
+	"metadata": {
+		"screen": "enemy_target_frame",
+		"display_name": "Enemy Target Frame",
+		"runtime_anchor": "combat.target_frame",
+		"visibility": "combat_only",
+		"runtime_note": "The game owns target identity, level, health, combat state, and status durations."
+	},
+	"root": {
+		"id": "enemy_target_frame",
+		"type": "EnemyTargetFrame",
+		"layout": {"position": [750, 78], "size": [420, 92], "mouse_filter": 2},
+		"binding": "combat.target",
+		"children": [
+			{"id": "target_name", "type": "Label", "layout": {"position": [10, 0], "size": [300, 22], "mouse_filter": 2}, "properties": {"text": "Bandit Captain", "font": "res://examples/assets/fonts/Cinzel.ttf", "font_size": "$font_size.body_bold", "color": "$colors.text_primary", "outline_size": 3, "font_outline_color": "$colors.shadow"}, "binding": "combat.target.name"},
+			{"id": "target_level", "type": "Label", "layout": {"position": [334, 1], "size": [76, 20], "mouse_filter": 2}, "properties": {"text": "Lv. 12", "font_size": "$font_size.caption", "color": "$colors.gold", "horizontal_alignment": "right", "outline_size": 3, "font_outline_color": "$colors.shadow"}, "binding": "combat.target.level"},
+			{"id": "target_health_bar", "type": "EnemyTargetHealthBar", "layout": {"position": [6, 23], "size": [408, 30]}, "properties": {"value": 0.71, "min_value": 0, "max_value": 1, "show_percentage": false}, "binding": "combat.target.health.ratio"},
+			{"id": "target_health_label", "type": "Label", "layout": {"position": [18, 29], "size": [384, 17], "mouse_filter": 2}, "properties": {"text": "85 / 120", "font_size": "$font_size.caption", "color": "$colors.text_primary", "horizontal_alignment": "center", "vertical_alignment": "center", "outline_size": 2, "font_outline_color": "$colors.shadow"}, "binding": "combat.target.health"},
+			{"id": "target_effects", "type": "Control", "layout": {"position": [12, 44], "size": [396, 38], "mouse_filter": 2}, "children": [
+				{"id": "target_effect_bleed", "type": "EnemyStatusEffect", "layout": {"position": [0, 0], "size": [34, 34]}, "properties": {"tooltip": "Bleeding", "accessibility_name": "Bleeding", "accessibility_description": "Target takes damage over time."}, "children": [{"id": "target_effect_bleed_icon", "type": "Texture", "layout": {"position": [5, 5], "size": [24, 24], "mouse_filter": 2}, "properties": {"texture": "res://examples/assets/ui/icons/hud_special.svg", "ignore_texture_size": true, "stretch_mode": 5}}]},
+				{"id": "target_effect_prayer", "type": "EnemyStatusEffect", "layout": {"position": [40, 0], "size": [34, 34]}, "properties": {"tooltip": "Protective prayer", "accessibility_name": "Protective prayer"}, "children": [{"id": "target_effect_prayer_icon", "type": "Texture", "layout": {"position": [5, 5], "size": [24, 24], "mouse_filter": 2}, "properties": {"texture": "res://examples/assets/ui/icons/hud_prayer.svg", "ignore_texture_size": true, "stretch_mode": 5}}]},
+				{"id": "target_effect_expose", "type": "EnemyStatusEffect", "layout": {"position": [80, 0], "size": [34, 34]}, "properties": {"tooltip": "Exposed", "accessibility_name": "Exposed"}, "children": [{"id": "target_effect_expose_icon", "type": "Texture", "layout": {"position": [5, 5], "size": [24, 24], "mouse_filter": 2}, "properties": {"texture": "res://examples/assets/ui/icons/gem.svg", "ignore_texture_size": true, "stretch_mode": 5}}]}
+			]}
+		]
+	}
+}

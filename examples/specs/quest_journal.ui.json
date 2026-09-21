@@ -1,0 +1,581 @@
+{
+	"schema_version": 1,
+	"name": "quest_journal",
+	"viewport": {
+		"width": 1920,
+		"height": 1080,
+		"scale_mode": "fit",
+		"safe_zone": 0.04
+	},
+	"theme": "dark_fantasy",
+	"metadata": {
+		"screen": "quest_journal",
+		"preview_mode": "skeleton",
+		"runtime_note": "The game supplies quest rows, selected detail content, objective state, and map integration."
+	},
+	"mock_data": {
+		"preview_mode": "empty_selection",
+		"seed": 19
+	},
+	"root": {
+		"id": "quest_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				80,
+				160
+			],
+			"size": [
+				620,
+				480
+			]
+		},
+		"children": [
+			{
+				"id": "quest_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						12
+					],
+					"size": [
+						500,
+						28
+					]
+				},
+				"properties": {
+					"text": "Quest Journal",
+					"font_size": "$font_size.heading",
+					"color": "$colors.gold"
+				}
+			},
+			{
+				"id": "quest_subtitle",
+				"type": "Label",
+				"layout": {
+					"position": [
+						0,
+						0
+					],
+					"size": [
+						0,
+						0
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_secondary",
+					"visible": false
+				}
+			},
+			{
+				"id": "quest_close",
+				"type": "SecondaryButton",
+				"layout": {
+					"position": [
+						572,
+						10
+					],
+					"size": [
+						32,
+						32
+					]
+				},
+				"properties": {
+					"text": "×",
+					"font_size": "$font_size.heading"
+				},
+				"action": "quests.close"
+			},
+			{
+				"id": "quest_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						16,
+						48
+					],
+					"size": [
+						588,
+						1
+					]
+				}
+			},
+			{
+				"id": "quest_active_tab",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						16,
+						58
+					],
+					"size": [
+						100,
+						32
+					]
+				},
+				"properties": {
+					"text": "ACTIVE",
+					"font_size": "$font_size.caption",
+					"toggle_mode": true,
+					"button_pressed": true
+				},
+				"action": "quests.filter.active"
+			},
+			{
+				"id": "quest_completed_tab",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						124,
+						58
+					],
+					"size": [
+						110,
+						32
+					]
+				},
+				"properties": {
+					"text": "COMPLETED",
+					"font_size": "$font_size.caption"
+				},
+				"action": "quests.filter.completed"
+			},
+			{
+				"id": "quest_list",
+				"type": "SimplePanel",
+				"layout": {
+					"position": [
+						16,
+						102
+					],
+					"size": [
+						192,
+						356
+					]
+				},
+				"children": [
+					{
+						"id": "quest_search",
+						"type": "SearchBox",
+						"layout": {
+							"position": [
+								12,
+								10
+							],
+							"size": [
+								168,
+								32
+							]
+						},
+						"properties": {
+							"placeholder": "SEARCH QUESTS",
+							"font_size": "$font_size.caption"
+						},
+						"binding": "quests.search"
+					},
+					{
+						"id": "quest_entry_01",
+						"type": "QuestEntry",
+						"layout": {
+							"position": [
+								12,
+								54
+							],
+							"size": [
+								168,
+								36
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.caption",
+							"toggle_mode": true,
+							"button_pressed": true
+						},
+						"action": "quests.select.01",
+						"binding": "quests.rows.0.title"
+					},
+					{
+						"id": "quest_entry_02",
+						"type": "QuestEntry",
+						"layout": {
+							"position": [
+								12,
+								96
+							],
+							"size": [
+								168,
+								36
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.caption"
+						},
+						"action": "quests.select.02",
+						"binding": "quests.rows.1.title"
+					},
+					{
+						"id": "quest_entry_03",
+						"type": "QuestEntry",
+						"layout": {
+							"position": [
+								12,
+								138
+							],
+							"size": [
+								168,
+								36
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.caption"
+						},
+						"action": "quests.select.03",
+						"binding": "quests.rows.2.title"
+					},
+					{
+						"id": "quest_entry_04",
+						"type": "QuestEntry",
+						"layout": {
+							"position": [
+								12,
+								180
+							],
+							"size": [
+								168,
+								36
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.caption"
+						},
+						"action": "quests.select.04",
+						"binding": "quests.rows.3.title"
+					},
+					{
+						"id": "quest_entry_05",
+						"type": "QuestEntry",
+						"layout": {
+							"position": [
+								12,
+								222
+							],
+							"size": [
+								168,
+								36
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.caption"
+						},
+						"action": "quests.select.05",
+						"binding": "quests.rows.4.title"
+					}
+				]
+			},
+			{
+				"id": "quest_detail",
+				"type": "SectionPanel",
+				"layout": {
+					"position": [
+						222,
+						102
+					],
+					"size": [
+						382,
+						356
+					]
+				},
+				"children": [
+					{
+						"id": "quest_art_anchor",
+						"type": "Panel",
+						"layout": {
+							"position": [
+								12,
+								12
+							],
+							"size": [
+								130,
+								100
+							]
+						},
+						"style": {
+							"background": "$colors.surface_inset",
+							"border": "$colors.border_muted",
+							"border_width": "$border_width.hairline",
+							"radius": "$radius.md"
+						},
+						"metadata": {
+							"runtime_anchor": "quest.selected.art",
+							"content_owner": "game_runtime_or_asset"
+						}
+					},
+					{
+						"id": "quest_art_label",
+						"type": "Label",
+						"layout": {
+							"position": [
+								20,
+								48
+							],
+							"size": [
+								114,
+								24
+							]
+						},
+						"properties": {
+							"text": "QUEST ART / MAP",
+							"font_size": "$font_size.caption",
+							"color": "$colors.text_secondary",
+							"horizontal_alignment": "center"
+						}
+					},
+					{
+						"id": "quest_art_hint",
+						"type": "Label",
+						"layout": {
+							"position": [
+								0,
+								0
+							],
+							"size": [
+								0,
+								0
+							]
+						},
+						"properties": {
+							"text": "",
+							"font_size": "$font_size.micro",
+							"color": "$colors.text_muted",
+							"horizontal_alignment": "center",
+							"visible": false
+						},
+						"binding": "quest.selected.art"
+					},
+					{
+						"id": "quest_selected_title",
+						"type": "Label",
+						"layout": {
+							"position": [
+								156,
+								12
+							],
+							"size": [
+								212,
+								28
+							]
+						},
+						"properties": {
+							"text": "Select a quest",
+							"font_size": "$font_size.heading",
+							"color": "$colors.gold"
+						},
+						"binding": "quest.selected.title"
+					},
+					{
+						"id": "quest_selected_meta",
+						"type": "Label",
+						"layout": {
+							"position": [
+								156,
+								44
+							],
+							"size": [
+								212,
+								18
+							]
+						},
+						"properties": {
+							"text": "LEVEL —  ·  REGION —",
+							"font_size": "$font_size.caption",
+							"color": "$colors.text_secondary"
+						},
+						"binding": "quest.selected.meta"
+					},
+					{
+						"id": "quest_description_rule",
+						"type": "Separator",
+						"layout": {
+							"position": [
+								156,
+								69
+							],
+							"size": [
+								212,
+								1
+							]
+						}
+					},
+					{
+						"id": "quest_description",
+						"type": "RichText",
+						"layout": {
+							"position": [
+								156,
+								78
+							],
+							"size": [
+								212,
+								56
+							]
+						},
+						"properties": {
+							"text": "",
+							"font_size": "$font_size.body",
+							"color": "$colors.text_secondary",
+							"fit_content": false,
+							"scroll_active": false
+						},
+						"binding": "quest.selected.description"
+					},
+					{
+						"id": "quest_objectives_title",
+						"type": "Label",
+						"layout": {
+							"position": [
+								12,
+								144
+							],
+							"size": [
+								358,
+								20
+							]
+						},
+						"properties": {
+							"text": "OBJECTIVES",
+							"font_size": "$font_size.caption",
+							"color": "$colors.gold"
+						}
+					},
+					{
+						"id": "quest_objectives",
+						"type": "RichText",
+						"layout": {
+							"position": [
+								12,
+								170
+							],
+							"size": [
+								358,
+								60
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.body",
+							"color": "$colors.text_secondary"
+						},
+						"binding": "quest.selected.objectives"
+					},
+					{
+						"id": "quest_reward_label",
+						"type": "Label",
+						"layout": {
+							"position": [
+								12,
+								238
+							],
+							"size": [
+								358,
+								18
+							]
+						},
+						"properties": {
+							"text": "REWARD",
+							"font_size": "$font_size.caption",
+							"color": "$colors.gold"
+						}
+					},
+					{
+						"id": "quest_reward",
+						"type": "Label",
+						"layout": {
+							"position": [
+								12,
+								261
+							],
+							"size": [
+								358,
+								24
+							]
+						},
+						"properties": {
+							"text": "—",
+							"font_size": "$font_size.body",
+							"color": "$colors.text_secondary"
+						},
+						"binding": "quest.selected.reward"
+					},
+					{
+						"id": "quest_track",
+						"type": "PrimaryButton",
+						"layout": {
+							"position": [
+								12,
+								308
+							],
+							"size": [
+								168,
+								32
+							]
+						},
+						"properties": {
+							"text": "TRACK QUEST",
+							"font_size": "$font_size.caption"
+						},
+						"action": "quests.track"
+					},
+					{
+						"id": "quest_map",
+						"type": "SecondaryButton",
+						"layout": {
+							"position": [
+								190,
+								308
+							],
+							"size": [
+								180,
+								32
+							]
+						},
+						"properties": {
+							"text": "SHOW ON MAP",
+							"font_size": "$font_size.caption"
+						},
+						"action": "quests.show_on_map"
+					}
+				]
+			},
+			{
+				"id": "quest_footer_hint",
+				"type": "Label",
+				"layout": {
+					"position": [
+						0,
+						0
+					],
+					"size": [
+						0,
+						0
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": "$font_size.micro",
+					"color": "$colors.text_muted",
+					"horizontal_alignment": "center",
+					"visible": false
+				},
+				"binding": "quests.navigation"
+			}
+		]
+	}
+}

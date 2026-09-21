@@ -1,0 +1,712 @@
+{
+	"schema_version": 1,
+	"name": "loadout",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 274,
+		"height": 326,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a",
+				"ink_d9d4c6": "#d9d4c6"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/focus_ring.svg",
+				"texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_enamel.svg",
+				"hover_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_hover.svg",
+				"pressed_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/focus_ring.svg",
+				"texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_smoke.svg",
+				"hover_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_hover.svg",
+				"pressed_texture": "res://client/content/ui/zeal_ui_atlas/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Equipment / loadout",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer.",
+		"package_id": "zeal_ui_atlas",
+		"interface_id": "03_equipment_loadout",
+		"display_name": "Equipment / Loadout",
+		"ai_description": "paper doll equipment slots, character preview and combat stats",
+		"generated_scene": "scenes/03_equipment_loadout.tscn"
+	},
+	"root": {
+		"id": "loadout_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				274,
+				326
+			]
+		},
+		"children": [
+			{
+				"id": "loadout_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						219,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u265c  Equipment",
+					"font_size": 13,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "loadout_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						250,
+						1
+					]
+				}
+			},
+			{
+				"id": "loadout_select",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						148,
+						10
+					],
+					"size": [
+						99,
+						21
+					]
+				},
+				"properties": {
+					"text": "Loadout I  \u25be",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "loadout.select"
+			},
+			{
+				"id": "loadout_character",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						65,
+						39
+					],
+					"size": [
+						147,
+						235
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/knight.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "loadout_slot_0",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						16,
+						43
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_0_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								724,
+								0,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.0"
+			},
+			{
+				"id": "loadout_slot_1",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						16,
+						98
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_1_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								0,
+								0,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.1"
+			},
+			{
+				"id": "loadout_slot_2",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						16,
+						153
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_2_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								362,
+								0,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.2"
+			},
+			{
+				"id": "loadout_slot_3",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						16,
+						208
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_3_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								724,
+								362,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.3"
+			},
+			{
+				"id": "loadout_slot_4",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						220,
+						43
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_4_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								724,
+								362,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.4"
+			},
+			{
+				"id": "loadout_slot_5",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						220,
+						98
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_5_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								724,
+								724,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.5"
+			},
+			{
+				"id": "loadout_slot_6",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						220,
+						153
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_6_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								362,
+								362,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.6"
+			},
+			{
+				"id": "loadout_slot_7",
+				"type": "ItemSlot",
+				"layout": {
+					"position": [
+						220,
+						208
+					],
+					"size": [
+						38,
+						38
+					]
+				},
+				"children": [
+					{
+						"id": "loadout_slot_7_icon",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								5,
+								4
+							],
+							"size": [
+								28,
+								28
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://client/content/ui/zeal_ui_atlas/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								724,
+								362,
+								362,
+								362
+							]
+						}
+					}
+				],
+				"binding": "loadout.slot.7"
+			},
+			{
+				"id": "loadout_stats_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						16,
+						274
+					],
+					"size": [
+						242,
+						1
+					]
+				}
+			},
+			{
+				"id": "loadout_attack",
+				"type": "Label",
+				"layout": {
+					"position": [
+						24,
+						278
+					],
+					"size": [
+						68,
+						30
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Attack\n320",
+					"font_size": 10,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "loadout_defence",
+				"type": "Label",
+				"layout": {
+					"position": [
+						105,
+						278
+					],
+					"size": [
+						68,
+						30
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Defence\n298",
+					"font_size": 10,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "loadout_faith",
+				"type": "Label",
+				"layout": {
+					"position": [
+						194,
+						278
+					],
+					"size": [
+						60,
+						30
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Faith\n180",
+					"font_size": 10,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_d9d4c6",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "equipment_sets",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						80,
+						305
+					],
+					"size": [
+						121,
+						18
+					]
+				},
+				"properties": {
+					"text": "Equipment Sets",
+					"font_size": 9,
+					"font": "res://client/content/ui/zeal_ui_atlas/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "equipment.sets"
+			}
+		]
+	}
+}

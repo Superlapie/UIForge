@@ -1,0 +1,1080 @@
+{
+	"schema_version": 1,
+	"name": "codex",
+	"theme": "dark_fantasy",
+	"viewport": {
+		"width": 500,
+		"height": 239,
+		"scale_mode": "fit"
+	},
+	"theme_overrides": {
+		"tokens": {
+			"font_size": {
+				"micro": 9,
+				"caption": 10,
+				"body": 11,
+				"heading": 13,
+				"title": 20
+			},
+			"material": {
+				"window_tint": "#ffffff38"
+			},
+			"atlas": {
+				"ink_cbb68a": "#cbb68a",
+				"ink_9eaaa9": "#9eaaa9",
+				"ink_d9d4c6": "#d9d4c6"
+			}
+		},
+		"styles": {
+			"atlas_text_panel": {
+				"background": "#080d10",
+				"border": "#756344",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 3,
+					"top": 2,
+					"right": 3,
+					"bottom": 2
+				}
+			},
+			"atlas_line": {
+				"background": "#507084",
+				"border": "#507084",
+				"border_width": 0
+			},
+			"tab": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"list_row": {
+				"background": "#0a1014",
+				"border": "#424540",
+				"border_width": 1,
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 2,
+					"bottom": 2
+				},
+				"font_color": "#d9d4c6",
+				"hover_background": "#203441",
+				"hover_border": "#a08a5e",
+				"pressed_background": "#152b39",
+				"pressed_border": "#cbb68a"
+			},
+			"button_primary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_enamel.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_texture": "res://examples/assets/ui/button_smoke.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#172c39",
+				"border": "$colors.border_highlight",
+				"border_width": 1,
+				"radius": "$radius.sm",
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"shadow_color": "$colors.shadow",
+				"shadow_size": 2,
+				"hover_background": "#244253",
+				"pressed_background": "#203548",
+				"disabled_background": "#171c22"
+			},
+			"button_secondary": {
+				"focus_texture": "res://examples/assets/ui/focus_ring.svg",
+				"texture": "res://examples/assets/ui/button_smoke.svg",
+				"hover_texture": "res://examples/assets/ui/button_hover.svg",
+				"pressed_texture": "res://examples/assets/ui/button_pressed.svg",
+				"disabled_modulate": "#85909999",
+				"texture_margin_left": 4,
+				"texture_margin_right": 4,
+				"texture_margin_top": 4,
+				"texture_margin_bottom": 4,
+				"background": "#0b1219",
+				"border": "$colors.border_muted",
+				"border_width": "$border_width.hairline",
+				"radius": 1,
+				"content_margin": {
+					"left": 4,
+					"right": 4,
+					"top": 1,
+					"bottom": 1
+				},
+				"hover_background": "#263b4e",
+				"pressed_background": "#172532",
+				"disabled_background": "#10151b"
+			},
+			"atlas_orb": {
+				"background": "#0c1620",
+				"border": "#756a51",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77"
+			},
+			"atlas_orb_active": {
+				"background": "#123956",
+				"border": "#acd8ff",
+				"border_width": 1,
+				"radius": 18,
+				"content_margin": {
+					"left": 0,
+					"right": 0,
+					"top": 0,
+					"bottom": 0
+				},
+				"hover_background": "#1b3e59",
+				"hover_border": "#d8c590",
+				"pressed_background": "#184c77",
+				"shadow_color": "#499def80",
+				"shadow_size": 4
+			}
+		}
+	},
+	"metadata": {
+		"preview_mode": "populated",
+		"template_title": "Codex / faith and powers",
+		"runtime_note": "Illustrative preview values; bind actions and data in the game layer."
+	},
+	"root": {
+		"id": "codex_window",
+		"type": "WindowFrame",
+		"layout": {
+			"position": [
+				0,
+				0
+			],
+			"size": [
+				500,
+				239
+			]
+		},
+		"children": [
+			{
+				"id": "codex_title",
+				"type": "Label",
+				"layout": {
+					"position": [
+						16,
+						8
+					],
+					"size": [
+						445,
+						23
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u265c  Codex",
+					"font_size": 13,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "codex_rule",
+				"type": "Separator",
+				"layout": {
+					"position": [
+						12,
+						34
+					],
+					"size": [
+						476,
+						1
+					]
+				}
+			},
+			{
+				"id": "codex_path_0",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						13,
+						39
+					],
+					"size": [
+						128,
+						27
+					]
+				},
+				"properties": {
+					"text": "The Lumerean Faith",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.path.0"
+			},
+			{
+				"id": "codex_path_1",
+				"type": "PrimaryButton",
+				"layout": {
+					"position": [
+						13,
+						69
+					],
+					"size": [
+						128,
+						27
+					]
+				},
+				"properties": {
+					"text": "Radiant Path     12/18",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.path.1"
+			},
+			{
+				"id": "codex_path_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						13,
+						99
+					],
+					"size": [
+						128,
+						27
+					]
+				},
+				"properties": {
+					"text": "Dawn Magic       8/16",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.path.2"
+			},
+			{
+				"id": "codex_path_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						13,
+						129
+					],
+					"size": [
+						128,
+						27
+					]
+				},
+				"properties": {
+					"text": "Void Studies      5/14",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.path.3"
+			},
+			{
+				"id": "codex_path_4",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						13,
+						159
+					],
+					"size": [
+						128,
+						27
+					]
+				},
+				"properties": {
+					"text": "Nature\u2019s Balance  7/16",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.path.4"
+			},
+			{
+				"id": "codex_path_5",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						13,
+						189
+					],
+					"size": [
+						128,
+						27
+					]
+				},
+				"properties": {
+					"text": "Ancient Lore      4/12",
+					"font_size": 9,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.path.5"
+			},
+			{
+				"id": "codex_path_name",
+				"type": "Label",
+				"layout": {
+					"position": [
+						158,
+						42
+					],
+					"size": [
+						177,
+						25
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "\u2727  Radiant Path",
+					"font_size": 14,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_cbb68a",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "codex_motto",
+				"type": "Label",
+				"layout": {
+					"position": [
+						185,
+						66
+					],
+					"size": [
+						130,
+						18
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"text": "Light endures.",
+					"font_size": 10,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"color": "$atlas.ink_9eaaa9",
+					"clip_text": true
+				}
+			},
+			{
+				"id": "codex_ability_0",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						158,
+						94
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.0",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_0",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						164,
+						100
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						1086,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_1",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						202,
+						94
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.1",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_1",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						208,
+						100
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_2",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						246,
+						94
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.2",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_2",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						252,
+						100
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						362,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_3",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						290,
+						94
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.3",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_3",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						296,
+						100
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_special.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "codex_ability_4",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						158,
+						137
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.4",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_4",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						164,
+						143
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						1086,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_5",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						202,
+						137
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.5",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_5",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						208,
+						143
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_6",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						246,
+						137
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.6",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_6",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						252,
+						143
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						362,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_7",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						290,
+						137
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.7",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_7",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						296,
+						143
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_special.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "codex_ability_8",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						158,
+						180
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.8",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_8",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						164,
+						186
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						1086,
+						724,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_9",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						202,
+						180
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.9",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_9",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						208,
+						186
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						0,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_10",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						246,
+						180
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.10",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_10",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						252,
+						186
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/atlas/items.png",
+					"ignore_texture_size": true,
+					"stretch_mode": 5,
+					"texture_region": [
+						0,
+						362,
+						362,
+						362
+					]
+				}
+			},
+			{
+				"id": "codex_ability_11",
+				"type": "TabButton",
+				"layout": {
+					"position": [
+						290,
+						180
+					],
+					"size": [
+						36,
+						36
+					]
+				},
+				"properties": {
+					"text": "",
+					"font_size": 17,
+					"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+					"clip_text": true
+				},
+				"action": "codex.ability.11",
+				"style": "atlas_orb"
+			},
+			{
+				"id": "codex_ability_icon_11",
+				"type": "Texture",
+				"layout": {
+					"position": [
+						296,
+						186
+					],
+					"size": [
+						24,
+						24
+					],
+					"mouse_filter": 2
+				},
+				"properties": {
+					"texture": "res://examples/assets/ui/icons/hud_special.svg",
+					"ignore_texture_size": true,
+					"stretch_mode": 5
+				}
+			},
+			{
+				"id": "ability_detail",
+				"type": "SimplePanel",
+				"layout": {
+					"position": [
+						340,
+						40
+					],
+					"size": [
+						145,
+						188
+					]
+				},
+				"children": [
+					{
+						"id": "ability_emblem",
+						"type": "Texture",
+						"layout": {
+							"position": [
+								52,
+								4
+							],
+							"size": [
+								42,
+								42
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"texture": "res://examples/assets/atlas/items.png",
+							"ignore_texture_size": true,
+							"stretch_mode": 5,
+							"texture_region": [
+								1086,
+								724,
+								362,
+								362
+							]
+						}
+					},
+					{
+						"id": "ability_name",
+						"type": "Label",
+						"layout": {
+							"position": [
+								10,
+								48
+							],
+							"size": [
+								128,
+								21
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"text": "Beacon of Hope",
+							"font_size": 12,
+							"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+							"color": "$atlas.ink_cbb68a",
+							"clip_text": true
+						}
+					},
+					{
+						"id": "ability_description",
+						"type": "Label",
+						"layout": {
+							"position": [
+								10,
+								78
+							],
+							"size": [
+								128,
+								48
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"text": "Emits a wave of sacred light,\nrestoring health to you and\nnearby allies.",
+							"font_size": 9,
+							"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+							"color": "$atlas.ink_d9d4c6",
+							"clip_text": true
+						}
+					},
+					{
+						"id": "ability_cost",
+						"type": "Label",
+						"layout": {
+							"position": [
+								10,
+								126
+							],
+							"size": [
+								128,
+								39
+							],
+							"mouse_filter": 2
+						},
+						"properties": {
+							"text": "Cooldown             45s\nFaith Cost              40\nRange                    15m",
+							"font_size": 9,
+							"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+							"color": "$atlas.ink_d9d4c6",
+							"clip_text": true
+						}
+					},
+					{
+						"id": "learn_ability",
+						"type": "PrimaryButton",
+						"layout": {
+							"position": [
+								10,
+								165
+							],
+							"size": [
+								126,
+								20
+							]
+						},
+						"properties": {
+							"text": "Learn Ability",
+							"font_size": 9,
+							"font": "res://examples/assets/fonts/DejaVuSerifCondensed.ttf",
+							"clip_text": true
+						},
+						"action": "learn.ability"
+					}
+				],
+				"style": "atlas_text_panel"
+			}
+		]
+	}
+}

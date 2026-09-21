@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="96">
+<defs><linearGradient id="s" x2="0" y2="1"><stop stop-color="#17232b" stop-opacity=".94"/><stop offset="1" stop-color="#070c12" stop-opacity=".72"/></linearGradient><linearGradient id="g" x2="1" y2=".2"><stop stop-color="#5c4a31"/><stop offset=".2" stop-color="#cfb985"/><stop offset=".5" stop-color="#5f5138"/><stop offset=".8" stop-color="#b59d6b"/><stop offset="1" stop-color="#4a3c29"/></linearGradient></defs>
+<path d="M4 22Q4 7 20 7H236Q252 7 252 22V74Q252 89 236 89H20Q4 89 4 74Z" fill="url(#s)" stroke="#030609" stroke-width="3"/>
+<path d="M5 30V20Q5 8 20 8H236Q251 8 251 20V30M5 66V76Q5 88 20 88H236Q251 88 251 76V66" fill="none" stroke="url(#g)" stroke-width="1"/>
+<path d="M12 30V23Q12 15 23 15H233Q244 15 244 23V30M12 66V73Q12 81 23 81H233Q244 81 244 73V66" fill="none" stroke="#5c645e" stroke-opacity=".45" stroke-width=".7"/>
+<path d="M4 32Q17 31 19 10Q24 21 31 12M4 25Q14 23 12 16Q9 13 7 19M252 32Q239 31 237 10Q232 21 225 12M252 25Q242 23 244 16Q247 13 249 19" fill="none" stroke="#a99466" stroke-width=".8"/>
+<path d="M4 64Q17 65 19 86Q24 75 31 84M252 64Q239 65 237 86Q232 75 225 84" fill="none" stroke="#a99466" stroke-width=".8"/>
+</svg>
