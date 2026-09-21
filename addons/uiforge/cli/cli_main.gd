@@ -53,13 +53,33 @@ func _new_document() -> Dictionary:
 		return {"success": false, "errors": [{"code": "USAGE", "message": "Usage: ui new <template> <output.ui.json>"}]}
 	var template := str(args[1])
 	var output := str(args[2])
-	var created := UIForgeTemplates.create(template, output.get_file().trim_suffix(".ui.json"))
+	var document_name := output.get_file().trim_suffix(".ui.json")
+	var name_error := UIForgeID.document_name_diagnostic(document_name)
+	if not name_error.is_empty():
+		return {"success": false, "committed": false, "errors": [name_error]}
+	var created := UIForgeTemplates.create(template, document_name)
 	if created.get("document") == null:
-		return {"success": false, "errors": created.errors}
+		return {"success": false, "committed": false, "errors": created.errors}
 	var document: UIForgeDocument = created.document
+	var validation := UIForgeValidator.new().validate(document)
+	if not validation.success:
+		return {"success": false, "committed": false, "errors": _error_diagnostics(validation.diagnostics), "diagnostics": validation.diagnostics}
 	var saved := UIForgeSerializer.save_document(document, output)
+	if not saved.success:
+		saved["success"] = false
+		saved["committed"] = false
+		return saved
+	saved["success"] = true
+	saved["committed"] = true
 	saved["template"] = template
 	return saved
+
+func _error_diagnostics(diagnostics: Array) -> Array:
+	var errors: Array = []
+	for diagnostic in diagnostics:
+		if str(diagnostic.get("severity", "")) == "error":
+			errors.append(diagnostic)
+	return errors
 
 func _validate_document() -> Dictionary:
 	if args.size() < 2:

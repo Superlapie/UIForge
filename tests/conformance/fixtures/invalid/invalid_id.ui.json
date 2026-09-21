@@ -1,0 +1,12 @@
+{
+	"schema_version": 1,
+	"name": "invalid_id",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "1bad",
+		"type": "Label",
+		"layout": {"size": [120, 32]},
+		"properties": {"text": "bad"}
+	}
+}

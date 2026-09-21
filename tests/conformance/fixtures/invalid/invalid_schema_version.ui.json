@@ -1,0 +1,12 @@
+{
+	"schema_version": "one",
+	"name": "invalid_schema_version",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "Panel",
+		"layout": {"size": [400, 300]},
+		"children": []
+	}
+}

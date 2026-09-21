@@ -1,0 +1,13 @@
+{
+	"schema_version": 1,
+	"name": "float_columns",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "Grid",
+		"layout": {"size": [400, 300]},
+		"properties": {"columns": 1.5},
+		"children": []
+	}
+}

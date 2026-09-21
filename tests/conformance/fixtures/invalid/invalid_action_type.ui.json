@@ -1,0 +1,13 @@
+{
+	"schema_version": 1,
+	"name": "invalid_action_type",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "PrimaryButton",
+		"action": {"name": "bad"},
+		"layout": {"size": [120, 40]},
+		"properties": {"text": "Go"}
+	}
+}

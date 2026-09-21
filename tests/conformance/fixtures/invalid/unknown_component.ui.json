@@ -1,0 +1,12 @@
+{
+	"schema_version": 1,
+	"name": "unknown_component",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "ComponentInstance",
+		"component": "MissingComponent",
+		"layout": {"size": [120, 40]}
+	}
+}

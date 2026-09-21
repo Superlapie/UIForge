@@ -1,0 +1,13 @@
+{
+	"schema_version": 1,
+	"name": "unknown_node_key",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "Panel",
+		"unexpected_node_field": true,
+		"layout": {"size": [400, 300]},
+		"children": []
+	}
+}

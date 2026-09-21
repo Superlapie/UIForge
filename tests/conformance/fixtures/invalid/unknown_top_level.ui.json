@@ -1,0 +1,13 @@
+{
+	"schema_version": 1,
+	"name": "conformance_minimal",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"extra_key": true,
+	"root": {
+		"id": "root",
+		"type": "Panel",
+		"layout": {"size": [400, 300]},
+		"children": []
+	}
+}

@@ -444,7 +444,7 @@ func _gui_input(event: InputEvent) -> void:
 				var hit := _hit_test(event.position)
 				if not hit.is_empty():
 					var hit_id := str(hit.get("id", ""))
-					var additive: bool = event.ctrl_pressed or event.command_or_control_pressed
+					var additive: bool = event.ctrl_pressed or event.meta_pressed
 					if additive or hit_id not in selected_ids:
 						select_node(hit_id, additive)
 					var layout: Dictionary = hit.get("layout", {})
@@ -577,14 +577,15 @@ func _apply_drag(mouse: Vector2, resize: bool) -> void:
 	queue_redraw()
 
 func _commit_drag() -> void:
-	if document == null or drag_start_document.is_empty() or undo_redo == null:
+	if document == null or drag_start_document.is_empty():
 		return
-	var before_snapshot := drag_start_document.duplicate(true)
-	var after_snapshot := document.data.duplicate(true)
-	undo_redo.create_action("UIForge %s" % ("Resize" if is_resizing else "Move"))
-	undo_redo.add_do_method(self, "_apply_drag_document_snapshot", after_snapshot)
-	undo_redo.add_undo_method(self, "_apply_drag_document_snapshot", before_snapshot)
-	undo_redo.commit_action()
+	if undo_redo != null:
+		var before_snapshot := drag_start_document.duplicate(true)
+		var after_snapshot := document.data.duplicate(true)
+		undo_redo.create_action("UIForge %s" % ("Resize" if is_resizing else "Move"))
+		undo_redo.add_do_method(self, "_apply_drag_document_snapshot", after_snapshot)
+		undo_redo.add_undo_method(self, "_apply_drag_document_snapshot", before_snapshot)
+		undo_redo.commit_action()
 	drag_start_document.clear()
 
 func _apply_drag_document_snapshot(snapshot: Dictionary) -> void:

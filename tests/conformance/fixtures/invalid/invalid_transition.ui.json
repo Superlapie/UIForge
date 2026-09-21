@@ -1,0 +1,15 @@
+{
+	"schema_version": 1,
+	"name": "invalid_transition",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "PrimaryButton",
+		"layout": {"size": [120, 40]},
+		"properties": {"text": "Go"},
+		"transitions": {
+			"hover": {"preset": "fade", "duration": "slow"}
+		}
+	}
+}

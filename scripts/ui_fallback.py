@@ -21,9 +21,21 @@ ROOT = Path(__file__).resolve().parents[1]
 THEME_PATH = ROOT / "addons/uiforge/themes/dark_fantasy.theme.json"
 SCHEMA_VERSION = 1
 ID_GRAMMAR = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
+DOCUMENT_NAME_GRAMMAR = re.compile(r"^[A-Za-z0-9_-]+$")
 TOP_LEVEL_KEYS = {
     "schema_version", "name", "viewport", "theme", "root", "components",
     "theme_overrides", "metadata", "mock_data", "reference",
+}
+NODE_KEYS = {
+    "id", "name", "type", "component", "overrides", "base_type", "layout", "properties",
+    "style", "background_style", "fill_style", "states", "action", "binding", "effects",
+    "transitions", "metadata", "mock_data", "decorations", "children",
+}
+LAYOUT_KEYS = {
+    "position", "size", "min_size", "max_size", "anchors", "offsets", "anchors_preset",
+    "padding", "gap", "grow", "grow_horizontal", "grow_vertical", "size_flags_horizontal",
+    "size_flags_vertical", "size_flags_stretch_ratio", "z_index", "mouse_filter", "pivot",
+    "rotation_degrees", "scale", "layout_mode",
 }
 NATIVE_TYPES = {
     "Control", "Panel", "Label", "RichText", "Texture", "Button", "TextureButton",
@@ -142,6 +154,22 @@ def is_valid_id(node_id: str) -> bool:
     return bool(node_id) and ID_GRAMMAR.fullmatch(str(node_id)) is not None
 
 
+def is_valid_document_name(name: str) -> bool:
+    return bool(name) and DOCUMENT_NAME_GRAMMAR.fullmatch(str(name)) is not None
+
+
+def document_name_diagnostic(name: str) -> dict[str, Any]:
+    if is_valid_document_name(name):
+        return {}
+    return {
+        "severity": "error",
+        "code": "DOCUMENT_NAME_INVALID",
+        "message": f"Document name '{name}' must match {DOCUMENT_NAME_GRAMMAR.pattern}.",
+        "node": "",
+        "recommendation": "Use a stable document name with letters, numbers, underscores, and hyphens only.",
+    }
+
+
 def id_diagnostic(node_id: str, context_id: str = "") -> dict[str, Any]:
     if is_valid_id(node_id):
         return {}
@@ -232,10 +260,22 @@ def load(path: str) -> dict[str, Any]:
 
 def save(path: str, data: dict[str, Any]) -> dict[str, Any]:
     target = fs_path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
     temporary = target.with_name(target.name + ".aether_tmp")
-    temporary.write_text(json.dumps(data, indent="\t", ensure_ascii=False) + "\n", encoding="utf-8")
-    temporary.replace(target)
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        temporary.write_text(json.dumps(data, indent="\t", ensure_ascii=False) + "\n", encoding="utf-8")
+        temporary.replace(target)
+    except OSError as exc:
+        if temporary.exists():
+            try:
+                temporary.unlink()
+            except OSError:
+                pass
+        return {
+            "success": False,
+            "path": str(target),
+            "errors": [{"code": "FILE_WRITE_FAILED", "message": str(exc), "path": str(target)}],
+        }
     return {"success": True, "path": str(target), "errors": []}
 
 
@@ -280,6 +320,12 @@ def find(data: dict[str, Any], node_id: str) -> tuple[dict[str, Any] | None, dic
     return None, None
 
 
+def is_whole_number(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) or (
+        isinstance(value, float) and not isinstance(value, bool) and math.isfinite(value) and value == math.floor(value)
+    )
+
+
 def validate(data: dict[str, Any]) -> dict[str, Any]:
     diagnostics: list[dict[str, Any]] = []
     ids: set[str] = set()
@@ -291,19 +337,39 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     def add(severity: str, code: str, message: str, node: str = "", recommendation: str = ""):
         diagnostics.append({"severity": severity, "code": code, "message": message, "node": node, "recommendation": recommendation})
 
+    def number_value(value: Any, field: str, node_id: str) -> float | None:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            add("error", "LAYOUT_INVALID", f"{field} must be numeric.", node_id)
+            return None
+        return float(value)
+
+    def vec2_numeric(values: Any, field: str, node_id: str) -> bool:
+        if not isinstance(values, list) or len(values) < 2:
+            add("error", "LAYOUT_INVALID", f"{field} must contain two numeric values.", node_id)
+            return False
+        return number_value(values[0], f"{field}[0]", node_id) is not None and number_value(values[1], f"{field}[1]", node_id) is not None
+
     for key in data.keys():
         if str(key) not in TOP_LEVEL_KEYS:
             add("error", "UNKNOWN_DOCUMENT_KEY", f"Unknown top-level key '{key}'.", "", "Remove the key or extend the UIForge V1 contract deliberately.")
-    if data.get("schema_version") != SCHEMA_VERSION:
+    schema_version = data.get("schema_version")
+    if not is_whole_number(schema_version) or int(schema_version) != SCHEMA_VERSION:
         add("error", "SCHEMA_VERSION_UNSUPPORTED", "Document schema_version must be 1.")
-    if not data.get("name"):
+    document_name = str(data.get("name", ""))
+    if not document_name:
         add("error", "DOCUMENT_NAME_MISSING", "Document name is required.")
+    else:
+        diagnostic = document_name_diagnostic(document_name)
+        if diagnostic:
+            add(diagnostic["severity"], diagnostic["code"], diagnostic["message"], diagnostic["node"], diagnostic.get("recommendation", ""))
     viewport_value = data.get("viewport", {})
     viewport = viewport_value if isinstance(viewport_value, dict) else {}
     if not isinstance(viewport_value, dict) and "viewport" in data:
         add("error", "VIEWPORT_INVALID", "viewport must be an object.", "viewport", "Use {\"width\": 1920, \"height\": 1080}.")
-    if int(viewport.get("width", 0)) <= 0 or int(viewport.get("height", 0)) <= 0:
-        add("error", "VIEWPORT_INVALID", "Viewport width and height must be positive.", "viewport")
+    width = viewport.get("width")
+    height = viewport.get("height")
+    if not is_whole_number(width) or int(width) <= 0 or not is_whole_number(height) or int(height) <= 0:
+        add("error", "VIEWPORT_INVALID", "Viewport width and height must be positive integers.", "viewport")
     root = data.get("root")
     if not isinstance(root, dict):
         add("error", "ROOT_MISSING", "A document must contain a root node.")
@@ -343,6 +409,9 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             add("error", "DUPLICATE_ID", f"Duplicate node id '{node_id}'.", node_id)
         else:
             ids.add(node_id)
+        for key in node.keys():
+            if str(key) not in NODE_KEYS:
+                add("error", "UNKNOWN_NODE_KEY", f"Unknown node key '{key}'.", node_id, "Remove the key or extend the UIForge V1 contract deliberately.")
         if node_type not in NATIVE_TYPES and node_type not in COMPONENTS and node_type != "ComponentInstance":
             add("error", "UNKNOWN_NODE_TYPE", f"Unknown node type '{node_type}'.", node_id)
         if node_type == "ComponentInstance":
@@ -357,12 +426,29 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         layout = node.get("layout", {})
         if not isinstance(layout, dict):
             add("error", "LAYOUT_INVALID", "layout must be an object.", node_id)
+            layout = {}
+        else:
+            for key in layout.keys():
+                if str(key) not in LAYOUT_KEYS:
+                    add("error", "UNKNOWN_LAYOUT_KEY", f"Unknown layout key '{key}'.", node_id, "Remove the key or extend the UIForge V1 contract deliberately.")
         position = layout.get("position", []) if isinstance(layout, dict) else []
         size = layout.get("size", []) if isinstance(layout, dict) else []
-        if len(position) >= 2 and len(size) >= 2 and (float(position[0]) + float(size[0]) > float(viewport.get("width", 1920)) + 2 or float(position[1]) + float(size[1]) > float(viewport.get("height", 1080)) + 2):
-            add("warning", "LAYOUT_OUTSIDE_VIEWPORT", "Node extends beyond the design viewport.", node_id)
-        if node_type in {"Button", "TextureButton", "CheckBox", "CheckButton", "Slider", "HSlider", "VSlider", "SpinBox", "LineEdit", "OptionButton", "MenuButton", "LinkButton", "PrimaryButton", "SecondaryButton", "IconButton", "TabButton", "ItemSlot", "SidebarEntry"} and len(size) >= 2 and (float(size[0]) < 32 or float(size[1]) < 32):
-            add("warning", "SMALL_HIT_TARGET", "Interactive node is smaller than the recommended 32px hit target.", node_id)
+        if "position" in layout and not vec2_numeric(position, "layout.position", node_id):
+            position = []
+        if "size" in layout and not vec2_numeric(size, "layout.size", node_id):
+            size = []
+        if len(position) >= 2 and len(size) >= 2:
+            px = number_value(position[0], "layout.position[0]", node_id)
+            py = number_value(position[1], "layout.position[1]", node_id)
+            sx = number_value(size[0], "layout.size[0]", node_id)
+            sy = number_value(size[1], "layout.size[1]", node_id)
+            if None not in (px, py, sx, sy) and (px + sx > float(viewport.get("width", 1920)) + 2 or py + sy > float(viewport.get("height", 1080)) + 2):
+                add("warning", "LAYOUT_OUTSIDE_VIEWPORT", "Node extends beyond the design viewport.", node_id)
+        if node_type in {"Button", "TextureButton", "CheckBox", "CheckButton", "Slider", "HSlider", "VSlider", "SpinBox", "LineEdit", "OptionButton", "MenuButton", "LinkButton", "PrimaryButton", "SecondaryButton", "IconButton", "TabButton", "ItemSlot", "SidebarEntry"} and len(size) >= 2:
+            sx = number_value(size[0], "layout.size[0]", node_id)
+            sy = number_value(size[1], "layout.size[1]", node_id)
+            if sx is not None and sy is not None and (sx < 32 or sy < 32):
+                add("warning", "SMALL_HIT_TARGET", "Interactive node is smaller than the recommended 32px hit target.", node_id)
         properties = node.get("properties", {})
         if not isinstance(properties, dict):
             add("error", "PROPERTIES_INVALID", "properties must be an object.", node_id)
@@ -395,7 +481,10 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
                     continue
                 if str(transition.get("preset", "")) not in {"fade", "scale", "slide", "hover", "button_press", "panel_reveal"}:
                     add("error", "TRANSITION_PRESET_UNKNOWN", f"Unknown transition preset '{transition.get('preset', '')}'.", node_id)
-                if float(transition.get("duration", 0.18)) <= 0:
+                duration_raw = transition.get("duration", 0.18)
+                if isinstance(duration_raw, bool) or not isinstance(duration_raw, (int, float)):
+                    add("error", "TRANSITION_DURATION_INVALID", "Transition duration must be positive.", node_id)
+                elif float(duration_raw) <= 0:
                     add("error", "TRANSITION_DURATION_INVALID", "Transition duration must be positive.", node_id)
         effects = node.get("effects", {})
         if not isinstance(effects, (dict, list, str)):
@@ -403,8 +492,12 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         scan_resources(properties.get("godot_overrides", {}) if isinstance(properties, dict) else {}, node_id)
         scan_resources(node.get("effects", {}), node_id)
         scan_resources(node.get("decorations", {}), node_id)
-        if "columns" in properties and (not isinstance(properties["columns"], (int, float)) or int(properties["columns"]) < 1):
+        if "columns" in properties and (not is_whole_number(properties["columns"]) or int(properties["columns"]) < 1):
             add("error", "GRID_COLUMNS_INVALID", "Grid columns must be a positive integer.", node_id)
+        if "action" in node and not isinstance(node.get("action"), str):
+            add("error", "ACTION_INVALID", "action must be a string identifier.", node_id)
+        if "binding" in node and not isinstance(node.get("binding"), str):
+            add("error", "BINDING_INVALID", "binding must be a string identifier.", node_id)
         children_value = node.get("children", [])
         if "children" in node and not isinstance(children_value, list):
             add("error", "CHILDREN_INVALID", "children must be an array.", node_id)
@@ -941,12 +1034,15 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
         if len(argv) < 3:
             return {"success": False, "errors": [{"code": "USAGE", "message": "ui new <template> <output.ui.json>"}]}, 1
         name = fs_path(argv[2]).name.removesuffix(".ui.json")
+        name_diagnostic = document_name_diagnostic(name)
+        if name_diagnostic:
+            return {"success": False, "committed": False, "errors": [name_diagnostic]}, 1
         catalog = template_catalog()
         template = argv[1]
         if template in catalog:
             loaded = load(catalog[template]["path"])
             if loaded.get("document") is None:
-                return {"success": False, "errors": loaded.get("errors", [])}, 1
+                return {"success": False, "committed": False, "errors": loaded.get("errors", [])}, 1
             data = loaded["document"]
             data["name"] = name
             data.setdefault("metadata", {})["template"] = template
@@ -954,7 +1050,20 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
             data = {"schema_version": 1, "name": name, "viewport": {"width": 1920, "height": 1080}, "theme": "dark_fantasy", "root": {"id": f"{name}_root", "type": "WindowFrame", "layout": {"position": [80, 80], "size": [960, 640]}, "properties": {"title": name.replace("_", " ").title()}, "children": []}}
         else:
             return {"success": False, "errors": [{"code": "UNKNOWN_TEMPLATE", "message": f"Unknown template: {template}"}]}, 1
-        return save(argv[2], data), 0
+        validation = validate(data)
+        if not validation["success"]:
+            return {
+                "success": False,
+                "committed": False,
+                "errors": [item for item in validation["diagnostics"] if item.get("severity") == "error"],
+                "diagnostics": validation["diagnostics"],
+            }, 1
+        saved = save(argv[2], data)
+        if not saved.get("success", False):
+            return {"success": False, "committed": False, "errors": saved.get("errors", []), "template": template}, 1
+        saved["committed"] = True
+        saved["template"] = template
+        return saved, 0
     if command == "build-all":
         source_dir = fs_path(argv[1]) if len(argv) > 1 else ROOT / "examples/specs"
         output_dir = fs_path(argv[2]) if len(argv) > 2 else ROOT / "examples/scenes"

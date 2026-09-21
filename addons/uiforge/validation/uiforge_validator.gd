@@ -5,6 +5,17 @@ const TOP_LEVEL_KEYS: Array[String] = [
 	"schema_version", "name", "viewport", "theme", "root", "components",
 	"theme_overrides", "metadata", "mock_data", "reference"
 ]
+const NODE_KEYS: Array[String] = [
+	"id", "name", "type", "component", "overrides", "base_type", "layout", "properties",
+	"style", "background_style", "fill_style", "states", "action", "binding", "effects",
+	"transitions", "metadata", "mock_data", "decorations", "children"
+]
+const LAYOUT_KEYS: Array[String] = [
+	"position", "size", "min_size", "max_size", "anchors", "offsets", "anchors_preset",
+	"padding", "gap", "grow", "grow_horizontal", "grow_vertical", "size_flags_horizontal",
+	"size_flags_vertical", "size_flags_stretch_ratio", "z_index", "mouse_filter", "pivot",
+	"rotation_degrees", "scale", "layout_mode"
+]
 
 var diagnostics: Array[Dictionary] = []
 var ids: Dictionary = {}
@@ -21,18 +32,20 @@ func validate(input: UIForgeDocument, theme_override: UIForgeTheme = null) -> Di
 	for key in document.data.keys():
 		if str(key) not in TOP_LEVEL_KEYS:
 			_add("error", "UNKNOWN_DOCUMENT_KEY", "Unknown top-level key '%s'." % key, "", "Remove the key or extend the UIForge V1 contract deliberately.")
-	if int(document.data.get("schema_version", 0)) != UIForgeTypes.SCHEMA_VERSION:
+	if not _schema_version_valid(document.data.get("schema_version", null)):
 		_add("error", "SCHEMA_VERSION_UNSUPPORTED", "Document schema_version must be %d." % UIForgeTypes.SCHEMA_VERSION, "", "Run a migration or update the document schema.")
-	if str(document.data.get("name", "")).is_empty():
+	var document_name := str(document.data.get("name", ""))
+	if document_name.is_empty():
 		_add("error", "DOCUMENT_NAME_MISSING", "Document name is required.", "", "Give the document a stable human-readable name.")
+	else:
+		_add_diagnostic(UIForgeID.document_name_diagnostic(document_name))
 	var viewport: Dictionary = {}
 	var viewport_value: Variant = document.data.get("viewport", {})
 	if viewport_value is Dictionary:
 		viewport = viewport_value
+		_validate_viewport(viewport)
 	else:
 		_add("error", "VIEWPORT_INVALID", "viewport must be an object.", "viewport", "Use {\"width\": 1920, \"height\": 1080}.")
-	if int(viewport.get("width", 0)) <= 0 or int(viewport.get("height", 0)) <= 0:
-		_add("error", "VIEWPORT_INVALID", "Viewport width and height must be positive.", "viewport", "Use a design resolution such as 1920x1080.")
 	var root_node := document.root()
 	if root_node.is_empty():
 		_add("error", "ROOT_MISSING", "A document must contain a root node.", "", "Add a root Control or WindowFrame.")
@@ -71,6 +84,9 @@ func _validate_node(node: Variant, parent_id: String, viewport: Dictionary) -> v
 		_add("error", "DUPLICATE_ID", "Duplicate node id '%s'." % node_id, node_id, "Rename one node; AI operations address nodes by id.")
 	else:
 		ids[node_id] = true
+	for key in node.keys():
+		if str(key) not in NODE_KEYS:
+			_add("error", "UNKNOWN_NODE_KEY", "Unknown node key '%s'." % key, node_id, "Remove the key or extend the UIForge V1 contract deliberately.")
 	if node_type.is_empty():
 		_add("error", "NODE_TYPE_MISSING", "Node '%s' has no type." % node_id, node_id, "Choose a native node or reusable component type.")
 	elif not _known_type(node_type):
@@ -94,6 +110,9 @@ func _validate_node(node: Variant, parent_id: String, viewport: Dictionary) -> v
 		var layout_value: Variant = node.get("layout")
 		if layout_value is Dictionary:
 			layout = layout_value
+			for key in layout.keys():
+				if str(key) not in LAYOUT_KEYS:
+					_add("error", "UNKNOWN_LAYOUT_KEY", "Unknown layout key '%s'." % key, node_id, "Remove the key or extend the UIForge V1 contract deliberately.")
 		else:
 			_add("error", "LAYOUT_INVALID", "layout must be an object.", node_id, "Move layout values into a JSON object.")
 	var properties: Dictionary = {}
@@ -109,21 +128,33 @@ func _validate_node(node: Variant, parent_id: String, viewport: Dictionary) -> v
 		var position_value: Variant = layout.get("position")
 		if position_value is Array:
 			position = position_value
+			if not _vec2_numeric(position, node_id, "layout.position"):
+				position = []
 		else:
 			_add("error", "LAYOUT_INVALID", "layout.position must be an array.", node_id, "Use [x, y].")
 	if layout.has("size"):
 		var size_value: Variant = layout.get("size")
 		if size_value is Array:
 			size = size_value
+			if not _vec2_numeric(size, node_id, "layout.size"):
+				size = []
 		else:
 			_add("error", "LAYOUT_INVALID", "layout.size must be an array.", node_id, "Use [width, height].")
 	if position.size() >= 2 and size.size() >= 2:
-		var right := float(position[0]) + float(size[0])
-		var bottom := float(position[1]) + float(size[1])
-		if right > float(viewport.get("width", 1920)) + 2.0 or bottom > float(viewport.get("height", 1080)) + 2.0:
-			_add("warning", "LAYOUT_OUTSIDE_VIEWPORT", "Node extends beyond the design viewport.", node_id, "Use anchors or a responsive container, or confirm the overflow is intentional.")
-	if node_type in UIForgeTypes.INTERACTIVE_TYPES and size.size() >= 2 and (float(size[0]) < 32.0 or float(size[1]) < 32.0):
-		_add("warning", "SMALL_HIT_TARGET", "Interactive node is smaller than the recommended 32px hit target.", node_id, "Increase its minimum size unless it is intentionally compact.")
+		var px := _number_value(position[0], "layout.position[0]", node_id)
+		var py := _number_value(position[1], "layout.position[1]", node_id)
+		var sx := _number_value(size[0], "layout.size[0]", node_id)
+		var sy := _number_value(size[1], "layout.size[1]", node_id)
+		if px != null and py != null and sx != null and sy != null:
+			var right: float = float(px) + float(sx)
+			var bottom: float = float(py) + float(sy)
+			if right > float(viewport.get("width", 1920)) + 2.0 or bottom > float(viewport.get("height", 1080)) + 2.0:
+				_add("warning", "LAYOUT_OUTSIDE_VIEWPORT", "Node extends beyond the design viewport.", node_id, "Use anchors or a responsive container, or confirm the overflow is intentional.")
+	if node_type in UIForgeTypes.INTERACTIVE_TYPES and size.size() >= 2:
+		var width_value := _number_value(size[0], "layout.size[0]", node_id)
+		var height_value := _number_value(size[1], "layout.size[1]", node_id)
+		if width_value != null and height_value != null and (width_value < 32.0 or height_value < 32.0):
+			_add("warning", "SMALL_HIT_TARGET", "Interactive node is smaller than the recommended 32px hit target.", node_id, "Increase its minimum size unless it is intentionally compact.")
 	var children: Array = []
 	if node.has("children"):
 		var children_value: Variant = node.get("children")
@@ -184,8 +215,10 @@ func _validate_node_properties(node: Dictionary, node_id: String, properties: Di
 		var overrides_value: Variant = properties.get("godot_overrides")
 		if not overrides_value is Dictionary:
 			_add("error", "GODOT_OVERRIDES_INVALID", "properties.godot_overrides must be an object.", node_id, "Use native Godot property paths mapped to JSON values.")
-	if properties.has("columns") and (not (properties["columns"] is int or properties["columns"] is float) or int(properties["columns"]) < 1):
-		_add("error", "GRID_COLUMNS_INVALID", "Grid columns must be a positive integer.", node_id, "Set properties.columns to 1 or more.")
+	if properties.has("columns"):
+		var columns_value: Variant = properties["columns"]
+		if not _is_whole_number(columns_value) or int(columns_value) < 1:
+			_add("error", "GRID_COLUMNS_INVALID", "Grid columns must be a positive integer.", node_id, "Set properties.columns to 1 or more.")
 	if properties.has("value") and not (properties["value"] is float or properties["value"] is int):
 		_add("error", "PROPERTY_TYPE_INVALID", "value must be numeric.", node_id, "Use a number for sliders and progress displays.")
 	if node.has("action"):
@@ -213,7 +246,10 @@ func _validate_node_properties(node: Dictionary, node_id: String, properties: Di
 				var preset := str(transition.get("preset", ""))
 				if preset not in ["fade", "scale", "slide", "hover", "button_press", "panel_reveal"]:
 					_add("error", "TRANSITION_PRESET_UNKNOWN", "Unknown transition preset '%s'." % preset, node_id, "Use fade, scale, slide, hover, button_press, or panel_reveal.")
-				if float(transition.get("duration", 0.18)) <= 0.0:
+				var duration_value: Variant = transition.get("duration", 0.18)
+				if not (duration_value is int or duration_value is float):
+					_add("error", "TRANSITION_DURATION_INVALID", "Transition duration must be positive.", node_id, "Use a duration such as 0.18.")
+				elif float(duration_value) <= 0.0:
 					_add("error", "TRANSITION_DURATION_INVALID", "Transition duration must be positive.", node_id, "Use a duration such as 0.18.")
 
 func _validate_sibling_overlaps(children: Array, parent_id: String, parent_type: String) -> void:
@@ -240,7 +276,39 @@ func _node_rect(node: Dictionary) -> Rect2:
 	var size: Array = layout.get("size", [0, 0]) if layout.get("size", [0, 0]) is Array else [0, 0]
 	if position.size() < 2 or size.size() < 2:
 		return Rect2()
-	return Rect2(Vector2(float(position[0]), float(position[1])), Vector2(float(size[0]), float(size[1])))
+	var px := _number_value(position[0], "layout.position[0]", str(node.get("id", "")))
+	var py := _number_value(position[1], "layout.position[1]", str(node.get("id", "")))
+	var sx := _number_value(size[0], "layout.size[0]", str(node.get("id", "")))
+	var sy := _number_value(size[1], "layout.size[1]", str(node.get("id", "")))
+	if px == null or py == null or sx == null or sy == null:
+		return Rect2()
+	return Rect2(Vector2(px, py), Vector2(sx, sy))
+
+func _schema_version_valid(value: Variant) -> bool:
+	return _is_whole_number(value) and int(value) == UIForgeTypes.SCHEMA_VERSION
+
+func _validate_viewport(viewport: Dictionary) -> void:
+	var width_value: Variant = viewport.get("width", null)
+	var height_value: Variant = viewport.get("height", null)
+	if not _is_whole_number(width_value) or int(width_value) <= 0 or not _is_whole_number(height_value) or int(height_value) <= 0:
+		_add("error", "VIEWPORT_INVALID", "Viewport width and height must be positive integers.", "viewport", "Use a design resolution such as 1920x1080.")
+
+func _is_whole_number(value: Variant) -> bool:
+	return value is int or (value is float and is_equal_approx(value, floor(value)))
+
+func _vec2_numeric(values: Array, node_id: String, field: String) -> bool:
+	if values.size() < 2:
+		_add("error", "LAYOUT_INVALID", "%s must contain two numeric values." % field, node_id, "Use [x, y] or [width, height].")
+		return false
+	var first := _number_value(values[0], "%s[0]" % field, node_id)
+	var second := _number_value(values[1], "%s[1]" % field, node_id)
+	return first != null and second != null
+
+func _number_value(value: Variant, field: String, node_id: String) -> Variant:
+	if value is int or value is float:
+		return float(value)
+	_add("error", "LAYOUT_INVALID", "%s must be numeric." % field, node_id, "Use numbers for layout coordinates and sizes.")
+	return null
 
 func _is_interactive(node: Dictionary) -> bool:
 	return str(node.get("type", "")) in UIForgeTypes.INTERACTIVE_TYPES or str(node.get("action", "")).is_empty() == false

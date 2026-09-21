@@ -1,0 +1,20 @@
+{
+	"validation_vectors": [
+		{"id": "valid_minimal", "file": "minimal.ui.json", "expect_valid": true, "schema_valid": true},
+		{"id": "unknown_top_level_key", "file": "invalid/unknown_top_level.ui.json", "expect_valid": false, "expect_codes": ["UNKNOWN_DOCUMENT_KEY"], "schema_valid": false},
+		{"id": "invalid_document_name", "file": "invalid/invalid_document_name.ui.json", "expect_valid": false, "expect_codes": ["DOCUMENT_NAME_INVALID"], "schema_valid": false},
+		{"id": "invalid_id", "file": "invalid/invalid_id.ui.json", "expect_valid": false, "expect_codes": ["ID_INVALID"], "schema_valid": false},
+		{"id": "duplicate_id", "file": "invalid/duplicate_id.ui.json", "expect_valid": false, "expect_codes": ["DUPLICATE_ID"]},
+		{"id": "unknown_node_key", "file": "invalid/unknown_node_key.ui.json", "expect_valid": false, "expect_codes": ["UNKNOWN_NODE_KEY"], "schema_valid": false},
+		{"id": "unknown_layout_key", "file": "invalid/unknown_layout_key.ui.json", "expect_valid": false, "expect_codes": ["UNKNOWN_LAYOUT_KEY"], "schema_valid": false},
+		{"id": "malformed_viewport", "file": "invalid/malformed_viewport.ui.json", "expect_valid": false, "expect_codes": ["VIEWPORT_INVALID"], "schema_valid": false},
+		{"id": "malformed_position", "file": "invalid/malformed_position.ui.json", "expect_valid": false, "expect_codes": ["LAYOUT_INVALID"], "schema_valid": false},
+		{"id": "float_columns", "file": "invalid/float_columns.ui.json", "expect_valid": false, "expect_codes": ["GRID_COLUMNS_INVALID"], "schema_valid": false},
+		{"id": "unknown_property", "file": "invalid/unknown_property.ui.json", "expect_valid": false, "expect_codes": ["UNSUPPORTED_PROPERTY"], "schema_valid": false},
+		{"id": "invalid_action_type", "file": "invalid/invalid_action_type.ui.json", "expect_valid": false, "expect_codes": ["ACTION_INVALID"], "schema_valid": false},
+		{"id": "invalid_transition", "file": "invalid/invalid_transition.ui.json", "expect_valid": false, "expect_codes": ["TRANSITION_DURATION_INVALID"], "schema_valid": false},
+		{"id": "malformed_children", "file": "invalid/malformed_children.ui.json", "expect_valid": false, "expect_codes": ["CHILDREN_INVALID"], "schema_valid": false},
+		{"id": "invalid_schema_version", "file": "invalid/invalid_schema_version.ui.json", "expect_valid": false, "expect_codes": ["SCHEMA_VERSION_UNSUPPORTED"], "schema_valid": false},
+		{"id": "unknown_component", "file": "invalid/unknown_component.ui.json", "expect_valid": false, "expect_codes": ["UNKNOWN_COMPONENT"]}
+	]
+}

@@ -14,21 +14,21 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install optional schema validator
-        run: pip install jsonschema
-      - name: Run portable fallback tests
+        run: python3 -m pip install --user jsonschema
+      - name: Run portable test suite
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
-      - name: Run conformance corpus
-        run: python3 -m unittest tests/test_conformance.py -v
 
   godot:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y xvfb unzip wget
       - name: Install Godot 4.7.2
         run: |
           wget -q https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
           unzip -q Godot_v4.7.2-stable_linux.x86_64.zip
           sudo mv Godot_v4.7.2-stable_linux.x86_64 /usr/local/bin/godot
           godot --version
-      - name: Run native test runner
-        run: godot --headless --path . --script res://tests/test_runner.gd
+      - name: Run native test suite
+        run: PATH="$HOME/.local/bin:$PATH" ./scripts/test

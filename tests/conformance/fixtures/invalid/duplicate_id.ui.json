@@ -1,0 +1,15 @@
+{
+	"schema_version": 1,
+	"name": "duplicate_id",
+	"viewport": {"width": 800, "height": 600},
+	"theme": "dark_fantasy",
+	"root": {
+		"id": "root",
+		"type": "Panel",
+		"layout": {"size": [400, 300]},
+		"children": [
+			{"id": "dup", "type": "Label", "layout": {"size": [80, 24]}, "properties": {"text": "A"}},
+			{"id": "dup", "type": "Label", "layout": {"size": [80, 24]}, "properties": {"text": "B"}}
+		]
+	}
+}

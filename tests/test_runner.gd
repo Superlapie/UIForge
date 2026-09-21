@@ -131,19 +131,28 @@ func _test_canvas_drag_release() -> void:
 	var document := UIForgeSerializer.create_default("canvas_drag")
 	canvas.set_document(document)
 	get_root().add_child(canvas)
-	canvas.select_node(str(document.root().get("id", "")))
+	var root_id := str(document.root().get("id", ""))
+	canvas.select_node(root_id)
+	var start_position: Array = document.find_node(root_id).get("layout", {}).get("position", [80, 80])
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.pressed = true
 	press.position = Vector2(120, 120)
 	canvas._gui_input(press)
 	_assert(canvas.is_dragging or canvas.is_resizing, "canvas_drag_started")
+	var motion := InputEventMouseMotion.new()
+	motion.position = Vector2(180, 180)
+	motion.relative = Vector2(60, 60)
+	canvas._gui_input(motion)
+	var moved_position: Array = document.find_node(root_id).get("layout", {}).get("position", start_position)
+	_assert(moved_position != start_position, "canvas_drag_mutates_position")
 	var release := InputEventMouseButton.new()
 	release.button_index = MOUSE_BUTTON_LEFT
 	release.pressed = false
-	release.position = Vector2(140, 140)
+	release.position = Vector2(180, 180)
 	canvas._gui_input(release)
 	_assert(not canvas.is_dragging and not canvas.is_resizing, "canvas_drag_release_clears_state")
+	_assert(canvas.drag_start_document.is_empty(), "canvas_drag_snapshot_cleared")
 	canvas.queue_free()
 
 func _test_validation_contract() -> void:
