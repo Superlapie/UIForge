@@ -253,7 +253,7 @@ static func _read_txn_meta(meta_path: String) -> Dictionary:
 	var file := FileAccess.open(meta_path, FileAccess.READ)
 	if file == null:
 		return {}
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	var parsed: Variant = _parse_json_text(file.get_as_text())
 	file.close()
 	return parsed if parsed is Dictionary else {}
 
@@ -290,7 +290,7 @@ static func _read_replace_meta(meta_path: String) -> Dictionary:
 	var file := FileAccess.open(meta_path, FileAccess.READ)
 	if file == null:
 		return {}
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	var parsed: Variant = _parse_json_text(file.get_as_text())
 	file.close()
 	return parsed if parsed is Dictionary else {}
 
@@ -380,10 +380,18 @@ static func _pending_may_promote(absolute: String, paths: TxnPaths, meta: Dictio
 	return true
 
 static func _json_revision_from_text(text: String) -> String:
-	var parsed: Variant = JSON.parse_string(text)
+	var parsed: Variant = _parse_json_text(text)
 	if parsed is Dictionary:
 		return UIForgeHash.content_hash(parsed)
 	return ""
+
+static func _parse_json_text(text: String) -> Variant:
+	if text.is_empty():
+		return null
+	var parser := JSON.new()
+	if parser.parse(text) != OK:
+		return null
+	return parser.data
 
 static func _json_revision_from_file(path: String) -> String:
 	var file := FileAccess.open(path, FileAccess.READ)

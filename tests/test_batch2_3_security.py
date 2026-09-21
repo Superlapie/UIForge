@@ -99,7 +99,7 @@ class Batch23SecurityTests(unittest.TestCase):
             lock_dir = _lock_dir(target)
             lock_dir.mkdir()
             (lock_dir / "owner.json").write_text(
-                json.dumps({"owner_nonce": "stale-owner", "pid": 999999, "started": 0.0}),
+                json.dumps({"owner_nonce": "stale-owner", "pid": 999999, "started": time.time() - LOCK_STALE_SECONDS - 10}),
                 encoding="utf-8",
             )
             self.assertTrue(_try_reclaim_stale_lock(lock_dir))

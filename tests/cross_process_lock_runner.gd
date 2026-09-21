@@ -3,7 +3,7 @@ extends SceneTree
 const ITERATIONS := 25
 
 func _init() -> void:
-	call_deferred("_run")
+	_run()
 
 func _run() -> void:
 	var failures: Array[String] = []
@@ -27,13 +27,14 @@ func _run() -> void:
 		var pid_b := OS.create_process(godot_bin, ["--headless", "--path", project, "--script", worker, "--", source_res, revision, "B"])
 		while OS.is_process_running(pid_a) or OS.is_process_running(pid_b):
 			OS.delay_msec(5)
+		OS.delay_msec(25)
 		var result_a := _read_result_file(source_abs, "A")
 		var result_b := _read_result_file(source_abs, "B")
 		if result_a.is_empty() or result_b.is_empty():
 			failures.append("iteration_%d_missing_result_files" % iteration)
 			continue
-		var parsed_a: Variant = JSON.parse_string(result_a)
-		var parsed_b: Variant = JSON.parse_string(result_b)
+		var parsed_a = _parse_result_json(result_a)
+		var parsed_b = _parse_result_json(result_b)
 		if not parsed_a is Dictionary or not parsed_b is Dictionary:
 			failures.append("iteration_%d_bad_result_json" % iteration)
 			continue
@@ -68,3 +69,11 @@ func _read_result_file(source_abs: String, marker: String) -> String:
 	var text := file.get_as_text()
 	file.close()
 	return text
+
+func _parse_result_json(text: String) -> Variant:
+	if text.is_empty():
+		return null
+	var parser := JSON.new()
+	if parser.parse(text) != OK:
+		return null
+	return parser.data

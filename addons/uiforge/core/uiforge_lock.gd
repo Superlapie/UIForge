@@ -88,9 +88,17 @@ static func _read_lock_meta(lock_dir: String) -> Dictionary:
 	var file := FileAccess.open("%s/owner.json" % lock_dir, FileAccess.READ)
 	if file == null:
 		return {}
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	var parsed: Variant = _parse_json_text(file.get_as_text())
 	file.close()
 	return parsed if parsed is Dictionary else {}
+
+static func _parse_json_text(text: String) -> Variant:
+	if text.is_empty():
+		return null
+	var parser := JSON.new()
+	if parser.parse(text) != OK:
+		return null
+	return parser.data
 
 static func _remove_lock_dir(lock_dir: String) -> void:
 	if not DirAccess.dir_exists_absolute(lock_dir):

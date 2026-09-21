@@ -367,6 +367,8 @@ def _lock_is_stale(lock_dir: Path) -> bool:
     age = time.time() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
     if age < NEW_LOCK_GRACE_SECONDS:
         return False
+    if age >= LOCK_STALE_SECONDS:
+        return True
     if meta:
         pid = int(meta.get("pid", 0))
         if pid > 0 and _pid_alive(pid) and age < LOCK_STALE_SECONDS:
@@ -389,13 +391,19 @@ def reclaim_stale_lock_verified(lock_dir: Path, expected_nonce: str) -> bool:
         return False
     reclaim_path = lock_dir.with_name(f"{lock_dir.name}.reclaim_{secrets.token_hex(8)}")
     try:
-        os.replace(lock_dir, reclaim_path)
+        if os.name == "nt":
+            shutil.move(str(lock_dir), str(reclaim_path))
+        else:
+            os.replace(lock_dir, reclaim_path)
     except OSError:
         return False
     reclaimed_meta = _read_lock_meta(reclaim_path)
     if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
         try:
-            os.replace(reclaim_path, lock_dir)
+            if os.name == "nt":
+                shutil.move(str(reclaim_path), str(lock_dir))
+            else:
+                os.replace(reclaim_path, lock_dir)
         except OSError:
             pass
         return False
