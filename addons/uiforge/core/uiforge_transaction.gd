@@ -155,10 +155,29 @@ static func verify_scene_syntax(temp_path: String) -> Dictionary:
 		return {"ok": false, "errors": parsed.get("errors", [{"code": "SCENE_PROVENANCE_INVALID", "message": "Generated scene has invalid provenance."}])}
 	if not parsed.get("header", {}).get("trusted", false):
 		return {"ok": false, "errors": [{"code": "SCENE_PROVENANCE_INVALID", "message": "Generated scene is missing trusted UIForge provenance header."}]}
-	var packed: Variant = ResourceLoader.load(temp_path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE)
+	var packed: Variant = _load_packed_scene_for_verify(temp_path)
 	if packed == null:
 		return {"ok": false, "errors": [{"code": "SCENE_SYNTAX_INVALID", "message": "Godot could not parse generated scene at %s." % temp_path}]}
 	return {"ok": true, "errors": []}
+
+static func _load_packed_scene_for_verify(temp_path: String) -> Variant:
+	var safe_path := "/tmp/uiforge_verify_%d_%d.tscn" % [Time.get_ticks_usec(), randi()]
+	if FileAccess.file_exists(safe_path):
+		DirAccess.remove_absolute(safe_path)
+	var source_file := FileAccess.open(temp_path, FileAccess.READ)
+	if source_file == null:
+		return null
+	var dest_file := FileAccess.open(safe_path, FileAccess.WRITE)
+	if dest_file == null:
+		source_file.close()
+		return ResourceLoader.load(temp_path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE)
+	dest_file.store_string(source_file.get_as_text())
+	dest_file.close()
+	source_file.close()
+	var packed: Variant = ResourceLoader.load(safe_path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE)
+	if FileAccess.file_exists(safe_path):
+		DirAccess.remove_absolute(safe_path)
+	return packed
 
 class TxnPaths:
 	var backup: String

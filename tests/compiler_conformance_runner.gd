@@ -49,11 +49,11 @@ func _run() -> void:
 			failures.append("%s semantic snapshot mismatch" % fixture_id)
 	if failures.is_empty():
 		print(JSON.stringify({"success": true, "fixtures": fixtures.size()}))
-		quit(0)
-	for failure in failures:
-		push_error(failure)
-	print(JSON.stringify({"success": false, "failures": failures}))
-	quit(1)
+	else:
+		for failure in failures:
+			push_error(failure)
+		print(JSON.stringify({"success": false, "failures": failures}))
+	quit(0 if failures.is_empty() else 1)
 
 func _build_with_fallback(source: String, output: String) -> Dictionary:
 	var abs_source := ProjectSettings.globalize_path(source)
