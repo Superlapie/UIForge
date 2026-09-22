@@ -4,7 +4,9 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 PROJECT_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 
-if command -v godot >/dev/null 2>&1; then
+if [ -n "${GODOT_BIN:-}" ] && [ -e "$GODOT_BIN" ]; then
+	:
+elif command -v godot >/dev/null 2>&1; then
 	GODOT_BIN=$(command -v godot)
 elif command -v godot4 >/dev/null 2>&1; then
 	GODOT_BIN=$(command -v godot4)
