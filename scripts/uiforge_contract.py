@@ -81,6 +81,20 @@ def resolve_real_path(absolute: Path) -> Path:
         return absolute
 
 
+def _canonical_absolute_str(path: str | Path) -> str:
+    text = str(path).replace("\\", "/")
+    if os.name == "nt":
+        return text.lower()
+    try:
+        return str(Path(text).resolve())
+    except OSError:
+        return text
+
+
+def _same_absolute_path(left: str | Path, right: str | Path) -> bool:
+    return _canonical_absolute_str(left) == _canonical_absolute_str(right)
+
+
 def _windows_canonical_path(absolute: Path) -> Path:
     cursor = absolute
     suffix_parts: list[str] = []
@@ -679,7 +693,7 @@ def _replace_conflict(code: str, message: str) -> dict[str, Any]:
 
 
 def _validate_replace_meta(meta: dict[str, Any], dest_absolute: Path, stage: str) -> dict[str, Any]:
-    if str(meta.get("target", "")) != str(dest_absolute):
+    if not _same_absolute_path(meta.get("target", ""), dest_absolute):
         return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction target mismatch."}
     if str(meta.get("stage", "")) != stage:
         return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction stage mismatch."}
@@ -698,7 +712,7 @@ def recover_interrupted_replace(absolute: Path) -> dict[str, Any]:
     meta = _read_replace_meta(meta_path)
     backup_exists = backup_path.exists()
     dest_exists = absolute.exists()
-    if meta and str(meta.get("target", "")) != str(absolute):
+    if meta and not _same_absolute_path(meta.get("target", ""), absolute):
         return _replace_conflict("REPLACE_TXN_INVALID", f"Replace transaction target mismatch for {absolute}.")
     if not dest_exists and backup_exists:
         if not meta:

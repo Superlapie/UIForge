@@ -57,7 +57,9 @@ func _run_cli_validate(document_path: String) -> Dictionary:
 	var project_dir := ProjectSettings.globalize_path("res://")
 	var ui_script := "%s/scripts/ui" % project_dir
 	var output: Array = []
-	var exit_code := OS.execute("/bin/sh", [ui_script, "validate", document_path], output, true, false)
+	var exit_code := OS.execute("bash", [ui_script, "validate", document_path], output, true, false)
+	if exit_code != 0:
+		exit_code = OS.execute(ui_script, ["validate", document_path], output, true, false)
 	var stdout := "\n".join(output)
 	var parser := JSON.new()
 	for index in stdout.length():
