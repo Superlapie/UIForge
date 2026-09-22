@@ -17,7 +17,7 @@ func _dispatch() -> Dictionary:
 	var command := str(args[0])
 	match command:
 		"capabilities":
-			return {"success": true, "capabilities": UIForgeCapabilities.as_dict()}
+			return {"success": true, "backend": "godot-native", "capabilities": UIForgeCapabilities.as_dict()}
 		"new":
 			return _new_document()
 		"validate":

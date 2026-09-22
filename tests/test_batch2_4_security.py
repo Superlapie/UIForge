@@ -86,9 +86,11 @@ class Batch24SecurityTests(unittest.TestCase):
             _write_replace_meta(
                 meta,
                 {
+                    "transaction_id": "txn-provenance-backup",
                     "target": str(destination),
                     "stage": "backup",
                     "backup_hash": _file_text_hash(backup),
+                    "new_hash": "sha256:" + "3" * 64,
                 },
             )
             source = ROOT / "tests/conformance/fixtures/minimal.ui.json"
@@ -114,8 +116,10 @@ class Batch24SecurityTests(unittest.TestCase):
             _write_replace_meta(
                 meta,
                 {
+                    "transaction_id": "txn-commit-mismatch",
                     "target": str(destination),
                     "stage": "commit",
+                    "backup_hash": _file_text_hash(backup),
                     "new_hash": "sha256:" + "f" * 64,
                 },
             )

@@ -75,23 +75,58 @@ def fs_path(raw: str | Path) -> Path:
 def resolve_real_path(absolute: Path) -> Path:
     try:
         if os.name == "nt":
-            return _windows_resolved_path(absolute)
+            return _windows_canonical_path(absolute)
         return absolute.resolve()
     except OSError:
         return absolute
 
 
-def _windows_resolved_path(absolute: Path) -> Path:
+def _windows_canonical_path(absolute: Path) -> Path:
+    cursor = absolute
+    suffix_parts: list[str] = []
+    while not cursor.exists() and cursor.name:
+        suffix_parts.insert(0, cursor.name)
+        parent = cursor.parent
+        if parent == cursor:
+            break
+        cursor = parent
+    resolved_base = _windows_resolve_existing_prefix(cursor)
+    if not suffix_parts:
+        return resolved_base
+    return resolved_base.joinpath(*suffix_parts)
+
+
+def _windows_resolve_existing_prefix(existing_path: Path) -> Path:
     script = (
-        "$item = Get-Item -LiteralPath '{path}' -Force -ErrorAction SilentlyContinue; "
-        "if ($null -eq $item) {{ exit 2 }}; "
-        "$resolved = $item.FullName; "
-        "if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {{ "
+        "function Resolve-UIForgeExistingPath([string]$InputPath) { "
+        "$InputPath = $InputPath -replace '/','\\'; "
+        "if (-not [System.IO.Path]::IsPathRooted($InputPath)) { Write-Output ($InputPath -replace '\\\\','/'); exit 0 }; "
+        "$parts = New-Object System.Collections.Generic.List[string]; "
+        "$current = $InputPath; "
+        "while ($true) { "
+        "$parent = [System.IO.Path]::GetDirectoryName($current); "
+        "$leaf = [System.IO.Path]::GetFileName($current); "
+        "if ($leaf) { $parts.Insert(0, $leaf) }; "
+        "if ([string]::IsNullOrEmpty($parent) -or $parent -eq $current) { "
+        "if (-not $leaf -and $current) { $parts.Insert(0, $current.TrimEnd('\\')) }; break }; "
+        "$current = $parent }; "
+        "if ($parts.Count -eq 0) { Write-Output ($InputPath -replace '\\\\','/'); exit 0 }; "
+        "$resolved = $parts[0]; "
+        "if ($resolved -match '^[A-Za-z]:$') { $resolved = $resolved + '\\' }; "
+        "for ($i = 1; $i -lt $parts.Count; $i++) { "
+        "$candidate = Join-Path $resolved $parts[$i]; "
+        "if (-not (Test-Path -LiteralPath $candidate)) { $resolved = $candidate; continue }; "
+        "$item = Get-Item -LiteralPath $candidate -Force; "
+        "if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { "
         "$target = $item.Target; "
-        "if ($target -is [System.Array]) {{ $resolved = $target[0] }} elseif ($target) {{ $resolved = $target }} "
-        "}}; "
-        "Write-Output $resolved"
-    ).format(path=str(absolute).replace("'", "''"))
+        "if ($target -is [System.Array]) { $target = $target[0] }; "
+        "if ($target -and -not [System.IO.Path]::IsPathRooted($target)) { "
+        "$target = Join-Path ([System.IO.Path]::GetDirectoryName($candidate)) $target }; "
+        "$resolved = [System.IO.Path]::GetFullPath($target) "
+        "} else { $resolved = $item.FullName } }; "
+        "Write-Output ($resolved -replace '\\\\','/') }; "
+        "Resolve-UIForgeExistingPath '{path}'"
+    ).format(path=str(existing_path).replace("'", "''"))
     try:
         completed = subprocess.run(
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
@@ -100,10 +135,10 @@ def _windows_resolved_path(absolute: Path) -> Path:
             check=False,
         )
     except OSError:
-        return absolute
-    if completed.returncode != 0 or not completed.stdout.strip():
-        return absolute
-    return Path(completed.stdout.strip())
+        return existing_path
+    if completed.returncode == 0 and completed.stdout.strip():
+        return Path(completed.stdout.strip())
+    return existing_path
 
 
 def _query_windows_tasklist(pid: int) -> dict[str, Any]:
@@ -491,20 +526,82 @@ def _lock_is_stale(lock_dir: Path) -> bool:
     return True
 
 
-def _acquire_reclaim_guard(target_absolute: Path) -> bool:
+def _guard_is_stale(guard_dir: Path) -> bool:
+    return _lock_is_stale(guard_dir)
+
+
+def _ensure_reclaim_guard_clear(target_absolute: Path) -> bool:
     guard = _reclaim_guard_path(target_absolute)
-    if guard.exists():
-        return False
+    if not guard.exists():
+        return True
+    if _guard_is_stale(guard):
+        return _reclaim_stale_guard_verified(guard)
+    return False
+
+
+def _begin_reclaim_guard(target_absolute: Path) -> dict[str, Any]:
+    if not _ensure_reclaim_guard_clear(target_absolute):
+        return {"ok": False}
+    guard = _reclaim_guard_path(target_absolute)
+    guard_nonce = secrets.token_hex(16)
     try:
         guard.mkdir()
-    except FileExistsError:
+        _write_lock_meta(guard, guard_nonce)
+    except OSError:
+        _remove_lock_dir(guard)
+        return {"ok": False}
+    return {"ok": True, "guard_nonce": guard_nonce, "guard_path": guard}
+
+
+def _release_reclaim_guard_owned(target_absolute: Path, guard_nonce: str) -> None:
+    guard = _reclaim_guard_path(target_absolute)
+    if not guard_nonce or not guard.exists():
+        return
+    meta = _read_lock_meta(guard)
+    if meta.get("owner_nonce") != guard_nonce:
+        return
+    _remove_lock_dir(guard)
+
+
+def _reclaim_stale_guard_verified(guard_dir: Path) -> bool:
+    if not guard_dir.exists():
+        return True
+    if not _guard_is_stale(guard_dir):
         return False
+    meta = _read_lock_meta(guard_dir)
+    expected_nonce = str(meta.get("owner_nonce", ""))
+    if not expected_nonce:
+        return False
+    reclaim_path = guard_dir.with_name(f"{guard_dir.name}.reclaim_{secrets.token_hex(8)}")
+    try:
+        if os.name == "nt":
+            shutil.move(str(guard_dir), str(reclaim_path))
+        else:
+            os.replace(guard_dir, reclaim_path)
     except OSError:
         return False
+    reclaimed_meta = _read_lock_meta(reclaim_path)
+    if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
+        try:
+            if os.name == "nt":
+                shutil.move(str(reclaim_path), str(guard_dir))
+            else:
+                os.replace(reclaim_path, guard_dir)
+        except OSError:
+            pass
+        return False
+    _remove_lock_dir(reclaim_path)
     return True
 
 
-def _release_reclaim_guard(target_absolute: Path) -> None:
+def _acquire_reclaim_guard(target_absolute: Path) -> bool:
+    return _begin_reclaim_guard(target_absolute).get("ok", False)
+
+
+def _release_reclaim_guard(target_absolute: Path, guard_nonce: str = "") -> None:
+    if guard_nonce:
+        _release_reclaim_guard_owned(target_absolute, guard_nonce)
+        return
     guard = _reclaim_guard_path(target_absolute)
     if guard.exists():
         shutil.rmtree(guard, ignore_errors=True)
@@ -512,8 +609,10 @@ def _release_reclaim_guard(target_absolute: Path) -> None:
 
 def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
     target_absolute = lock_dir.with_name(lock_dir.name.removesuffix(".uiforge_lock"))
-    if not _acquire_reclaim_guard(target_absolute):
+    guard = _begin_reclaim_guard(target_absolute)
+    if not guard.get("ok"):
         return False
+    guard_nonce = str(guard.get("guard_nonce", ""))
     try:
         if not _lock_is_stale(lock_dir):
             return False
@@ -523,7 +622,7 @@ def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
             return False
         return reclaim_stale_lock_verified(lock_dir, expected_nonce)
     finally:
-        _release_reclaim_guard(target_absolute)
+        _release_reclaim_guard_owned(target_absolute, guard_nonce)
 
 
 def reclaim_stale_lock_verified(lock_dir: Path, expected_nonce: str) -> bool:
@@ -575,6 +674,24 @@ def _cleanup_replace_sidecars(absolute: Path) -> None:
         meta_path.unlink(missing_ok=True)
 
 
+def _replace_conflict(code: str, message: str) -> dict[str, Any]:
+    return {"ok": False, "status": "conflict", "errors": [{"code": code, "message": message}]}
+
+
+def _validate_replace_meta(meta: dict[str, Any], dest_absolute: Path, stage: str) -> dict[str, Any]:
+    if str(meta.get("target", "")) != str(dest_absolute):
+        return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction target mismatch."}
+    if str(meta.get("stage", "")) != stage:
+        return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction stage mismatch."}
+    if not str(meta.get("transaction_id", "")):
+        return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction id missing."}
+    for field in ("backup_hash", "new_hash"):
+        value = str(meta.get(field, ""))
+        if not value or HASH_PATTERN.fullmatch(value) is None:
+            return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction hash metadata invalid."}
+    return {"ok": True}
+
+
 def recover_interrupted_replace(absolute: Path) -> dict[str, Any]:
     backup_path = absolute.with_name(absolute.name + ".uiforge_replace_backup")
     meta_path = _replace_meta_path(absolute)
@@ -582,43 +699,57 @@ def recover_interrupted_replace(absolute: Path) -> dict[str, Any]:
     backup_exists = backup_path.exists()
     dest_exists = absolute.exists()
     if meta and str(meta.get("target", "")) != str(absolute):
-        return {
-            "ok": False,
-            "status": "conflict",
-            "errors": [{"code": "REPLACE_TXN_INVALID", "message": f"Replace transaction target mismatch for {absolute}."}],
-        }
+        return _replace_conflict("REPLACE_TXN_INVALID", f"Replace transaction target mismatch for {absolute}.")
     if not dest_exists and backup_exists:
-        backup_hash = _file_text_hash(backup_path)
-        expected_backup = str(meta.get("backup_hash", ""))
-        if expected_backup and expected_backup != backup_hash:
-            return {
-                "ok": False,
-                "status": "conflict",
-                "errors": [{"code": "REPLACE_BACKUP_INVALID", "message": f"Replace backup hash mismatch for {absolute}."}],
-            }
-        os.replace(backup_path, absolute)
-        _cleanup_replace_sidecars(absolute)
-        return {"ok": True, "status": "recovered", "errors": []}
-    if dest_exists and backup_exists:
+        if not meta:
+            os.replace(backup_path, absolute)
+            return {"ok": True, "status": "recovered", "errors": []}
         stage = str(meta.get("stage", ""))
-        dest_hash = _file_text_hash(absolute)
-        backup_hash = _file_text_hash(backup_path)
+        if stage == "backup":
+            valid = _validate_replace_meta(meta, absolute, "backup")
+            if not valid.get("ok"):
+                return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+            if str(meta.get("backup_hash", "")) != _file_text_hash(backup_path):
+                return _replace_conflict("REPLACE_BACKUP_INVALID", f"Replace backup hash mismatch for {absolute}.")
+            os.replace(backup_path, absolute)
+            _cleanup_replace_sidecars(absolute)
+            return {"ok": True, "status": "recovered", "errors": []}
+        return _replace_conflict("REPLACE_RECOVERY_CONFLICT", f"Ambiguous missing destination with backup for {absolute}.")
+    if dest_exists and backup_exists:
+        if not meta:
+            return _replace_conflict("REPLACE_RECOVERY_CONFLICT", f"Destination and backup exist without metadata for {absolute}.")
+        stage = str(meta.get("stage", ""))
+        if stage == "backup":
+            return _replace_conflict("REPLACE_RECOVERY_CONFLICT", f"Interrupted backup stage for {absolute}.")
         if stage in {"commit", "complete"}:
-            expected_new = str(meta.get("new_hash", ""))
-            if expected_new and expected_new != dest_hash:
-                return {
-                    "ok": False,
-                    "status": "conflict",
-                    "errors": [{"code": "REPLACE_RECOVERY_CONFLICT", "message": f"Committed destination hash mismatch for {absolute}."}],
-                }
+            valid = _validate_replace_meta(meta, absolute, stage)
+            if not valid.get("ok"):
+                return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+            dest_hash = _file_text_hash(absolute)
+            backup_hash = _file_text_hash(backup_path)
+            if dest_hash != str(meta.get("new_hash", "")):
+                return _replace_conflict("REPLACE_RECOVERY_CONFLICT", f"Committed destination hash mismatch for {absolute}.")
+            if backup_hash != str(meta.get("backup_hash", "")):
+                return _replace_conflict("REPLACE_BACKUP_INVALID", f"Backup hash mismatch for {absolute}.")
             backup_path.unlink(missing_ok=True)
             _cleanup_replace_sidecars(absolute)
             return {"ok": True, "status": "clean", "errors": []}
-        if not meta and dest_hash != backup_hash:
-            backup_path.unlink(missing_ok=True)
+        return _replace_conflict("REPLACE_TXN_INVALID", f"Unknown replace stage '{stage}' for {absolute}.")
+    if dest_exists and not backup_exists:
+        if not meta:
             return {"ok": True, "status": "clean", "errors": []}
-    if dest_exists and not backup_exists and meta:
-        _cleanup_replace_sidecars(absolute)
+        stage = str(meta.get("stage", ""))
+        if stage in {"commit", "complete"}:
+            valid = _validate_replace_meta(meta, absolute, stage)
+            if not valid.get("ok"):
+                return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+            if _file_text_hash(absolute) != str(meta.get("new_hash", "")):
+                return _replace_conflict("REPLACE_RECOVERY_CONFLICT", f"Destination hash mismatch for {absolute}.")
+            _cleanup_replace_sidecars(absolute)
+            return {"ok": True, "status": "clean", "errors": []}
+        return _replace_conflict("REPLACE_TXN_INVALID", f"Stale replace metadata for {absolute}.")
+    if not dest_exists and not backup_exists and meta:
+        return _replace_conflict("REPLACE_TXN_INVALID", f"Replace metadata without artifacts for {absolute}.")
     return {"ok": True, "status": "clean", "errors": []}
 
 
@@ -634,9 +765,8 @@ def replace_file(source_absolute: Path, dest_absolute: Path) -> None:
 def acquire_lock(target_absolute: Path) -> dict[str, Any]:
     lock_dir = _lock_dir(target_absolute)
     owner_nonce = secrets.token_hex(16)
-    guard = _reclaim_guard_path(target_absolute)
     for attempt in range(4):
-        if guard.exists():
+        if not _ensure_reclaim_guard_clear(target_absolute):
             time.sleep(0.025 * (attempt + 1))
             continue
         try:

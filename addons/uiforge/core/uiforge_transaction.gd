@@ -1,6 +1,13 @@
 class_name UIForgeTransaction
 extends RefCounted
 
+static var _replace_hash_pattern: RegEx
+
+static func _hash_regex() -> RegEx:
+	if _replace_hash_pattern == null:
+		_replace_hash_pattern = RegEx.create_from_string("^sha256:[0-9a-f]{64}$")
+	return _replace_hash_pattern
+
 static func unique_temp_path(absolute: String, extension: String = "") -> String:
 	var directory := absolute.get_base_dir()
 	var base := absolute.get_file()
@@ -28,7 +35,9 @@ static func replace_file(source_absolute: String, dest_absolute: String) -> Dict
 	var meta_path := _replace_meta_path(dest_absolute)
 	var backup_hash := _file_text_hash(dest_absolute)
 	var new_hash := _file_text_hash(source_absolute)
+	var transaction_id := _secure_transaction_id()
 	_write_replace_meta(meta_path, {
+		"transaction_id": transaction_id,
 		"target": dest_absolute,
 		"stage": "backup",
 		"backup_hash": backup_hash,
@@ -41,6 +50,7 @@ static func replace_file(source_absolute: String, dest_absolute: String) -> Dict
 		_cleanup_replace_meta(meta_path)
 		return {"ok": false, "errors": [{"code": "BACKUP_RENAME_FAILED", "message": "Could not protect %s" % dest_absolute}]}
 	_write_replace_meta(meta_path, {
+		"transaction_id": transaction_id,
 		"target": dest_absolute,
 		"stage": "commit",
 		"backup_hash": backup_hash,
@@ -53,6 +63,7 @@ static func replace_file(source_absolute: String, dest_absolute: String) -> Dict
 		_cleanup_replace_sidecars(dest_absolute)
 		return {"ok": false, "errors": [{"code": "ATOMIC_RENAME_FAILED", "message": "Could not replace %s" % dest_absolute}]}
 	_write_replace_meta(meta_path, {
+		"transaction_id": transaction_id,
 		"target": dest_absolute,
 		"stage": "complete",
 		"backup_hash": backup_hash,
@@ -314,49 +325,80 @@ static func _recover_interrupted_replace(dest_absolute: String) -> Dictionary:
 	var backup_exists := FileAccess.file_exists(backup_path)
 	var dest_exists := FileAccess.file_exists(dest_absolute)
 	if not meta.is_empty() and str(meta.get("target", "")) != dest_absolute:
-		return {
-			"ok": false,
-			"status": "conflict",
-			"errors": [{"code": "REPLACE_TXN_INVALID", "message": "Replace transaction target mismatch for %s." % dest_absolute}],
-		}
+		return _replace_conflict("REPLACE_TXN_INVALID", "Replace transaction target mismatch for %s." % dest_absolute)
 	if not dest_exists and backup_exists:
-		var backup_hash := _file_text_hash(backup_path)
-		var expected_backup := str(meta.get("backup_hash", ""))
-		if not expected_backup.is_empty() and expected_backup != backup_hash:
-			return {
-				"ok": false,
-				"status": "conflict",
-				"errors": [{"code": "REPLACE_BACKUP_INVALID", "message": "Replace backup hash mismatch for %s." % dest_absolute}],
-			}
-		if DirAccess.rename_absolute(backup_path, dest_absolute) != OK:
-			return {
-				"ok": false,
-				"status": "conflict",
-				"errors": [{"code": "REPLACE_RECOVERY_CONFLICT", "message": "Could not restore backup for %s." % dest_absolute}],
-			}
-		_cleanup_replace_sidecars(dest_absolute)
-		return {"ok": true, "status": "recovered", "errors": []}
-	if dest_exists and backup_exists:
+		if meta.is_empty():
+			if DirAccess.rename_absolute(backup_path, dest_absolute) != OK:
+				return _replace_conflict("REPLACE_RECOVERY_CONFLICT", "Could not restore orphan backup for %s." % dest_absolute)
+			return {"ok": true, "status": "recovered", "errors": []}
 		var stage := str(meta.get("stage", ""))
-		var dest_hash := _file_text_hash(dest_absolute)
-		var backup_hash := _file_text_hash(backup_path)
+		if stage == "backup":
+			var valid := _validate_replace_meta(meta, dest_absolute, "backup")
+			if not valid.get("ok", false):
+				return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+			if str(meta.get("backup_hash", "")) != _file_text_hash(backup_path):
+				return _replace_conflict("REPLACE_BACKUP_INVALID", "Replace backup hash mismatch for %s." % dest_absolute)
+			if DirAccess.rename_absolute(backup_path, dest_absolute) != OK:
+				return _replace_conflict("REPLACE_RECOVERY_CONFLICT", "Could not restore backup for %s." % dest_absolute)
+			_cleanup_replace_sidecars(dest_absolute)
+			return {"ok": true, "status": "recovered", "errors": []}
+		return _replace_conflict("REPLACE_RECOVERY_CONFLICT", "Ambiguous missing destination with backup for %s." % dest_absolute)
+	if dest_exists and backup_exists:
+		if meta.is_empty():
+			return _replace_conflict("REPLACE_RECOVERY_CONFLICT", "Destination and backup exist without metadata for %s." % dest_absolute)
+		var stage := str(meta.get("stage", ""))
+		if stage == "backup":
+			return _replace_conflict("REPLACE_RECOVERY_CONFLICT", "Interrupted backup stage for %s." % dest_absolute)
 		if stage in ["commit", "complete"]:
-			var expected_new := str(meta.get("new_hash", ""))
-			if not expected_new.is_empty() and expected_new != dest_hash:
-				return {
-					"ok": false,
-					"status": "conflict",
-					"errors": [{"code": "REPLACE_RECOVERY_CONFLICT", "message": "Committed destination hash mismatch for %s." % dest_absolute}],
-				}
+			var valid := _validate_replace_meta(meta, dest_absolute, stage)
+			if not valid.get("ok", false):
+				return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+			var dest_hash := _file_text_hash(dest_absolute)
+			var backup_hash := _file_text_hash(backup_path)
+			if dest_hash != str(meta.get("new_hash", "")):
+				return _replace_conflict("REPLACE_RECOVERY_CONFLICT", "Committed destination hash mismatch for %s." % dest_absolute)
+			if backup_hash != str(meta.get("backup_hash", "")):
+				return _replace_conflict("REPLACE_BACKUP_INVALID", "Backup hash mismatch for %s." % dest_absolute)
 			DirAccess.remove_absolute(backup_path)
 			_cleanup_replace_meta(meta_path)
 			return {"ok": true, "status": "clean", "errors": []}
-		if meta.is_empty() and dest_hash != backup_hash:
-			DirAccess.remove_absolute(backup_path)
+		return _replace_conflict("REPLACE_TXN_INVALID", "Unknown replace stage '%s' for %s." % [stage, dest_absolute])
+	if dest_exists and not backup_exists:
+		if meta.is_empty():
 			return {"ok": true, "status": "clean", "errors": []}
-	if dest_exists and not backup_exists and not meta.is_empty():
-		_cleanup_replace_meta(meta_path)
+		var stage := str(meta.get("stage", ""))
+		if stage in ["commit", "complete"]:
+			var valid := _validate_replace_meta(meta, dest_absolute, stage)
+			if not valid.get("ok", false):
+				return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+			if _file_text_hash(dest_absolute) != str(meta.get("new_hash", "")):
+				return _replace_conflict("REPLACE_RECOVERY_CONFLICT", "Destination hash mismatch for %s." % dest_absolute)
+			_cleanup_replace_meta(meta_path)
+			return {"ok": true, "status": "clean", "errors": []}
+		return _replace_conflict("REPLACE_TXN_INVALID", "Stale replace metadata for %s." % dest_absolute)
+	if not dest_exists and not backup_exists and not meta.is_empty():
+		return _replace_conflict("REPLACE_TXN_INVALID", "Replace metadata without artifacts for %s." % dest_absolute)
 	return {"ok": true, "status": "clean", "errors": []}
+
+static func _replace_conflict(code: String, message: String) -> Dictionary:
+	return {"ok": false, "status": "conflict", "errors": [{"code": code, "message": message}]}
+
+static func _validate_replace_meta(meta: Dictionary, dest_absolute: String, stage: String) -> Dictionary:
+	if str(meta.get("target", "")) != dest_absolute:
+		return {"ok": false, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction target mismatch."}
+	if str(meta.get("stage", "")) != stage:
+		return {"ok": false, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction stage mismatch."}
+	if str(meta.get("transaction_id", "")).is_empty():
+		return {"ok": false, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction id missing."}
+	for field in ["backup_hash", "new_hash"]:
+		var value := str(meta.get(field, ""))
+		if value.is_empty() or _hash_regex().search(value) == null:
+			return {"ok": false, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction hash metadata invalid."}
+	return {"ok": true, "errors": []}
+
+static func _secure_transaction_id() -> String:
+	var crypto := Crypto.new()
+	return crypto.generate_random_bytes(16).hex_encode()
 
 static func recover_interrupted_source_for_path(target_path: String) -> void:
 	var absolute := UIForgePaths.normalize_requested(target_path)

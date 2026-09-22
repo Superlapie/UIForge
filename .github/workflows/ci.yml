@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
       - name: Run Windows filesystem and trust tests
         shell: bash
-        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security -v
+        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security tests.test_batch2_5_security -v
 
   godot-linux:
     runs-on: ubuntu-latest
@@ -58,8 +58,8 @@ jobs:
           GODOT_EXE=$(find . -maxdepth 1 -name 'Godot_v4.7.2-stable_win64.exe' | head -n 1)
           mv "$GODOT_EXE" ./godot.exe
           ./godot.exe --version
-      - name: Run native Windows trust suite
+      - name: Run native Windows test suite
         shell: bash
         env:
           GODOT_BIN: ./godot.exe
-        run: ./scripts/test_trust
+        run: ./scripts/test

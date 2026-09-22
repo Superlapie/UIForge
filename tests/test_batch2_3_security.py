@@ -38,7 +38,16 @@ class Batch23SecurityTests(unittest.TestCase):
             backup = destination.with_name(destination.name + ".uiforge_replace_backup")
             meta = _replace_meta_path(destination)
             backup.write_text(MINIMAL_SCENE, encoding="utf-8")
-            _write_replace_meta(meta, {"target": str(destination), "stage": "backup", "backup_hash": _file_text_hash(backup)})
+            _write_replace_meta(
+                meta,
+                {
+                    "transaction_id": "txn-backup-restore",
+                    "target": str(destination),
+                    "stage": "backup",
+                    "backup_hash": _file_text_hash(backup),
+                    "new_hash": "sha256:" + "1" * 64,
+                },
+            )
             recover_interrupted_replace(destination)
             self.assertTrue(destination.exists())
             self.assertEqual(destination.read_text(encoding="utf-8"), MINIMAL_SCENE)
@@ -52,7 +61,16 @@ class Batch23SecurityTests(unittest.TestCase):
             meta = _replace_meta_path(destination)
             destination.write_text(UPDATED_SCENE, encoding="utf-8")
             backup.write_text(MINIMAL_SCENE, encoding="utf-8")
-            _write_replace_meta(meta, {"target": str(destination), "stage": "commit", "new_hash": _file_text_hash(destination)})
+            _write_replace_meta(
+                meta,
+                {
+                    "transaction_id": "txn-commit-clean",
+                    "target": str(destination),
+                    "stage": "commit",
+                    "backup_hash": _file_text_hash(backup),
+                    "new_hash": _file_text_hash(destination),
+                },
+            )
             recover_interrupted_replace(destination)
             self.assertEqual(destination.read_text(encoding="utf-8"), UPDATED_SCENE)
             self.assertFalse(backup.exists())
@@ -114,7 +132,16 @@ class Batch23SecurityTests(unittest.TestCase):
             backup = destination.with_name(destination.name + ".uiforge_replace_backup")
             meta = _replace_meta_path(destination)
             backup.write_text(MINIMAL_SCENE, encoding="utf-8")
-            _write_replace_meta(meta, {"target": str(destination), "stage": "backup"})
+            _write_replace_meta(
+                meta,
+                {
+                    "transaction_id": "txn-backup-sidecars",
+                    "target": str(destination),
+                    "stage": "backup",
+                    "backup_hash": _file_text_hash(backup),
+                    "new_hash": "sha256:" + "2" * 64,
+                },
+            )
             recover_interrupted_replace(destination)
             self.assertFalse(backup.exists())
             self.assertFalse(meta.exists())

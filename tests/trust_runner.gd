@@ -12,14 +12,20 @@ func _init() -> void:
 func _run() -> void:
 	_test_paths()
 	_test_locking()
+	_test_reclaim_guard_ownership()
 	_test_process_liveness()
 	_test_transactions()
 	_test_output_replacement()
+	_test_replacement_recovery_states()
 	_test_provenance_after_recovery()
 	_test_scene_verification()
 	_test_resource_provenance()
+	_test_native_cli_backend()
 	if OS.get_name() == "Windows":
+		_test_windows_path_forms()
 		_test_windows_junction_containment()
+		_test_windows_junction_descendant_containment()
+		_test_windows_nested_junction_containment()
 	else:
 		_test_symlink_containment()
 	if failures.is_empty():
@@ -97,6 +103,38 @@ func _test_locking() -> void:
 	_assert(UIForgeLock.reclaim_stale_lock(stale_dir, target), "lock_dead_owner_reclaimed")
 	_assert(not DirAccess.dir_exists_absolute(stale_dir), "lock_dead_owner_removed")
 
+func _test_reclaim_guard_ownership() -> void:
+	_prepare_trust_dir("guard/target.ui.json")
+	var target := _trust_abs("guard/target.ui.json")
+	if not FileAccess.file_exists(target):
+		FileAccess.open(target, FileAccess.WRITE).close()
+	var guard := UIForgeLock.begin_reclaim_guard(target)
+	_assert(guard.get("ok", false), "reclaim_guard_acquire")
+	var blocked := UIForgeLock.acquire(target)
+	_assert(not blocked.get("ok", false), "reclaim_guard_blocks_writer")
+	UIForgeLock.release_reclaim_guard(target, str(guard.get("guard_nonce", "")))
+	var stale_guard := UIForgeLock.reclaim_guard_path(target)
+	DirAccess.make_dir_absolute(stale_guard)
+	_write_owner_json(stale_guard, {
+		"owner_nonce": "dead-guard",
+		"pid": 999999,
+		"process_start": "0",
+		"started": Time.get_unix_time_from_system() - 3600,
+	})
+	_assert(UIForgeLock.guard_is_stale(stale_guard), "reclaim_guard_dead_stale")
+	_assert(UIForgeLock.reclaim_stale_guard(stale_guard, target), "reclaim_guard_dead_recovered")
+	_assert(not DirAccess.dir_exists_absolute(stale_guard), "reclaim_guard_dead_removed")
+	var fresh := UIForgeLock.begin_reclaim_guard(target)
+	_assert(fresh.get("ok", false), "reclaim_guard_fresh_acquire")
+	_assert(not UIForgeLock.reclaim_stale_guard(UIForgeLock.reclaim_guard_path(target), target), "reclaim_guard_grace_protected")
+	UIForgeLock.release_reclaim_guard(target, "wrong-nonce")
+	_assert(DirAccess.dir_exists_absolute(UIForgeLock.reclaim_guard_path(target)), "reclaim_guard_wrong_nonce_keeps_guard")
+	UIForgeLock.release_reclaim_guard(target, str(fresh.get("guard_nonce", "")))
+	var reacquire := UIForgeLock.acquire(target)
+	_assert(reacquire.get("ok", false), "reclaim_guard_write_after_recovery")
+	UIForgeLock.release(str(reacquire.get("lock_path", "")), str(reacquire.get("owner_nonce", "")))
+	_assert(not DirAccess.dir_exists_absolute(UIForgeLock.reclaim_guard_path(target)), "reclaim_guard_no_sidecars")
+
 func _test_process_liveness() -> void:
 	var current := UIForgeProcess.current_process_identity()
 	_assert(current.get("ok", false), "process_current_alive")
@@ -143,11 +181,7 @@ func _test_output_replacement() -> void:
 	_assert(recovery.get("ok", false) and recovery.get("status", "") == "clean", "replace_recovery_initial")
 	DirAccess.remove_absolute(dest_abs)
 	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
-	_write_replace_meta(meta_abs, {
-		"target": dest_abs,
-		"stage": "backup",
-		"backup_hash": _text_hash(backup_abs),
-	})
+	_write_replace_meta(meta_abs, _replace_meta_payload(dest_abs, "backup", _text_hash(backup_abs), "sha256:%s" % "1".repeat(64)))
 	recovery = UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
 	_assert(recovery.get("ok", false) and recovery.get("status", "") == "recovered", "replace_recovery_restore")
 	_assert(FileAccess.get_file_as_string(dest_abs) == HUMAN_SCENE, "replace_recovery_restored_bytes")
@@ -163,11 +197,7 @@ func _test_provenance_after_recovery() -> void:
 	var meta_abs := "%s.uiforge_replace_txn" % dest_abs
 	_cleanup_sidecars(dest_abs)
 	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
-	_write_replace_meta(meta_abs, {
-		"target": dest_abs,
-		"stage": "backup",
-		"backup_hash": _text_hash(backup_abs),
-	})
+	_write_replace_meta(meta_abs, _replace_meta_payload(dest_abs, "backup", _text_hash(backup_abs), "sha256:%s" % "2".repeat(64)))
 	var source_path := "res://tests/conformance/fixtures/minimal.ui.json"
 	var source_id := UIForgeArtifact.source_identity(source_path)
 	var generated := _generated_scene_text(source_id, "sha256:0000000000000000000000000000000000000000000000000000000000000000")
@@ -193,6 +223,55 @@ func _test_provenance_after_recovery() -> void:
 	})
 	_assert(not mismatch.get("success", false), "provenance_different_source_rejected")
 	_assert(_has_error_code(mismatch, "OUTPUT_SOURCE_MISMATCH"), "provenance_different_source_code")
+	_cleanup_sidecars(dest_abs)
+	var malformed_meta_abs := "%s.uiforge_replace_txn" % dest_abs
+	_write_replace_meta(malformed_meta_abs, {"target": dest_abs, "stage": "commit"})
+	var malformed_recovery := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(not malformed_recovery.get("ok", false), "provenance_malformed_txn_conflict")
+	_assert(_recovery_code(malformed_recovery) == "REPLACE_TXN_INVALID", "provenance_malformed_txn_code")
+	_cleanup_sidecars(dest_abs)
+	FileAccess.open(dest_abs, FileAccess.WRITE).store_string(trusted)
+	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	_write_replace_meta(meta_abs, _replace_meta_payload(dest_abs, "commit", _text_hash(backup_abs), "sha256:%s" % "f".repeat(64)))
+	var hash_mismatch := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(not hash_mismatch.get("ok", false), "provenance_hash_mismatch_conflict")
+	_assert(_recovery_code(hash_mismatch) == "REPLACE_RECOVERY_CONFLICT", "provenance_hash_mismatch_code")
+	_assert(FileAccess.file_exists(backup_abs), "provenance_hash_mismatch_backup_preserved")
+
+func _test_replacement_recovery_states() -> void:
+	var state_count := 0
+	_prepare_trust_dir("recovery/state.tscn")
+	var dest_res := _trust_path("recovery/state.tscn")
+	var dest_abs := _trust_abs("recovery/state.tscn")
+	var backup_abs := "%s.uiforge_replace_backup" % dest_abs
+	var meta_abs := "%s.uiforge_replace_txn" % dest_abs
+	_cleanup_sidecars(dest_abs)
+	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	var orphan := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(orphan.get("ok", false) and orphan.get("status", "") == "recovered", "recovery_orphan_backup")
+	state_count += 1
+	_cleanup_sidecars(dest_abs)
+	FileAccess.open(dest_abs, FileAccess.WRITE).store_string(GENERATED_SCENE_BODY)
+	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	_write_replace_meta(meta_abs, _replace_meta_payload(dest_abs, "commit", _text_hash(backup_abs), _text_hash(dest_abs)))
+	var clean := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(clean.get("ok", false) and clean.get("status", "") == "clean", "recovery_commit_clean")
+	state_count += 1
+	_cleanup_sidecars(dest_abs)
+	FileAccess.open(dest_abs, FileAccess.WRITE).store_string(GENERATED_SCENE_BODY)
+	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	_write_replace_meta(meta_abs, {"target": dest_abs, "stage": "commit"})
+	var invalid := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(not invalid.get("ok", false) and _recovery_code(invalid) == "REPLACE_TXN_INVALID", "recovery_commit_missing_hashes")
+	state_count += 1
+	_cleanup_sidecars(dest_abs)
+	FileAccess.open(dest_abs, FileAccess.WRITE).store_string(GENERATED_SCENE_BODY)
+	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	_write_replace_meta(meta_abs, _replace_meta_payload(dest_abs, "backup", _text_hash(backup_abs), _text_hash(dest_abs)))
+	var backup_stage := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(not backup_stage.get("ok", false), "recovery_dest_backup_backup_stage_conflict")
+	state_count += 1
+	_assert(state_count >= 4, "recovery_state_table_count_%d" % state_count)
 
 func _test_scene_verification() -> void:
 	_prepare_trust_dir("scene/valid.tscn")
@@ -276,6 +355,100 @@ func _test_windows_junction_containment() -> void:
 	_assert(not checked.ok, "windows_junction_escape_blocked")
 	if not checked.errors.is_empty():
 		_assert(str(checked.errors[0].get("code", "")) == "OUTPUT_OUTSIDE_WORKSPACE", "windows_junction_escape_code")
+	_teardown_windows_junction(link_path)
+
+func _test_windows_junction_descendant_containment() -> void:
+	var workspace := UIForgePaths.workspace_root()
+	var temp_root := OS.get_environment("TEMP") if OS.has_environment("TEMP") else "C:/Windows/Temp"
+	var outside := "%s/uiforge_outside_desc_%d" % [temp_root.replace("\\", "/"), Time.get_ticks_usec()]
+	var nested := "%s/existing/nested" % outside
+	DirAccess.make_dir_recursive_absolute(nested)
+	var link_parent := "%s/trust_junctions_desc" % workspace
+	DirAccess.make_dir_recursive_absolute(link_parent)
+	var link_path := "%s/escape_link" % link_parent
+	_setup_windows_junction(link_path, outside)
+	var missing_target := "res://trust_junctions_desc/escape_link/existing/nested/new.tscn"
+	var missing_checked := UIForgePaths.validate_output(missing_target, UIForgePaths.ArtifactKind.SCENE, false)
+	_assert(not missing_checked.ok, "windows_junction_descendant_missing_blocked")
+	if not missing_checked.errors.is_empty():
+		_assert(str(missing_checked.errors[0].get("code", "")) == "OUTPUT_OUTSIDE_WORKSPACE", "windows_junction_descendant_missing_code")
+	var existing_abs := "%s/existing_file.tscn" % nested
+	FileAccess.open(existing_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	var existing_target := "res://trust_junctions_desc/escape_link/existing/nested/existing_file.tscn"
+	var existing_checked := UIForgePaths.validate_output(existing_target, UIForgePaths.ArtifactKind.SCENE, false)
+	_assert(not existing_checked.ok, "windows_junction_descendant_existing_blocked")
+	_teardown_windows_junction(link_path)
+
+func _test_windows_nested_junction_containment() -> void:
+	var workspace := UIForgePaths.workspace_root()
+	var temp_root := OS.get_environment("TEMP") if OS.has_environment("TEMP") else "C:/Windows/Temp"
+	var outside_a := "%s/uiforge_outside_a_%d" % [temp_root.replace("\\", "/"), Time.get_ticks_usec()]
+	var outside_b := "%s/uiforge_outside_b_%d" % [temp_root.replace("\\", "/"), Time.get_ticks_usec() + 1]
+	DirAccess.make_dir_recursive_absolute(outside_b)
+	DirAccess.make_dir_recursive_absolute(outside_a)
+	var inner_link := "%s/inner_link" % outside_a
+	_setup_windows_junction(inner_link, outside_b)
+	var link_parent := "%s/trust_junctions_nested" % workspace
+	DirAccess.make_dir_recursive_absolute(link_parent)
+	var outer_link := "%s/outer_link" % link_parent
+	_setup_windows_junction(outer_link, outside_a)
+	var nested_target := "res://trust_junctions_nested/outer_link/inner_link/deep/file.tscn"
+	var checked := UIForgePaths.validate_output(nested_target, UIForgePaths.ArtifactKind.SCENE, false)
+	_assert(not checked.ok, "windows_nested_junction_blocked")
+	if not checked.errors.is_empty():
+		_assert(str(checked.errors[0].get("code", "")) == "OUTPUT_OUTSIDE_WORKSPACE", "windows_nested_junction_code")
+	_teardown_windows_junction(outer_link)
+	_teardown_windows_junction(inner_link)
+
+func _test_windows_path_forms() -> void:
+	var workspace := UIForgePaths.workspace_root()
+	var sample := "%s/.uiforge/trust/paths/windows_sample.tscn" % workspace
+	_prepare_trust_dir("paths/windows_sample.tscn")
+	FileAccess.open(sample, FileAccess.WRITE).close()
+	var forms := [
+		sample,
+		sample.replace("/", "\\"),
+		sample.to_lower(),
+		"%s/.uiforge/trust/paths/with space.tscn" % workspace,
+	]
+	for form in forms:
+		if form.ends_with("with space.tscn"):
+			_prepare_trust_dir("paths/with space.tscn")
+			FileAccess.open(form, FileAccess.WRITE).close()
+		var resolved := UIForgePaths.resolve_real_path(form)
+		_assert(not resolved.is_empty(), "windows_path_form_%s" % form)
+	_assert(UIForgePaths.validate_output("res://.uiforge/trust/paths/windows_sample.tscn", UIForgePaths.ArtifactKind.SCENE, false).ok, "windows_path_validate_sample")
+
+func _test_native_cli_backend() -> void:
+	var project := ProjectSettings.globalize_path("res://")
+	var ui_script := "%s/scripts/ui" % project
+	var output: Array = []
+	var exit_code := OS.execute("bash", [ui_script, "capabilities"], output, true, false)
+	if exit_code != 0:
+		exit_code = OS.execute(ui_script, ["capabilities"], output, true, false)
+	_assert(exit_code == 0, "native_cli_capabilities_exit")
+	var payload: Variant = _parse_cli_json(output)
+	_assert(payload is Dictionary and payload.get("success", false), "native_cli_capabilities_success")
+	_assert(str(payload.get("backend", "")) == "godot-native", "native_cli_backend_godot_native")
+	var validate_exit := OS.execute("bash", [ui_script, "validate", "examples/specs/inventory.ui.json"], output, true, false)
+	if validate_exit != 0:
+		validate_exit = OS.execute(ui_script, ["validate", "examples/specs/inventory.ui.json"], output, true, false)
+	_assert(validate_exit == 0, "native_cli_validate_exit")
+
+func _setup_windows_junction(link_path: String, target_path: String) -> void:
+	if DirAccess.dir_exists_absolute(link_path):
+		_teardown_windows_junction(link_path)
+	var output: Array = []
+	var ps_script := (
+		"$target='%s'; $link='%s'; "
+		+ "if (Test-Path -LiteralPath $link) { Remove-Item -LiteralPath $link -Force -Recurse -ErrorAction SilentlyContinue }; "
+		+ "New-Item -ItemType Junction -Path $link -Target $target | Out-Null"
+	) % [target_path.replace("'", "''"), link_path.replace("'", "''")]
+	var exit_code := OS.execute("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", ps_script], output, true, false)
+	if exit_code != 0:
+		OS.execute("cmd.exe", ["/c", "mklink", "/J", link_path.replace("/", "\\"), target_path.replace("/", "\\")], output, true, false)
+
+func _teardown_windows_junction(link_path: String) -> void:
 	OS.execute("cmd.exe", ["/c", "rmdir", link_path.replace("/", "\\")], [], true, false)
 
 func _generated_scene_text(source_identity_value: String, source_hash: String) -> String:
@@ -293,6 +466,40 @@ func _write_replace_meta(meta_abs: String, payload: Dictionary) -> void:
 	if file != null:
 		file.store_string(JSON.stringify(payload))
 		file.close()
+
+func _replace_meta_payload(dest_abs: String, stage: String, backup_hash: String, new_hash: String, transaction_id: String = "") -> Dictionary:
+	var txn := transaction_id if not transaction_id.is_empty() else _secure_transaction_id()
+	return {
+		"transaction_id": txn,
+		"target": dest_abs,
+		"stage": stage,
+		"backup_hash": backup_hash,
+		"new_hash": new_hash,
+	}
+
+func _secure_transaction_id() -> String:
+	var crypto := Crypto.new()
+	return crypto.generate_random_bytes(16).hex_encode()
+
+func _recovery_code(result: Dictionary) -> String:
+	for item in result.get("errors", []):
+		if str(item.get("code", "")) != "":
+			return str(item.get("code", ""))
+	return ""
+
+func _parse_cli_json(output: Array) -> Variant:
+	var text := ""
+	for line in output:
+		text += str(line)
+	if text.is_empty():
+		return null
+	var start := text.find("{")
+	if start < 0:
+		return null
+	var parser := JSON.new()
+	if parser.parse(text.substr(start)) != OK:
+		return null
+	return parser.data
 
 func _text_hash(path: String) -> String:
 	var file := FileAccess.open(path, FileAccess.READ)

@@ -8,7 +8,7 @@ static func acquire(target_absolute: String) -> Dictionary:
 	var owner_nonce := _secure_nonce()
 	var process_identity := UIForgeProcess.current_process_identity()
 	for attempt in 4:
-		if DirAccess.dir_exists_absolute(_reclaim_guard_path(target_absolute)):
+		if not _ensure_reclaim_guard_clear(target_absolute):
 			OS.delay_msec(25 * (attempt + 1))
 			continue
 		var created := _try_create_lock_dir(lock_dir, owner_nonce, process_identity)
@@ -31,7 +31,7 @@ static func release(lock_path: String, owner_nonce: String) -> void:
 		return
 	if not DirAccess.dir_exists_absolute(lock_path):
 		return
-	var meta := _read_lock_meta(lock_path)
+	var meta := _read_owner_meta(lock_path)
 	if str(meta.get("owner_nonce", "")) != owner_nonce:
 		return
 	_remove_lock_dir(lock_path)
@@ -42,82 +42,80 @@ static func reclaim_guard_path(target_absolute: String) -> String:
 static func lock_is_stale(lock_dir: String) -> bool:
 	return _lock_is_stale(lock_dir)
 
+static func guard_is_stale(guard_dir: String) -> bool:
+	return _guard_is_stale(guard_dir)
+
 static func try_reclaim_stale_lock_verified(lock_dir: String, expected_nonce: String) -> bool:
 	return _reclaim_lock_verified(lock_dir, expected_nonce)
 
 static func reclaim_stale_lock(lock_dir: String, target_absolute: String) -> bool:
 	return _try_reclaim_stale_lock(lock_dir, target_absolute)
 
+static func begin_reclaim_guard(target_absolute: String) -> Dictionary:
+	return _begin_reclaim_guard(target_absolute)
+
+static func release_reclaim_guard(target_absolute: String, guard_nonce: String) -> void:
+	_release_reclaim_guard_owned(target_absolute, guard_nonce)
+
+static func reclaim_stale_guard(guard_dir: String, target_absolute: String) -> bool:
+	return _reclaim_stale_guard_verified(guard_dir, target_absolute)
+
 static func _reclaim_guard_path(target_absolute: String) -> String:
 	return "%s.uiforge_reclaim_guard" % target_absolute
 
-static func _acquire_reclaim_guard(target_absolute: String) -> bool:
+static func _ensure_reclaim_guard_clear(target_absolute: String) -> bool:
 	var guard := _reclaim_guard_path(target_absolute)
-	if DirAccess.dir_exists_absolute(guard):
-		return false
-	return DirAccess.make_dir_absolute(guard) == OK
+	if not DirAccess.dir_exists_absolute(guard):
+		return true
+	if _guard_is_stale(guard):
+		return _reclaim_stale_guard_verified(guard, target_absolute)
+	return false
 
-static func _release_reclaim_guard(target_absolute: String) -> void:
+static func _begin_reclaim_guard(target_absolute: String) -> Dictionary:
+	if not _ensure_reclaim_guard_clear(target_absolute):
+		return {"ok": false}
 	var guard := _reclaim_guard_path(target_absolute)
-	if DirAccess.dir_exists_absolute(guard):
-		DirAccess.remove_absolute(guard)
-
-static func _try_create_lock_dir(lock_dir: String, owner_nonce: String, process_identity: Dictionary) -> Dictionary:
-	var target_absolute := lock_dir.trim_suffix(".uiforge_lock")
-	if DirAccess.dir_exists_absolute(_reclaim_guard_path(target_absolute)):
+	var guard_nonce := _secure_nonce()
+	var process_identity := UIForgeProcess.current_process_identity()
+	if DirAccess.make_dir_absolute(guard) != OK:
 		return {"ok": false}
-	var err := DirAccess.make_dir_absolute(lock_dir)
-	if err == OK:
-		var meta := {
-			"owner_nonce": owner_nonce,
-			"pid": OS.get_process_id(),
-			"process_start": str(process_identity.get("start_ticks", "")),
-			"started": Time.get_unix_time_from_system(),
-			"hostname": OS.get_environment("HOSTNAME") if OS.has_environment("HOSTNAME") else "",
-		}
-		if not _write_lock_meta(lock_dir, meta):
-			_remove_lock_dir(lock_dir)
-			return {"ok": false}
-		return {"ok": true, "lock_path": lock_dir, "owner_nonce": owner_nonce}
-	if err == ERR_ALREADY_EXISTS:
+	if not _write_owner_meta(guard, guard_nonce, process_identity):
+		_remove_lock_dir(guard)
 		return {"ok": false}
-	return {"ok": false, "errors": [{"code": "LOCK_CREATE_FAILED", "message": lock_dir}]}
+	return {"ok": true, "guard_nonce": guard_nonce, "guard_path": guard}
 
-static func _try_reclaim_stale_lock(lock_dir: String, target_absolute: String) -> bool:
-	if not _acquire_reclaim_guard(target_absolute):
+static func _release_reclaim_guard_owned(target_absolute: String, guard_nonce: String) -> void:
+	var guard := _reclaim_guard_path(target_absolute)
+	if guard_nonce.is_empty() or not DirAccess.dir_exists_absolute(guard):
+		return
+	var meta := _read_owner_meta(guard)
+	if str(meta.get("owner_nonce", "")) != guard_nonce:
+		return
+	_remove_lock_dir(guard)
+
+static func _reclaim_stale_guard_verified(guard_dir: String, target_absolute: String) -> bool:
+	if not DirAccess.dir_exists_absolute(guard_dir):
+		return true
+	if not _guard_is_stale(guard_dir):
 		return false
-	if not _lock_is_stale(lock_dir):
-		_release_reclaim_guard(target_absolute)
-		return false
-	var meta := _read_lock_meta(lock_dir)
+	var meta := _read_owner_meta(guard_dir)
 	var expected_nonce := str(meta.get("owner_nonce", ""))
 	if expected_nonce.is_empty():
-		_release_reclaim_guard(target_absolute)
 		return false
-	if not _lock_is_stale(lock_dir):
-		_release_reclaim_guard(target_absolute)
+	var reclaim_path := "%s.reclaim_%s" % [guard_dir, _secure_nonce()]
+	if DirAccess.rename_absolute(guard_dir, reclaim_path) != OK:
 		return false
-	var reclaimed := _reclaim_lock_verified(lock_dir, expected_nonce)
-	_release_reclaim_guard(target_absolute)
-	return reclaimed
-
-static func _reclaim_lock_verified(lock_dir: String, expected_nonce: String) -> bool:
-	if not DirAccess.dir_exists_absolute(lock_dir):
-		return false
-	var reclaim_path := "%s.reclaim_%s" % [lock_dir, _secure_nonce()]
-	if DirAccess.rename_absolute(lock_dir, reclaim_path) != OK:
-		return false
-	var reclaimed_meta := _read_lock_meta(reclaim_path)
+	var reclaimed_meta := _read_owner_meta(reclaim_path)
 	if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
-		DirAccess.rename_absolute(reclaim_path, lock_dir)
+		DirAccess.rename_absolute(reclaim_path, guard_dir)
 		return false
 	_remove_lock_dir(reclaim_path)
 	return true
 
-static func _lock_is_stale(lock_dir: String) -> bool:
-	if not DirAccess.dir_exists_absolute(lock_dir):
+static func _guard_is_stale(guard_dir: String) -> bool:
+	if not DirAccess.dir_exists_absolute(guard_dir):
 		return false
-	var meta := _read_lock_meta(lock_dir)
+	var meta := _read_owner_meta(guard_dir)
 	var started := int(meta.get("started", 0))
 	var age := Time.get_unix_time_from_system() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
 	if age < NEW_LOCK_GRACE_SECONDS:
@@ -131,7 +129,73 @@ static func _lock_is_stale(lock_dir: String) -> bool:
 		return false
 	return true
 
-static func _write_lock_meta(lock_dir: String, meta: Dictionary) -> bool:
+static func _try_create_lock_dir(lock_dir: String, owner_nonce: String, process_identity: Dictionary) -> Dictionary:
+	var err := DirAccess.make_dir_absolute(lock_dir)
+	if err == OK:
+		if not _write_owner_meta(lock_dir, owner_nonce, process_identity):
+			_remove_lock_dir(lock_dir)
+			return {"ok": false}
+		return {"ok": true, "lock_path": lock_dir, "owner_nonce": owner_nonce}
+	if err == ERR_ALREADY_EXISTS:
+		return {"ok": false}
+	return {"ok": false, "errors": [{"code": "LOCK_CREATE_FAILED", "message": lock_dir}]}
+
+static func _try_reclaim_stale_lock(lock_dir: String, target_absolute: String) -> bool:
+	var guard := _begin_reclaim_guard(target_absolute)
+	if not guard.get("ok", false):
+		return false
+	var guard_nonce := str(guard.get("guard_nonce", ""))
+	if not _lock_is_stale(lock_dir):
+		_release_reclaim_guard_owned(target_absolute, guard_nonce)
+		return false
+	var meta := _read_owner_meta(lock_dir)
+	var expected_nonce := str(meta.get("owner_nonce", ""))
+	if expected_nonce.is_empty() or not _lock_is_stale(lock_dir):
+		_release_reclaim_guard_owned(target_absolute, guard_nonce)
+		return false
+	var reclaimed := _reclaim_lock_verified(lock_dir, expected_nonce)
+	_release_reclaim_guard_owned(target_absolute, guard_nonce)
+	return reclaimed
+
+static func _reclaim_lock_verified(lock_dir: String, expected_nonce: String) -> bool:
+	if not DirAccess.dir_exists_absolute(lock_dir):
+		return false
+	var reclaim_path := "%s.reclaim_%s" % [lock_dir, _secure_nonce()]
+	if DirAccess.rename_absolute(lock_dir, reclaim_path) != OK:
+		return false
+	var reclaimed_meta := _read_owner_meta(reclaim_path)
+	if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
+		DirAccess.rename_absolute(reclaim_path, lock_dir)
+		return false
+	_remove_lock_dir(reclaim_path)
+	return true
+
+static func _lock_is_stale(lock_dir: String) -> bool:
+	if not DirAccess.dir_exists_absolute(lock_dir):
+		return false
+	var meta := _read_owner_meta(lock_dir)
+	var started := int(meta.get("started", 0))
+	var age := Time.get_unix_time_from_system() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
+	if age < NEW_LOCK_GRACE_SECONDS:
+		return false
+	if meta.is_empty():
+		return true
+	var alive_status := UIForgeProcess.pid_alive(meta)
+	if alive_status == UIForgeProcess.AliveStatus.ALIVE:
+		return false
+	if alive_status == UIForgeProcess.AliveStatus.UNKNOWN:
+		return false
+	return true
+
+static func _write_owner_meta(lock_dir: String, owner_nonce: String, process_identity: Dictionary = {}) -> bool:
+	var identity := process_identity if not process_identity.is_empty() else UIForgeProcess.current_process_identity()
+	var meta := {
+		"owner_nonce": owner_nonce,
+		"pid": OS.get_process_id(),
+		"process_start": str(identity.get("start_ticks", "")),
+		"started": Time.get_unix_time_from_system(),
+		"hostname": OS.get_environment("HOSTNAME") if OS.has_environment("HOSTNAME") else "",
+	}
 	var file := FileAccess.open("%s/owner.json" % lock_dir, FileAccess.WRITE)
 	if file == null:
 		return false
@@ -140,7 +204,7 @@ static func _write_lock_meta(lock_dir: String, meta: Dictionary) -> bool:
 	file.close()
 	return true
 
-static func _read_lock_meta(lock_dir: String) -> Dictionary:
+static func _read_owner_meta(lock_dir: String) -> Dictionary:
 	var file := FileAccess.open("%s/owner.json" % lock_dir, FileAccess.READ)
 	if file == null:
 		return {}

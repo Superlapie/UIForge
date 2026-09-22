@@ -62,6 +62,8 @@ static func resolve_real_path(absolute: String) -> String:
 	var path := _godot_absolute(absolute)
 	if path.is_empty():
 		return path
+	if OS.get_name() == "Windows":
+		return _windows_canonical_path(path)
 	var cursor := path
 	var suffix := ""
 	while not cursor.is_empty() and not DirAccess.dir_exists_absolute(cursor) and not FileAccess.file_exists(cursor):
@@ -77,33 +79,69 @@ static func resolve_real_path(absolute: String) -> String:
 		return resolved_base
 	return ("%s%s" % [resolved_base, suffix]).replace("\\", "/").simplify_path()
 
+static func _windows_canonical_path(path: String) -> String:
+	var cursor := path
+	var suffix := ""
+	while not cursor.is_empty() and not DirAccess.dir_exists_absolute(cursor) and not FileAccess.file_exists(cursor):
+		var base := cursor.get_file()
+		if base.is_empty():
+			break
+		suffix = "/%s%s" % [base, suffix]
+		cursor = cursor.get_base_dir()
+	if cursor.is_empty():
+		cursor = path
+	var resolved_base := _windows_resolve_existing_prefix(cursor)
+	if suffix.is_empty():
+		return resolved_base
+	return ("%s%s" % [resolved_base, suffix]).replace("\\", "/").simplify_path()
+
+static func _windows_resolve_existing_prefix(existing_path: String) -> String:
+	var output: Array = []
+	var escaped := existing_path.replace("'", "''")
+	var script := (
+		"function Resolve-UIForgeExistingPath([string]$InputPath) { "
+		+ "$InputPath = $InputPath -replace '/','\\'; "
+		+ "if (-not [System.IO.Path]::IsPathRooted($InputPath)) { Write-Output ($InputPath -replace '\\\\','/'); exit 0 }; "
+		+ "$parts = New-Object System.Collections.Generic.List[string]; "
+		+ "$current = $InputPath; "
+		+ "while ($true) { "
+		+ "$parent = [System.IO.Path]::GetDirectoryName($current); "
+		+ "$leaf = [System.IO.Path]::GetFileName($current); "
+		+ "if ($leaf) { $parts.Insert(0, $leaf) }; "
+		+ "if ([string]::IsNullOrEmpty($parent) -or $parent -eq $current) { "
+		+ "if (-not $leaf -and $current) { $parts.Insert(0, $current.TrimEnd('\\')) }; break }; "
+		+ "$current = $parent }; "
+		+ "if ($parts.Count -eq 0) { Write-Output ($InputPath -replace '\\\\','/'); exit 0 }; "
+		+ "$resolved = $parts[0]; "
+		+ "if ($resolved -match '^[A-Za-z]:$') { $resolved = $resolved + '\\' }; "
+		+ "for ($i = 1; $i -lt $parts.Count; $i++) { "
+		+ "$candidate = Join-Path $resolved $parts[$i]; "
+		+ "if (-not (Test-Path -LiteralPath $candidate)) { $resolved = $candidate; continue }; "
+		+ "$item = Get-Item -LiteralPath $candidate -Force; "
+		+ "if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { "
+		+ "$target = $item.Target; "
+		+ "if ($target -is [System.Array]) { $target = $target[0] }; "
+		+ "if ($target -and -not [System.IO.Path]::IsPathRooted($target)) { "
+		+ "$target = Join-Path ([System.IO.Path]::GetDirectoryName($candidate)) $target }; "
+		+ "$resolved = [System.IO.Path]::GetFullPath($target) "
+		+ "} else { $resolved = $item.FullName } }; "
+		+ "Write-Output ($resolved -replace '\\\\','/') }; "
+		+ "Resolve-UIForgeExistingPath '%s'"
+	) % escaped
+	var exit_code := OS.execute("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], output, true, false)
+	if exit_code == 0 and not output.is_empty():
+		return str(output[0]).strip_edges().replace("\\", "/")
+	return normalized_fallback(existing_path)
+
 static func _realpath_directory(dir_path: String) -> String:
 	var normalized := _godot_absolute(dir_path)
 	if OS.get_name() == "Windows":
-		return _windows_resolved_path(normalized)
+		return _windows_resolve_existing_prefix(normalized)
 	var output: Array = []
 	var exit_code := OS.execute("realpath", ["-m", normalized], output, true, false)
 	if exit_code == 0 and not output.is_empty():
 		return str(output[0]).strip_edges().replace("\\", "/")
 	return normalized.simplify_path()
-
-static func _windows_resolved_path(path: String) -> String:
-	var output: Array = []
-	var escaped := path.replace("'", "''")
-	var script := (
-		"$item = Get-Item -LiteralPath '%s' -Force -ErrorAction SilentlyContinue; "
-		+ "if ($null -eq $item) { exit 2 }; "
-		+ "$resolved = $item.FullName; "
-		+ "if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { "
-		+ "$target = $item.Target; "
-		+ "if ($target -is [System.Array]) { $resolved = $target[0] } elseif ($target) { $resolved = $target } "
-		+ "}; "
-		+ "Write-Output $resolved"
-	) % escaped
-	var exit_code := OS.execute("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], output, true, false)
-	if exit_code == 0 and not output.is_empty():
-		return str(output[0]).strip_edges().replace("\\", "/")
-	return normalized_fallback(path)
 
 static func normalized_fallback(path: String) -> String:
 	return _godot_absolute(path).simplify_path()
