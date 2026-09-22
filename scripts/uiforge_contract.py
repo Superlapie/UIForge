@@ -85,7 +85,12 @@ def _windows_resolved_path(absolute: Path) -> Path:
     script = (
         "$item = Get-Item -LiteralPath '{path}' -Force -ErrorAction SilentlyContinue; "
         "if ($null -eq $item) {{ exit 2 }}; "
-        "Write-Output $item.FullName"
+        "$resolved = $item.FullName; "
+        "if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {{ "
+        "$target = $item.Target; "
+        "if ($target -is [System.Array]) {{ $resolved = $target[0] }} elseif ($target) {{ $resolved = $target }} "
+        "}}; "
+        "Write-Output $resolved"
     ).format(path=str(absolute).replace("'", "''"))
     try:
         completed = subprocess.run(

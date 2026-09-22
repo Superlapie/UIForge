@@ -93,7 +93,12 @@ static func _windows_resolved_path(path: String) -> String:
 	var script := (
 		"$item = Get-Item -LiteralPath '%s' -Force -ErrorAction SilentlyContinue; "
 		+ "if ($null -eq $item) { exit 2 }; "
-		+ "Write-Output $item.FullName"
+		+ "$resolved = $item.FullName; "
+		+ "if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { "
+		+ "$target = $item.Target; "
+		+ "if ($target -is [System.Array]) { $resolved = $target[0] } elseif ($target) { $resolved = $target } "
+		+ "}; "
+		+ "Write-Output $resolved"
 	) % escaped
 	var exit_code := OS.execute("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], output, true, false)
 	if exit_code == 0 and not output.is_empty():
