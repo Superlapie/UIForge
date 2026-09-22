@@ -4,6 +4,7 @@ extends RefCounted
 const NEW_LOCK_GRACE_SECONDS: int = 5
 
 static var publication_recovery_interleave_hook: Callable = Callable()
+static var force_directory_mtime_fallback: bool = false
 
 static func acquire(target_absolute: String) -> Dictionary:
 	var lock_dir := "%s.uiforge_lock" % target_absolute
@@ -70,6 +71,9 @@ static func reclaim_stale_guard(guard_dir: String, target_absolute: String) -> b
 
 static func reclaim_abandoned_publication(lock_dir: String) -> bool:
 	return _reclaim_abandoned_publication(lock_dir)
+
+static func owner_meta_valid(meta: Dictionary) -> bool:
+	return _owner_meta_valid(meta)
 
 static func _reclaim_guard_path(target_absolute: String) -> String:
 	return "%s.uiforge_reclaim_guard" % target_absolute
@@ -185,8 +189,8 @@ static func _lock_is_stale(lock_dir: String) -> bool:
 		if dir_age < float(NEW_LOCK_GRACE_SECONDS):
 			return false
 		return true
-	var started := int(meta.get("started", 0))
-	var age := Time.get_unix_time_from_system() - started if started > 0 else dir_age
+	var started := _positive_meta_timestamp(meta.get("started"))
+	var age := Time.get_unix_time_from_system() - started
 	if age < NEW_LOCK_GRACE_SECONDS:
 		return false
 	var alive_status := UIForgeProcess.pid_alive(meta)
@@ -196,25 +200,65 @@ static func _lock_is_stale(lock_dir: String) -> bool:
 		return false
 	return true
 
+static func _positive_meta_int(value: Variant) -> int:
+	if typeof(value) == TYPE_INT:
+		return int(value) if int(value) > 0 else 0
+	if typeof(value) == TYPE_FLOAT:
+		var as_float := float(value)
+		if not is_finite(as_float) or as_float != floor(as_float):
+			return 0
+		var as_int := int(as_float)
+		return as_int if as_int > 0 else 0
+	return 0
+
+static func _positive_meta_timestamp(value: Variant) -> float:
+	var value_type := typeof(value)
+	if value_type == TYPE_INT:
+		var as_int := float(value)
+		return as_int if as_int > 0.0 else 0.0
+	if value_type == TYPE_FLOAT:
+		var as_float := float(value)
+		return as_float if is_finite(as_float) and as_float > 0.0 else 0.0
+	return 0.0
+
 static func _owner_meta_valid(meta: Dictionary) -> bool:
 	if meta.is_empty():
 		return false
-	if str(meta.get("owner_nonce", "")).is_empty():
+	var nonce: Variant = meta.get("owner_nonce")
+	if typeof(nonce) != TYPE_STRING or str(nonce).is_empty():
 		return false
-	return meta.has("pid")
+	if _positive_meta_int(meta.get("pid")) <= 0:
+		return false
+	if _positive_meta_timestamp(meta.get("started")) <= 0.0:
+		return false
+	if meta.has("process_start") and not _process_start_compatible(meta.get("process_start")):
+		return false
+	return true
+
+static func _process_start_compatible(value: Variant) -> bool:
+	if value == null:
+		return true
+	var value_type := typeof(value)
+	return value_type == TYPE_STRING or value_type == TYPE_INT or value_type == TYPE_FLOAT
+
+static func _platform_directory_mtime(lock_dir: String) -> int:
+	var output: Array = []
+	if OS.get_name() == "Windows":
+		var ps := "([DateTimeOffset](Get-Item -LiteralPath '%s').LastWriteTimeUtc).ToUnixTimeSeconds()" % lock_dir.replace("'", "''")
+		if OS.execute("powershell.exe", ["-NoProfile", "-Command", ps], output, true, false) == 0 and not output.is_empty():
+			return int(str(output[0]).strip_edges())
+	elif OS.execute("stat", ["-c", "%Y", lock_dir], output, true, false) == 0 and not output.is_empty():
+		return int(str(output[0]).strip_edges())
+	return 0
 
 static func _directory_age_seconds(lock_dir: String) -> float:
 	if not DirAccess.dir_exists_absolute(lock_dir):
 		return 0.0
-	var modified := FileAccess.get_modified_time(lock_dir)
+	var modified := 0
+	if not force_directory_mtime_fallback:
+		modified = FileAccess.get_modified_time(lock_dir)
 	if modified <= 0:
-		var output: Array = []
-		if OS.get_name() == "Windows":
-			var ps := "(Get-Item -LiteralPath '%s').LastWriteTimeUtc.ToUnixTimeSeconds()" % lock_dir.replace("'", "''")
-			if OS.execute("powershell.exe", ["-NoProfile", "-Command", ps], output, true, false) == 0 and not output.is_empty():
-				modified = int(str(output[0]).strip_edges())
-		elif OS.execute("stat", ["-c", "%Y", lock_dir], output, true, false) == 0 and not output.is_empty():
-			modified = int(str(output[0]).strip_edges())
+		modified = _platform_directory_mtime(lock_dir)
 	if modified <= 0:
 		return 0.0
 	var age := float(Time.get_unix_time_from_system()) - float(modified)

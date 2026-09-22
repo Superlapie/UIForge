@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import re
 import secrets
@@ -47,6 +48,7 @@ FALLBACK_COMPATIBILITY: dict[str, set[str]] = {
 }
 LOCK_STALE_SECONDS = 300
 NEW_LOCK_GRACE_SECONDS = 5
+OWNER_NONCE_PATTERN = re.compile(r"^[0-9a-f]{32}$")
 PUBLICATION_RECOVERY_INTERLEAVE_HOOK: Callable[[Path, Path], None] | None = None
 GODOT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_]+$")
 SCENE_ID_PATTERN = re.compile(r'id="([^"]+)"')
@@ -566,29 +568,98 @@ def _query_process_identity(pid: int) -> dict[str, Any]:
     return {"ok": True, "pid": pid, "start_ticks": tail[19]}
 
 
+def _coerce_process_start(value: Any) -> str | None:
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, str):
+        return value
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return None
+        return str(value)
+    return None
+
+
+def _parse_positive_int(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value if value > 0 else None
+    if isinstance(value, float):
+        if not math.isfinite(value) or value != int(value):
+            return None
+        parsed = int(value)
+        return parsed if parsed > 0 else None
+    if isinstance(value, str):
+        try:
+            parsed = int(value, 10)
+        except ValueError:
+            return None
+        return parsed if parsed > 0 else None
+    return None
+
+
+def _parse_timestamp(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return float(value) if value > 0 else None
+    if isinstance(value, float):
+        return value if math.isfinite(value) and value > 0 else None
+    if isinstance(value, str):
+        try:
+            parsed = float(value)
+        except ValueError:
+            return None
+        return parsed if math.isfinite(parsed) and parsed > 0 else None
+    return None
+
+
+def _owner_meta_valid(meta: dict[str, Any]) -> bool:
+    if not isinstance(meta, dict) or not meta:
+        return False
+    nonce = meta.get("owner_nonce")
+    if not isinstance(nonce, str) or not nonce:
+        return False
+    if _parse_positive_int(meta.get("pid")) is None:
+        return False
+    if _parse_timestamp(meta.get("started")) is None:
+        return False
+    if "process_start" in meta and _coerce_process_start(meta.get("process_start")) is None:
+        return False
+    return True
+
+
 def _pid_alive_status(meta: dict[str, Any]) -> str:
-    pid = int(meta.get("pid", 0))
-    if pid <= 0:
+    if not isinstance(meta, dict):
         return "dead"
-    stored_start = str(meta.get("process_start", ""))
-    identity = _query_process_identity(pid)
+    pid = _parse_positive_int(meta.get("pid"))
+    if pid is None:
+        return "dead"
+    stored_start = ""
+    if "process_start" in meta:
+        coerced = _coerce_process_start(meta.get("process_start"))
+        if coerced is None:
+            return "dead"
+        stored_start = coerced
+    try:
+        identity = _query_process_identity(pid)
+    except (TypeError, ValueError, OSError):
+        return "unknown"
     if not identity.get("ok"):
         return "dead" if identity.get("dead") else "unknown"
     if not stored_start:
         return "alive"
-    if not str(identity.get("start_ticks", "")):
+    live_start = str(identity.get("start_ticks", ""))
+    if not live_start:
         return "unknown"
-    if str(identity.get("start_ticks", "")) != stored_start:
+    if live_start != stored_start:
         return "dead"
     return "alive"
-
-
-def _owner_meta_valid(meta: dict[str, Any]) -> bool:
-    if not meta:
-        return False
-    if not str(meta.get("owner_nonce", "")):
-        return False
-    return meta.get("pid") is not None
 
 
 def _directory_age_seconds(lock_dir: Path) -> float:
@@ -641,8 +712,12 @@ def _lock_is_stale(lock_dir: Path) -> bool:
         if dir_age < NEW_LOCK_GRACE_SECONDS:
             return False
         return True
-    started = float(meta.get("started", 0))
-    age = time.time() - started if started > 0 else dir_age
+    started = _parse_timestamp(meta.get("started"))
+    if started is None:
+        if dir_age < NEW_LOCK_GRACE_SECONDS:
+            return False
+        return True
+    age = time.time() - started
     if age < NEW_LOCK_GRACE_SECONDS:
         return False
     status = _pid_alive_status(meta)

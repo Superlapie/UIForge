@@ -14,6 +14,9 @@ func _run() -> void:
 	_test_locking()
 	_test_reclaim_guard_ownership()
 	_test_publication_crash_recovery()
+	_test_owner_metadata_contract()
+	_test_structurally_invalid_metadata_recovery()
+	_test_directory_age_fallback()
 	_test_process_liveness()
 	_test_transactions()
 	_test_output_replacement()
@@ -186,6 +189,88 @@ func _test_publication_crash_recovery() -> void:
 	_assert(str(live_meta.get("owner_nonce", "")) == "live-race-owner", "publication_live_owner_nonce")
 	_remove_directory_recursive(canonical)
 	_assert(not _has_reclaim_sidecars(target), "publication_no_sidecars")
+
+func _test_owner_metadata_contract() -> void:
+	var invalid_cases: Array[Dictionary] = [
+		{"owner_nonce": "abc", "pid": "not-a-number", "started": 1},
+		{"owner_nonce": "abc", "pid": 123, "started": "not-a-number"},
+		{"owner_nonce": [], "pid": 123, "started": 123},
+		{"owner_nonce": "abc", "pid": {}, "started": 123},
+		{"owner_nonce": "abc", "pid": true, "started": 123},
+	]
+	for index in invalid_cases.size():
+		var payload: Dictionary = invalid_cases[index]
+		_assert(not UIForgeLock.owner_meta_valid(payload), "owner_meta_invalid_%d" % index)
+		var status := UIForgeProcess.pid_alive(payload)
+		_assert(
+			status == UIForgeProcess.AliveStatus.DEAD or status == UIForgeProcess.AliveStatus.UNKNOWN,
+			"owner_meta_pid_alive_nothrow_%d" % index
+		)
+	var malformed_liveness: Array[Dictionary] = [
+		{"pid": "banana"},
+		{"pid": null},
+		{"owner_nonce": []},
+		{"process_start": {}},
+	]
+	for index in malformed_liveness.size():
+		var payload: Dictionary = malformed_liveness[index]
+		var liveness := UIForgeProcess.pid_alive(payload)
+		_assert(
+			liveness == UIForgeProcess.AliveStatus.DEAD or liveness == UIForgeProcess.AliveStatus.UNKNOWN,
+			"owner_meta_liveness_nothrow_%d" % index
+		)
+
+func _test_structurally_invalid_metadata_recovery() -> void:
+	_prepare_trust_dir("publication/invalid_meta.ui.json")
+	var target := _trust_abs("publication/invalid_meta.ui.json")
+	if not FileAccess.file_exists(target):
+		FileAccess.open(target, FileAccess.WRITE).close()
+	var invalid_cases: Array[Dictionary] = [
+		{"owner_nonce": "abc", "pid": "not-a-number", "started": 1},
+		{"owner_nonce": "abc", "pid": 123, "started": "not-a-number"},
+		{"owner_nonce": [], "pid": 123, "started": 123},
+		{"owner_nonce": "abc", "pid": {}, "started": 123},
+		{"owner_nonce": "abc", "pid": true, "started": 123},
+	]
+	for index in invalid_cases.size():
+		var payload: Dictionary = invalid_cases[index]
+		_cleanup_publication_sidecars(target)
+		var lock_dir := "%s.uiforge_lock" % target
+		DirAccess.make_dir_absolute(lock_dir)
+		_write_owner_json(lock_dir, payload)
+		_assert(not UIForgeLock.lock_is_stale(lock_dir), "invalid_meta_fresh_protected_%d" % index)
+		_assert(not UIForgeLock.acquire(target).get("ok", false), "invalid_meta_fresh_blocks_%d" % index)
+		_age_directory_for_test(lock_dir, float(UIForgeLock.NEW_LOCK_GRACE_SECONDS) + 2.0)
+		_assert(UIForgeLock.lock_is_stale(lock_dir), "invalid_meta_stale_%d" % index)
+		_assert(UIForgeLock.reclaim_abandoned_publication(lock_dir), "invalid_meta_recovered_%d" % index)
+		var acquired := UIForgeLock.acquire(target)
+		_assert(acquired.get("ok", false), "invalid_meta_write_%d" % index)
+		UIForgeLock.release(str(acquired.get("lock_path", "")), str(acquired.get("owner_nonce", "")))
+		_assert(not _has_reclaim_sidecars(target), "invalid_meta_no_sidecars_%d" % index)
+
+func _test_directory_age_fallback() -> void:
+	_prepare_trust_dir("publication/fallback_target.ui.json")
+	var target := _trust_abs("publication/fallback_target.ui.json")
+	if not FileAccess.file_exists(target):
+		FileAccess.open(target, FileAccess.WRITE).close()
+	_cleanup_publication_sidecars(target)
+	var lock_dir := "%s.uiforge_lock" % target
+	UIForgeLock.force_directory_mtime_fallback = true
+	DirAccess.make_dir_absolute(lock_dir)
+	var fresh_age := UIForgeLock.directory_age_seconds(lock_dir)
+	_assert(fresh_age >= 0.0, "directory_age_fallback_obtained_mtime")
+	_assert(fresh_age < float(UIForgeLock.NEW_LOCK_GRACE_SECONDS), "directory_age_fallback_fresh")
+	_assert(UIForgeLock.publication_is_initializing(lock_dir), "directory_age_fallback_initializing")
+	_age_directory_for_test(lock_dir, float(UIForgeLock.NEW_LOCK_GRACE_SECONDS) + 2.0)
+	var stale_age := UIForgeLock.directory_age_seconds(lock_dir)
+	_assert(stale_age >= float(UIForgeLock.NEW_LOCK_GRACE_SECONDS), "directory_age_fallback_stale_age")
+	_assert(UIForgeLock.lock_is_stale(lock_dir), "directory_age_fallback_stale_ownerless")
+	_assert(UIForgeLock.reclaim_abandoned_publication(lock_dir), "directory_age_fallback_recovered")
+	var acquired := UIForgeLock.acquire(target)
+	_assert(acquired.get("ok", false), "directory_age_fallback_write")
+	UIForgeLock.release(str(acquired.get("lock_path", "")), str(acquired.get("owner_nonce", "")))
+	UIForgeLock.force_directory_mtime_fallback = false
+	_assert(not _has_reclaim_sidecars(target), "directory_age_fallback_no_sidecars")
 
 func _inject_live_owner_during_recovery(reclaim_path: String, _canonical_path: String) -> void:
 	var identity := UIForgeProcess.current_process_identity()

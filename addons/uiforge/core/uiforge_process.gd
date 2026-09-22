@@ -14,10 +14,22 @@ static func current_process_identity() -> Dictionary:
 	return query_process_identity(OS.get_process_id())
 
 static func pid_alive(meta: Dictionary) -> AliveStatus:
-	var pid := int(meta.get("pid", 0))
+	if typeof(meta) != TYPE_DICTIONARY:
+		return AliveStatus.DEAD
+	var pid := _positive_meta_int(meta.get("pid"))
 	if pid <= 0:
 		return AliveStatus.DEAD
-	var stored_start := str(meta.get("process_start", ""))
+	var stored_start := ""
+	if meta.has("process_start"):
+		var process_start: Variant = meta.get("process_start")
+		if process_start == null:
+			stored_start = ""
+		elif typeof(process_start) == TYPE_STRING:
+			stored_start = str(process_start)
+		elif typeof(process_start) == TYPE_INT or typeof(process_start) == TYPE_FLOAT:
+			stored_start = str(process_start)
+		else:
+			return AliveStatus.DEAD
 	var identity := query_process_identity(pid)
 	if not identity.get("ok", false):
 		if identity.get("dead", false):
@@ -79,3 +91,14 @@ static func _query_unix(pid: int) -> Dictionary:
 	if tail.size() < 20:
 		return {"ok": true, "pid": pid, "start_ticks": ""}
 	return {"ok": true, "pid": pid, "start_ticks": tail[19]}
+
+static func _positive_meta_int(value: Variant) -> int:
+	if typeof(value) == TYPE_INT:
+		return int(value) if int(value) > 0 else 0
+	if typeof(value) == TYPE_FLOAT:
+		var as_float := float(value)
+		if not is_finite(as_float) or as_float != floor(as_float):
+			return 0
+		var as_int := int(as_float)
+		return as_int if as_int > 0 else 0
+	return 0
