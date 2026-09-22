@@ -55,11 +55,17 @@ func _run_validation_vector(vector: Dictionary) -> void:
 
 func _run_cli_validate(document_path: String) -> Dictionary:
 	var project_dir := ProjectSettings.globalize_path("res://")
-	var ui_script := "%s/scripts/ui" % project_dir
 	var output: Array = []
-	var exit_code := OS.execute("bash", [ui_script, "validate", document_path], output, true, false)
-	if exit_code != 0:
-		exit_code = OS.execute(ui_script, ["validate", document_path], output, true, false)
+	var exit_code := -1
+	if OS.get_name() == "Windows":
+		var godot_bin := "./godot.exe"
+		if OS.has_environment("GODOT_BIN"):
+			godot_bin = OS.get_environment("GODOT_BIN")
+		var launcher := "%s/scripts/ui_godot.py" % project_dir
+		exit_code = OS.execute("python3", PackedStringArray([launcher, godot_bin, "validate", document_path]), output, true, false)
+	else:
+		var ui_script := "%s/scripts/ui" % project_dir
+		exit_code = OS.execute("bash", PackedStringArray([ui_script, "validate", document_path]), output, true, false)
 	var stdout := "\n".join(output)
 	var parser := JSON.new()
 	for index in stdout.length():

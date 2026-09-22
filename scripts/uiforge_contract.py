@@ -82,13 +82,17 @@ def resolve_real_path(absolute: Path) -> Path:
 
 
 def _canonical_absolute_str(path: str | Path) -> str:
-    text = str(path).replace("\\", "/")
+    text = str(_normalize_compare_path(path)).replace("\\", "/")
     if os.name == "nt":
         return text.lower()
-    try:
-        return str(Path(text).resolve())
-    except OSError:
-        return text
+    return text
+
+
+def _normalize_compare_path(path: str | Path) -> Path:
+    raw = Path(str(path))
+    if os.name == "nt" and raw.is_absolute():
+        return resolve_real_path(raw)
+    return raw
 
 
 def _same_absolute_path(left: str | Path, right: str | Path) -> bool:

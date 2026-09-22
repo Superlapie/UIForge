@@ -421,19 +421,31 @@ func _test_windows_path_forms() -> void:
 
 func _test_native_cli_backend() -> void:
 	var project := ProjectSettings.globalize_path("res://")
-	var ui_script := "%s/scripts/ui" % project
 	var output: Array = []
-	var exit_code := OS.execute("bash", [ui_script, "capabilities"], output, true, false)
-	if exit_code != 0:
-		exit_code = OS.execute(ui_script, ["capabilities"], output, true, false)
+	var exit_code := -1
+	if OS.get_name() == "Windows":
+		var godot_bin := "./godot.exe"
+		if OS.has_environment("GODOT_BIN"):
+			godot_bin = OS.get_environment("GODOT_BIN")
+		var launcher := "%s/scripts/ui_godot.py" % project
+		exit_code = OS.execute("python3", PackedStringArray([launcher, godot_bin, "capabilities"]), output, true, false)
+	else:
+		var ui_script := "%s/scripts/ui" % project
+		exit_code = OS.execute("bash", PackedStringArray([ui_script, "capabilities"]), output, true, false)
 	_assert(exit_code == 0, "native_cli_capabilities_exit")
 	var payload: Variant = _parse_cli_json(output)
 	_assert(payload is Dictionary and payload.get("success", false), "native_cli_capabilities_success")
 	_assert(str(payload.get("backend", "")) == "godot-native", "native_cli_backend_godot_native")
-	var validate_exit := OS.execute("bash", [ui_script, "validate", "examples/specs/inventory.ui.json"], output, true, false)
-	if validate_exit != 0:
-		validate_exit = OS.execute(ui_script, ["validate", "examples/specs/inventory.ui.json"], output, true, false)
-	_assert(validate_exit == 0, "native_cli_validate_exit")
+	if OS.get_name() == "Windows":
+		var godot_bin := "./godot.exe"
+		if OS.has_environment("GODOT_BIN"):
+			godot_bin = OS.get_environment("GODOT_BIN")
+		var launcher := "%s/scripts/ui_godot.py" % project
+		exit_code = OS.execute("python3", PackedStringArray([launcher, godot_bin, "validate", "examples/specs/inventory.ui.json"]), output, true, false)
+	else:
+		var ui_script := "%s/scripts/ui" % project
+		exit_code = OS.execute("bash", PackedStringArray([ui_script, "validate", "examples/specs/inventory.ui.json"]), output, true, false)
+	_assert(exit_code == 0, "native_cli_validate_exit")
 
 func _setup_windows_junction(link_path: String, target_path: String) -> void:
 	if DirAccess.dir_exists_absolute(link_path):
