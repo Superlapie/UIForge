@@ -3,6 +3,8 @@ extends RefCounted
 
 const NEW_LOCK_GRACE_SECONDS: int = 5
 
+static var publication_recovery_interleave_hook: Callable = Callable()
+
 static func acquire(target_absolute: String) -> Dictionary:
 	var lock_dir := "%s.uiforge_lock" % target_absolute
 	var owner_nonce := _secure_nonce()
@@ -45,6 +47,12 @@ static func lock_is_stale(lock_dir: String) -> bool:
 static func guard_is_stale(guard_dir: String) -> bool:
 	return _guard_is_stale(guard_dir)
 
+static func directory_age_seconds(lock_dir: String) -> float:
+	return _directory_age_seconds(lock_dir)
+
+static func publication_is_initializing(lock_dir: String) -> bool:
+	return DirAccess.dir_exists_absolute(lock_dir) and _directory_age_seconds(lock_dir) < float(NEW_LOCK_GRACE_SECONDS)
+
 static func try_reclaim_stale_lock_verified(lock_dir: String, expected_nonce: String) -> bool:
 	return _reclaim_lock_verified(lock_dir, expected_nonce)
 
@@ -59,6 +67,9 @@ static func release_reclaim_guard(target_absolute: String, guard_nonce: String) 
 
 static func reclaim_stale_guard(guard_dir: String, target_absolute: String) -> bool:
 	return _reclaim_stale_guard_verified(guard_dir, target_absolute)
+
+static func reclaim_abandoned_publication(lock_dir: String) -> bool:
+	return _reclaim_abandoned_publication(lock_dir)
 
 static func _reclaim_guard_path(target_absolute: String) -> String:
 	return "%s.uiforge_reclaim_guard" % target_absolute
@@ -98,36 +109,10 @@ static func _reclaim_stale_guard_verified(guard_dir: String, target_absolute: St
 		return true
 	if not _guard_is_stale(guard_dir):
 		return false
-	var meta := _read_owner_meta(guard_dir)
-	var expected_nonce := str(meta.get("owner_nonce", ""))
-	if expected_nonce.is_empty():
-		return false
-	var reclaim_path := "%s.reclaim_%s" % [guard_dir, _secure_nonce()]
-	if DirAccess.rename_absolute(guard_dir, reclaim_path) != OK:
-		return false
-	var reclaimed_meta := _read_owner_meta(reclaim_path)
-	if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
-		DirAccess.rename_absolute(reclaim_path, guard_dir)
-		return false
-	_remove_lock_dir(reclaim_path)
-	return true
+	return _reclaim_stale_directory(guard_dir)
 
 static func _guard_is_stale(guard_dir: String) -> bool:
-	if not DirAccess.dir_exists_absolute(guard_dir):
-		return false
-	var meta := _read_owner_meta(guard_dir)
-	var started := int(meta.get("started", 0))
-	var age := Time.get_unix_time_from_system() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
-	if age < NEW_LOCK_GRACE_SECONDS:
-		return false
-	if meta.is_empty():
-		return true
-	var alive_status := UIForgeProcess.pid_alive(meta)
-	if alive_status == UIForgeProcess.AliveStatus.ALIVE:
-		return false
-	if alive_status == UIForgeProcess.AliveStatus.UNKNOWN:
-		return false
-	return true
+	return _lock_is_stale(guard_dir)
 
 static func _try_create_lock_dir(lock_dir: String, owner_nonce: String, process_identity: Dictionary) -> Dictionary:
 	var err := DirAccess.make_dir_absolute(lock_dir)
@@ -145,20 +130,22 @@ static func _try_reclaim_stale_lock(lock_dir: String, target_absolute: String) -
 	if not guard.get("ok", false):
 		return false
 	var guard_nonce := str(guard.get("guard_nonce", ""))
-	if not _lock_is_stale(lock_dir):
-		_release_reclaim_guard_owned(target_absolute, guard_nonce)
-		return false
-	var meta := _read_owner_meta(lock_dir)
-	var expected_nonce := str(meta.get("owner_nonce", ""))
-	if expected_nonce.is_empty() or not _lock_is_stale(lock_dir):
-		_release_reclaim_guard_owned(target_absolute, guard_nonce)
-		return false
-	var reclaimed := _reclaim_lock_verified(lock_dir, expected_nonce)
+	var reclaimed := false
+	if _lock_is_stale(lock_dir):
+		reclaimed = _reclaim_stale_directory(lock_dir)
 	_release_reclaim_guard_owned(target_absolute, guard_nonce)
 	return reclaimed
 
+static func _reclaim_stale_directory(lock_dir: String) -> bool:
+	if not _lock_is_stale(lock_dir):
+		return false
+	var meta := _read_owner_meta(lock_dir)
+	if _owner_meta_valid(meta):
+		return _reclaim_lock_verified(lock_dir, str(meta.get("owner_nonce", "")))
+	return _reclaim_abandoned_publication(lock_dir)
+
 static func _reclaim_lock_verified(lock_dir: String, expected_nonce: String) -> bool:
-	if not DirAccess.dir_exists_absolute(lock_dir):
+	if expected_nonce.is_empty() or not DirAccess.dir_exists_absolute(lock_dir):
 		return false
 	var reclaim_path := "%s.reclaim_%s" % [lock_dir, _secure_nonce()]
 	if DirAccess.rename_absolute(lock_dir, reclaim_path) != OK:
@@ -170,22 +157,68 @@ static func _reclaim_lock_verified(lock_dir: String, expected_nonce: String) -> 
 	_remove_lock_dir(reclaim_path)
 	return true
 
+static func _reclaim_abandoned_publication(lock_dir: String) -> bool:
+	if not DirAccess.dir_exists_absolute(lock_dir):
+		return true
+	var reclaim_path := "%s.reclaim_%s" % [lock_dir, _secure_nonce()]
+	if DirAccess.rename_absolute(lock_dir, reclaim_path) != OK:
+		return false
+	if publication_recovery_interleave_hook.is_valid():
+		publication_recovery_interleave_hook.call(reclaim_path, lock_dir)
+	var reclaimed_meta := _read_owner_meta(reclaim_path)
+	if _owner_meta_valid(reclaimed_meta):
+		var alive_status := UIForgeProcess.pid_alive(reclaimed_meta)
+		if alive_status == UIForgeProcess.AliveStatus.ALIVE or alive_status == UIForgeProcess.AliveStatus.UNKNOWN:
+			if not DirAccess.dir_exists_absolute(lock_dir):
+				DirAccess.rename_absolute(reclaim_path, lock_dir)
+			return false
+		return _reclaim_lock_verified(reclaim_path, str(reclaimed_meta.get("owner_nonce", "")))
+	_remove_lock_dir(reclaim_path)
+	return true
+
 static func _lock_is_stale(lock_dir: String) -> bool:
 	if not DirAccess.dir_exists_absolute(lock_dir):
 		return false
+	var dir_age := _directory_age_seconds(lock_dir)
 	var meta := _read_owner_meta(lock_dir)
+	if not _owner_meta_valid(meta):
+		if dir_age < float(NEW_LOCK_GRACE_SECONDS):
+			return false
+		return true
 	var started := int(meta.get("started", 0))
-	var age := Time.get_unix_time_from_system() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
+	var age := Time.get_unix_time_from_system() - started if started > 0 else dir_age
 	if age < NEW_LOCK_GRACE_SECONDS:
 		return false
-	if meta.is_empty():
-		return true
 	var alive_status := UIForgeProcess.pid_alive(meta)
 	if alive_status == UIForgeProcess.AliveStatus.ALIVE:
 		return false
 	if alive_status == UIForgeProcess.AliveStatus.UNKNOWN:
 		return false
 	return true
+
+static func _owner_meta_valid(meta: Dictionary) -> bool:
+	if meta.is_empty():
+		return false
+	if str(meta.get("owner_nonce", "")).is_empty():
+		return false
+	return meta.has("pid")
+
+static func _directory_age_seconds(lock_dir: String) -> float:
+	if not DirAccess.dir_exists_absolute(lock_dir):
+		return 0.0
+	var modified := FileAccess.get_modified_time(lock_dir)
+	if modified <= 0:
+		var output: Array = []
+		if OS.get_name() == "Windows":
+			var ps := "(Get-Item -LiteralPath '%s').LastWriteTimeUtc.ToUnixTimeSeconds()" % lock_dir.replace("'", "''")
+			if OS.execute("powershell.exe", ["-NoProfile", "-Command", ps], output, true, false) == 0 and not output.is_empty():
+				modified = int(str(output[0]).strip_edges())
+		elif OS.execute("stat", ["-c", "%Y", lock_dir], output, true, false) == 0 and not output.is_empty():
+			modified = int(str(output[0]).strip_edges())
+	if modified <= 0:
+		return 0.0
+	var age := float(Time.get_unix_time_from_system()) - float(modified)
+	return max(0.0, age)
 
 static func _write_owner_meta(lock_dir: String, owner_nonce: String, process_identity: Dictionary = {}) -> bool:
 	var identity := process_identity if not process_identity.is_empty() else UIForgeProcess.current_process_identity()

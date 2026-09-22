@@ -47,6 +47,7 @@ FALLBACK_COMPATIBILITY: dict[str, set[str]] = {
 }
 LOCK_STALE_SECONDS = 300
 NEW_LOCK_GRACE_SECONDS = 5
+PUBLICATION_RECOVERY_INTERLEAVE_HOOK: Callable[[Path, Path], None] | None = None
 GODOT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_]+$")
 SCENE_ID_PATTERN = re.compile(r'id="([^"]+)"')
 
@@ -582,6 +583,23 @@ def _pid_alive_status(meta: dict[str, Any]) -> str:
     return "alive"
 
 
+def _owner_meta_valid(meta: dict[str, Any]) -> bool:
+    if not meta:
+        return False
+    if not str(meta.get("owner_nonce", "")):
+        return False
+    return meta.get("pid") is not None
+
+
+def _directory_age_seconds(lock_dir: Path) -> float:
+    if not lock_dir.exists():
+        return 0.0
+    try:
+        return max(0.0, time.time() - lock_dir.stat().st_mtime)
+    except OSError:
+        return 0.0
+
+
 def _write_lock_meta(lock_dir: Path, owner_nonce: str) -> None:
     identity = _query_process_identity(os.getpid())
     payload = {
@@ -617,19 +635,62 @@ def _pid_alive(pid: int) -> bool:
 def _lock_is_stale(lock_dir: Path) -> bool:
     if not lock_dir.exists():
         return False
+    dir_age = _directory_age_seconds(lock_dir)
     meta = _read_lock_meta(lock_dir)
+    if not _owner_meta_valid(meta):
+        if dir_age < NEW_LOCK_GRACE_SECONDS:
+            return False
+        return True
     started = float(meta.get("started", 0))
-    age = time.time() - started if started > 0 else NEW_LOCK_GRACE_SECONDS + 1
+    age = time.time() - started if started > 0 else dir_age
     if age < NEW_LOCK_GRACE_SECONDS:
         return False
-    if not meta:
-        return True
     status = _pid_alive_status(meta)
     if status == "alive":
         return False
     if status == "unknown":
         return False
     return True
+
+
+def _reclaim_abandoned_publication(lock_dir: Path) -> bool:
+    if not lock_dir.exists():
+        return True
+    reclaim_path = lock_dir.with_name(f"{lock_dir.name}.reclaim_{secrets.token_hex(8)}")
+    try:
+        if os.name == "nt":
+            shutil.move(str(lock_dir), str(reclaim_path))
+        else:
+            os.replace(lock_dir, reclaim_path)
+    except OSError:
+        return False
+    if PUBLICATION_RECOVERY_INTERLEAVE_HOOK is not None:
+        PUBLICATION_RECOVERY_INTERLEAVE_HOOK(reclaim_path, lock_dir)
+    reclaimed_meta = _read_lock_meta(reclaim_path)
+    if _owner_meta_valid(reclaimed_meta):
+        status = _pid_alive_status(reclaimed_meta)
+        if status in {"alive", "unknown"}:
+            if not lock_dir.exists():
+                try:
+                    if os.name == "nt":
+                        shutil.move(str(reclaim_path), str(lock_dir))
+                    else:
+                        os.replace(reclaim_path, lock_dir)
+                except OSError:
+                    pass
+            return False
+        return reclaim_stale_lock_verified(reclaim_path, str(reclaimed_meta.get("owner_nonce", "")))
+    _remove_lock_dir(reclaim_path)
+    return True
+
+
+def _reclaim_stale_directory(lock_dir: Path) -> bool:
+    if not _lock_is_stale(lock_dir):
+        return False
+    meta = _read_lock_meta(lock_dir)
+    if _owner_meta_valid(meta):
+        return reclaim_stale_lock_verified(lock_dir, str(meta.get("owner_nonce", "")))
+    return _reclaim_abandoned_publication(lock_dir)
 
 
 def _guard_is_stale(guard_dir: Path) -> bool:
@@ -674,30 +735,7 @@ def _reclaim_stale_guard_verified(guard_dir: Path) -> bool:
         return True
     if not _guard_is_stale(guard_dir):
         return False
-    meta = _read_lock_meta(guard_dir)
-    expected_nonce = str(meta.get("owner_nonce", ""))
-    if not expected_nonce:
-        return False
-    reclaim_path = guard_dir.with_name(f"{guard_dir.name}.reclaim_{secrets.token_hex(8)}")
-    try:
-        if os.name == "nt":
-            shutil.move(str(guard_dir), str(reclaim_path))
-        else:
-            os.replace(guard_dir, reclaim_path)
-    except OSError:
-        return False
-    reclaimed_meta = _read_lock_meta(reclaim_path)
-    if str(reclaimed_meta.get("owner_nonce", "")) != expected_nonce:
-        try:
-            if os.name == "nt":
-                shutil.move(str(reclaim_path), str(guard_dir))
-            else:
-                os.replace(reclaim_path, guard_dir)
-        except OSError:
-            pass
-        return False
-    _remove_lock_dir(reclaim_path)
-    return True
+    return _reclaim_stale_directory(guard_dir)
 
 
 def _acquire_reclaim_guard(target_absolute: Path) -> bool:
@@ -719,11 +757,7 @@ def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
     try:
         if not _lock_is_stale(lock_dir):
             return False
-        meta = _read_lock_meta(lock_dir)
-        expected_nonce = str(meta.get("owner_nonce", ""))
-        if not expected_nonce or not _lock_is_stale(lock_dir):
-            return False
-        return reclaim_stale_lock_verified(lock_dir, expected_nonce)
+        return _reclaim_stale_directory(lock_dir)
     finally:
         _release_reclaim_guard_owned(target_absolute, guard_nonce)
 

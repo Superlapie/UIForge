@@ -13,6 +13,7 @@ func _run() -> void:
 	_test_paths()
 	_test_locking()
 	_test_reclaim_guard_ownership()
+	_test_publication_crash_recovery()
 	_test_process_liveness()
 	_test_transactions()
 	_test_output_replacement()
@@ -137,6 +138,120 @@ func _test_reclaim_guard_ownership() -> void:
 	_assert(reacquire.get("ok", false), "reclaim_guard_write_after_recovery")
 	UIForgeLock.release(str(reacquire.get("lock_path", "")), str(reacquire.get("owner_nonce", "")))
 	_assert(not DirAccess.dir_exists_absolute(UIForgeLock.reclaim_guard_path(target)), "reclaim_guard_no_sidecars")
+
+func _test_publication_crash_recovery() -> void:
+	_prepare_trust_dir("publication/lock_target.ui.json")
+	var target := _trust_abs("publication/lock_target.ui.json")
+	if not FileAccess.file_exists(target):
+		FileAccess.open(target, FileAccess.WRITE).close()
+	_cleanup_publication_sidecars(target)
+	var lock_dir := "%s.uiforge_lock" % target
+	DirAccess.make_dir_absolute(lock_dir)
+	_assert(UIForgeLock.publication_is_initializing(lock_dir), "publication_fresh_lock_initializing")
+	_assert(not UIForgeLock.lock_is_stale(lock_dir), "publication_fresh_lock_not_stale")
+	_assert(not UIForgeLock.acquire(target).get("ok", false), "publication_fresh_lock_blocks_acquire")
+	_remove_directory_recursive(lock_dir)
+	DirAccess.make_dir_absolute(lock_dir)
+	_age_directory_for_test(lock_dir, float(UIForgeLock.NEW_LOCK_GRACE_SECONDS) + 2.0)
+	_assert(UIForgeLock.lock_is_stale(lock_dir), "publication_stale_ownerless_lock_stale")
+	_assert(UIForgeLock.reclaim_abandoned_publication(lock_dir), "publication_stale_ownerless_lock_recovered")
+	var recovered := UIForgeLock.acquire(target)
+	_assert(recovered.get("ok", false), "publication_stale_ownerless_lock_write")
+	UIForgeLock.release(str(recovered.get("lock_path", "")), str(recovered.get("owner_nonce", "")))
+	var guard_dir := UIForgeLock.reclaim_guard_path(target)
+	DirAccess.make_dir_absolute(guard_dir)
+	_assert(UIForgeLock.publication_is_initializing(guard_dir), "publication_fresh_guard_initializing")
+	_assert(not UIForgeLock.guard_is_stale(guard_dir), "publication_fresh_guard_not_stale")
+	_remove_directory_recursive(guard_dir)
+	DirAccess.make_dir_absolute(guard_dir)
+	_age_directory_for_test(guard_dir, float(UIForgeLock.NEW_LOCK_GRACE_SECONDS) + 2.0)
+	_assert(UIForgeLock.guard_is_stale(guard_dir), "publication_stale_ownerless_guard_stale")
+	_assert(UIForgeLock.reclaim_abandoned_publication(guard_dir), "publication_stale_ownerless_guard_recovered")
+	var guard_write := UIForgeLock.acquire(target)
+	_assert(guard_write.get("ok", false), "publication_stale_ownerless_guard_write")
+	UIForgeLock.release(str(guard_write.get("lock_path", "")), str(guard_write.get("owner_nonce", "")))
+	DirAccess.make_dir_absolute(lock_dir)
+	FileAccess.open("%s/owner.json" % lock_dir, FileAccess.WRITE).store_string("{")
+	_age_directory_for_test(lock_dir, float(UIForgeLock.NEW_LOCK_GRACE_SECONDS) + 2.0)
+	_assert(UIForgeLock.reclaim_abandoned_publication(lock_dir), "publication_malformed_lock_recovered")
+	_assert(not DirAccess.dir_exists_absolute(lock_dir), "publication_malformed_lock_removed")
+	DirAccess.make_dir_absolute(lock_dir)
+	_age_directory_for_test(lock_dir, float(UIForgeLock.NEW_LOCK_GRACE_SECONDS) + 2.0)
+	var canonical := lock_dir
+	UIForgeLock.publication_recovery_interleave_hook = Callable(self, "_inject_live_owner_during_recovery")
+	_assert(not UIForgeLock.reclaim_abandoned_publication(canonical), "publication_live_owner_preserved")
+	UIForgeLock.publication_recovery_interleave_hook = Callable()
+	_assert(DirAccess.dir_exists_absolute(canonical), "publication_live_owner_restored")
+	var live_meta := _read_owner_json(canonical)
+	_assert(str(live_meta.get("owner_nonce", "")) == "live-race-owner", "publication_live_owner_nonce")
+	_remove_directory_recursive(canonical)
+	_assert(not _has_reclaim_sidecars(target), "publication_no_sidecars")
+
+func _inject_live_owner_during_recovery(reclaim_path: String, _canonical_path: String) -> void:
+	var identity := UIForgeProcess.current_process_identity()
+	_write_owner_json(reclaim_path, {
+		"owner_nonce": "live-race-owner",
+		"pid": OS.get_process_id(),
+		"process_start": str(identity.get("start_ticks", "")),
+		"started": Time.get_unix_time_from_system(),
+	})
+
+func _read_owner_json(lock_dir: String) -> Dictionary:
+	var file := FileAccess.open("%s/owner.json" % lock_dir, FileAccess.READ)
+	if file == null:
+		return {}
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	file.close()
+	return parsed if parsed is Dictionary else {}
+
+func _age_directory_for_test(path: String, age_seconds: float) -> void:
+	var old_unix := int(Time.get_unix_time_from_system() - age_seconds)
+	if OS.get_name() == "Windows":
+		var ps := "(Get-Item -LiteralPath '%s').LastWriteTime = [DateTimeOffset]::FromUnixTimeSeconds(%d).LocalDateTime" % [path.replace("'", "''"), old_unix]
+		OS.execute("powershell.exe", ["-NoProfile", "-Command", ps], [], true, false)
+	else:
+		OS.execute("touch", ["-d", "@%d" % old_unix, path], [], true, false)
+
+func _has_reclaim_sidecars(target: String) -> bool:
+	if DirAccess.dir_exists_absolute("%s.uiforge_lock" % target):
+		return true
+	if DirAccess.dir_exists_absolute("%s.uiforge_reclaim_guard" % target):
+		return true
+	return _parent_has_reclaim_sidecars(target.get_base_dir())
+
+func _cleanup_publication_sidecars(target: String) -> void:
+	_remove_directory_recursive("%s.uiforge_lock" % target)
+	_remove_directory_recursive("%s.uiforge_reclaim_guard" % target)
+	_remove_reclaim_sidecars_in_parent(target.get_base_dir())
+
+func _parent_has_reclaim_sidecars(parent: String) -> bool:
+	var dir := DirAccess.open(parent)
+	if dir == null:
+		return false
+	dir.list_dir_begin()
+	var entry := dir.get_next()
+	while not entry.is_empty():
+		if entry.contains(".reclaim_"):
+			dir.list_dir_end()
+			return true
+		entry = dir.get_next()
+	dir.list_dir_end()
+	return false
+
+func _remove_reclaim_sidecars_in_parent(parent: String) -> void:
+	var dir := DirAccess.open(parent)
+	if dir == null:
+		return
+	var to_remove: Array[String] = []
+	dir.list_dir_begin()
+	var entry := dir.get_next()
+	while not entry.is_empty():
+		if entry.contains(".reclaim_"):
+			to_remove.append("%s/%s" % [parent, entry])
+		entry = dir.get_next()
+	dir.list_dir_end()
+	for path in to_remove:
+		_remove_directory_recursive(path)
 
 func _test_process_liveness() -> void:
 	var current := UIForgeProcess.current_process_identity()
@@ -512,6 +627,20 @@ func _write_owner_json(lock_dir: String, payload: Dictionary) -> void:
 	if file != null:
 		file.store_string(JSON.stringify(payload))
 		file.close()
+
+func _remove_directory_recursive(path: String) -> void:
+	if not DirAccess.dir_exists_absolute(path):
+		return
+	var dir := DirAccess.open(path)
+	if dir != null:
+		dir.list_dir_begin()
+		var entry := dir.get_next()
+		while not entry.is_empty():
+			if not dir.current_is_dir():
+				dir.remove(entry)
+			entry = dir.get_next()
+		dir.list_dir_end()
+	DirAccess.remove_absolute(path)
 
 func _write_replace_meta(meta_abs: String, payload: Dictionary) -> void:
 	var file := FileAccess.open(meta_abs, FileAccess.WRITE)
