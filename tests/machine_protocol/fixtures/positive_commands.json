@@ -1,0 +1,244 @@
+[
+  {
+    "id": "positive_capabilities",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-capabilities",
+      "method": "capabilities",
+      "params": {}
+    },
+    "expect": {"success": true, "result_has": ["capabilities"]}
+  },
+  {
+    "id": "positive_new",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-new",
+      "method": "new",
+      "params": {
+        "template": "blank",
+        "output": ".uiforge/positive_new.ui.json",
+        "force": true
+      }
+    },
+    "expect": {"success": true, "result_has": ["committed"]}
+  },
+  {
+    "id": "positive_validate",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-validate",
+      "method": "validate",
+      "params": {"document": "tests/conformance/fixtures/minimal.ui.json"}
+    },
+    "expect": {"success": true, "result_has": ["revision"]}
+  },
+  {
+    "id": "positive_inspect",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-inspect",
+      "method": "inspect",
+      "params": {"document": "tests/conformance/fixtures/minimal.ui.json", "scope": "tree"}
+    },
+    "expect": {"success": true, "result_has": ["tree", "revision"]}
+  },
+  {
+    "id": "positive_get",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-get",
+      "method": "get",
+      "params": {
+        "document": "tests/conformance/fixtures/minimal.ui.json",
+        "node": "root",
+        "property": "layout.size"
+      }
+    },
+    "expect": {"success": true, "result_has": ["value", "revision"]}
+  },
+  {
+    "id": "positive_set",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "temp_document_from": "tests/conformance/fixtures/minimal.ui.json",
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-set",
+      "method": "set",
+      "params": {
+        "document": "__TEMP__",
+        "node": "root",
+        "property": "layout.size",
+        "value": "[480,360]"
+      }
+    },
+    "expect": {"success": true}
+  },
+  {
+    "id": "positive_add_object",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "temp_document_from": "tests/conformance/fixtures/minimal.ui.json",
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-add-object",
+      "method": "add",
+      "params": {
+        "document": "__TEMP__",
+        "parent": "root",
+        "node": {
+          "id": "machine_added_panel",
+          "type": "Panel",
+          "layout": {"position": [10, 10], "size": [100, 80]},
+          "children": []
+        }
+      }
+    },
+    "expect": {"success": true, "node_exists": "machine_added_panel"}
+  },
+  {
+    "id": "positive_add_string",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "temp_document_from": "tests/conformance/fixtures/minimal.ui.json",
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-add-string",
+      "method": "add",
+      "params": {
+        "document": "__TEMP__",
+        "parent": "root",
+        "node": "{\"id\":\"machine_added_panel_str\",\"type\":\"Panel\",\"layout\":{\"position\":[10,10],\"size\":[100,80]},\"children\":[]}"
+      }
+    },
+    "expect": {"success": true, "node_exists": "machine_added_panel_str"}
+  },
+  {
+    "id": "positive_delete",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "temp_document_from": "tests/conformance/fixtures/minimal.ui.json",
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-delete",
+      "method": "delete",
+      "params": {"document": "__TEMP__", "node": "child_a"}
+    },
+    "expect": {"success": true}
+  },
+  {
+    "id": "positive_move",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "temp_document_from": "tests/conformance/fixtures/minimal.ui.json",
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-move",
+      "method": "move",
+      "params": {"document": "__TEMP__", "node": "child_a", "parent": "parent_b", "index": 0}
+    },
+    "expect": {"success": true}
+  },
+  {
+    "id": "positive_duplicate",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "temp_document_from": "tests/conformance/fixtures/minimal.ui.json",
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-duplicate",
+      "method": "duplicate",
+      "params": {"document": "__TEMP__", "node": "child_a", "new_id": "child_a_copy"}
+    },
+    "expect": {"success": true}
+  },
+  {
+    "id": "positive_batch_dry",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "temp_document_from": "tests/conformance/fixtures/minimal.ui.json",
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-batch-dry",
+      "method": "batch",
+      "params": {
+        "document": "__TEMP__",
+        "dry_run": true,
+        "operations": [{"op": "set", "node": "root", "property": "layout.size", "value": "[420,300]"}]
+      }
+    },
+    "expect": {"success": true, "result_committed": false}
+  },
+  {
+    "id": "positive_build",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-build",
+      "method": "build",
+      "params": {
+        "document": "tests/conformance/fixtures/minimal.ui.json",
+        "output": ".uiforge/positive_build.tscn",
+        "force": true
+      }
+    },
+    "expect": {"success": true}
+  },
+  {
+    "id": "positive_build_all",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-build-all",
+      "method": "build-all",
+      "params": {
+        "source_dir": "tests/conformance/fixtures",
+        "output_dir": ".uiforge/positive_build_all",
+        "force": true
+      }
+    },
+    "expect": {"success": true, "result_has": ["built"]}
+  },
+  {
+    "id": "positive_render",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-render",
+      "method": "render",
+      "params": {
+        "document": "tests/conformance/fixtures/minimal.ui.json",
+        "viewport": "640x480",
+        "output": ".uiforge/positive_render.png",
+        "force": true
+      }
+    },
+    "expect": {"allowed_error_codes": ["HEADLESS_RENDER_UNAVAILABLE", "GODOT_UNAVAILABLE"], "success": true, "result_has": ["rendered_image"]}
+  },
+  {
+    "id": "positive_shutdown",
+    "transports": ["native_persistent"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "pos-shutdown",
+      "method": "shutdown",
+      "params": {}
+    },
+    "expect": {"success": true, "result_has": ["shutdown"]}
+  }
+]

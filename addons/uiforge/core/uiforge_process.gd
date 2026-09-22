@@ -3,6 +3,8 @@ extends RefCounted
 
 enum AliveStatus { ALIVE, DEAD, UNKNOWN }
 
+static var pid_alive_status_hook: Callable = Callable()
+
 static func query_process_identity(pid: int) -> Dictionary:
 	if pid <= 0:
 		return {"ok": false}
@@ -14,6 +16,8 @@ static func current_process_identity() -> Dictionary:
 	return query_process_identity(OS.get_process_id())
 
 static func pid_alive(meta: Dictionary) -> AliveStatus:
+	if pid_alive_status_hook.is_valid():
+		return pid_alive_status_hook.call(meta)
 	if typeof(meta) != TYPE_DICTIONARY:
 		return AliveStatus.DEAD
 	var pid := _positive_meta_int(meta.get("pid"))

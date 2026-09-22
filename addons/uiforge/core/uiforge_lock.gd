@@ -6,7 +6,7 @@ const NEW_LOCK_GRACE_SECONDS: int = 5
 static var publication_recovery_interleave_hook: Callable = Callable()
 static var force_directory_mtime_fallback: bool = false
 
-static func live_lock_held(target_absolute: String) -> bool:
+static func lock_blocks_recovery(target_absolute: String) -> bool:
 	var lock_dir := "%s.uiforge_lock" % target_absolute
 	if not DirAccess.dir_exists_absolute(lock_dir):
 		return false
@@ -15,7 +15,11 @@ static func live_lock_held(target_absolute: String) -> bool:
 	var meta := _read_owner_meta(lock_dir)
 	if not _owner_meta_valid(meta):
 		return _directory_age_seconds(lock_dir) < float(NEW_LOCK_GRACE_SECONDS)
-	return UIForgeProcess.pid_alive(meta) == UIForgeProcess.AliveStatus.ALIVE
+	var alive_status := UIForgeProcess.pid_alive(meta)
+	return alive_status == UIForgeProcess.AliveStatus.ALIVE or alive_status == UIForgeProcess.AliveStatus.UNKNOWN
+
+static func live_lock_held(target_absolute: String) -> bool:
+	return lock_blocks_recovery(target_absolute)
 
 static func acquire(target_absolute: String) -> Dictionary:
 	var lock_dir := "%s.uiforge_lock" % target_absolute

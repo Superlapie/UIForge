@@ -33,6 +33,7 @@ from uiforge_machine import CONNECT_PREFIX, INTERNAL_REQUEST_PREFIX, MAX_INTERNA
 
 FIXTURE = "tests/conformance/fixtures/minimal.ui.json"
 CONFORMANCE_FIXTURES = ROOT / "tests/machine_protocol/fixtures/conformance.json"
+POSITIVE_COMMAND_FIXTURES = ROOT / "tests/machine_protocol/fixtures/positive_commands.json"
 
 
 class IntegrationFailure(Exception):
@@ -133,6 +134,13 @@ def send_raw_line(proc: subprocess.Popen[str], raw: bytes) -> dict:
 
 
 def assert_response(response: dict, expect: dict, label: str) -> None:
+    allowed_error_codes = expect.get("allowed_error_codes", [])
+    if allowed_error_codes and not response.get("success"):
+        if response.get("error", {}).get("code") in allowed_error_codes:
+            return
+        raise IntegrationFailure(
+            f"{label}: expected one of {allowed_error_codes}, got {response.get('error', {}).get('code')} :: {response}"
+        )
     if expect.get("success") is not None and bool(response.get("success")) != bool(expect["success"]):
         raise IntegrationFailure(f"{label}: success expected {expect['success']} got {response.get('success')} :: {response}")
     if expect.get("error_code") and response.get("error", {}).get("code") != expect["error_code"]:
@@ -174,10 +182,11 @@ def build_request_raw(target_bytes: int, *, multibyte_pad: bool = False) -> byte
     raise IntegrationFailure(f"could not build request of exactly {target_bytes} bytes, nearest {len(exact)}")
 
 
-def copy_temp_document(source_rel: str, fixture_id: str, mutate: dict | None = None) -> str:
+def copy_temp_document(source_rel: str, fixture_id: str, mutate: dict | None = None, *, suffix: str = "") -> str:
     temp_dir = ROOT / ".uiforge" / "integration_temp"
     temp_dir.mkdir(parents=True, exist_ok=True)
-    temp_path = temp_dir / f"{fixture_id}.ui.json"
+    name = f"{fixture_id}{f'_{suffix}' if suffix else ''}.ui.json"
+    temp_path = temp_dir / name
     shutil.copy(ROOT / source_rel, temp_path)
     if mutate:
         data = json.loads(temp_path.read_text(encoding="utf-8"))
@@ -200,7 +209,7 @@ def substitute_temp_paths(value: object, temp_path: str) -> object:
     return value
 
 
-def prepare_fixture(fixture: dict) -> tuple[dict, str | None]:
+def prepare_fixture(fixture: dict, *, suffix: str = "") -> tuple[dict, str | None]:
     request = copy.deepcopy(fixture["request"])
     temp_path = None
     if fixture.get("temp_document_from"):
@@ -208,6 +217,7 @@ def prepare_fixture(fixture: dict) -> tuple[dict, str | None]:
             str(fixture["temp_document_from"]),
             str(fixture["id"]),
             fixture.get("mutate_temp_document"),
+            suffix=suffix,
         )
         request = substitute_temp_paths(request, temp_path)
     return request, temp_path
@@ -782,6 +792,53 @@ def run_frame_noise_ignored(godot: str) -> None:
         path.unlink(missing_ok=True)
 
 
+def assert_node_exists(godot: str, document: str, node_id: str, label: str) -> None:
+    _code, response = machine_oneshot(godot, {
+        "protocol": "uiforge.machine",
+        "protocol_version": 1,
+        "request_id": f"{label}-node-check",
+        "method": "get",
+        "params": {"document": document, "node": node_id, "property": "layout.size"},
+    })
+    if not response.get("success"):
+        raise IntegrationFailure(f"{label}: node {node_id} missing after command :: {response}")
+
+
+def run_positive_commands(godot: str) -> tuple[int, int]:
+    fixtures = json.loads(POSITIVE_COMMAND_FIXTURES.read_text(encoding="utf-8"))
+    executions = 0
+    proc = spawn_serve(godot)
+    assert proc.stdout is not None
+    read_json_line(proc.stdout)
+    for fixture in fixtures:
+        if fixture["id"] == "positive_shutdown":
+            continue
+        transports = fixture.get("transports", [])
+        expect = fixture["expect"]
+        if "native_oneshot" in transports:
+            request, temp_path = prepare_fixture(fixture, suffix="oneshot")
+            _code, response = machine_oneshot(godot, request)
+            assert_response(response, expect, f"positive_oneshot:{fixture['id']}")
+            if temp_path and expect.get("node_exists"):
+                assert_node_exists(godot, temp_path, str(expect["node_exists"]), f"positive_oneshot:{fixture['id']}")
+            executions += 1
+        if "native_persistent" in transports:
+            request, temp_path = prepare_fixture(fixture, suffix="persistent")
+            response = send_request(proc, request)
+            assert_response(response, expect, f"positive_persistent:{fixture['id']}")
+            if temp_path and expect.get("node_exists"):
+                assert_node_exists(godot, temp_path, str(expect["node_exists"]), f"positive_persistent:{fixture['id']}")
+            executions += 1
+        if "fallback" in transports:
+            request, temp_path = prepare_fixture(fixture, suffix="fallback")
+            response = fallback_dispatch(request)
+            assert_response(response, expect, f"positive_fallback:{fixture['id']}")
+            executions += 1
+    proc.stdin.close()
+    proc.wait(timeout=60)
+    return len(fixtures) - 1, executions
+
+
 def run_shared_fixtures(godot: str) -> tuple[int, int]:
     fixtures = json.loads(CONFORMANCE_FIXTURES.read_text(encoding="utf-8"))
     executions = 0
@@ -830,6 +887,8 @@ def main() -> int:
         "frame_noise": False,
         "shared_fixture_definitions": 0,
         "shared_fixture_executions": 0,
+        "positive_command_definitions": 0,
+        "positive_command_executions": 0,
     }
     run_persistent_handshake(godot)
     summary["persistent_handshake"] = True
@@ -854,6 +913,9 @@ def main() -> int:
     fixture_definitions, fixture_executions = run_shared_fixtures(godot)
     summary["shared_fixture_definitions"] = fixture_definitions
     summary["shared_fixture_executions"] = fixture_executions
+    positive_definitions, positive_executions = run_positive_commands(godot)
+    summary["positive_command_definitions"] = positive_definitions
+    summary["positive_command_executions"] = positive_executions
     print(json.dumps({"success": True, "suite": "native_protocol_integration", "summary": summary}, indent=2))
     return 0
 

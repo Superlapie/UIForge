@@ -435,11 +435,11 @@ static func try_recover_interrupted_source_for_path(target_path: String) -> Dict
 	var absolute := UIForgePaths.normalize_requested(target_path)
 	if absolute.is_empty():
 		return {"ok": false, "status": "invalid", "errors": [{"code": "OUTPUT_PATH_INVALID", "message": target_path}]}
-	if UIForgeLock.live_lock_held(absolute):
+	if UIForgeLock.lock_blocks_recovery(absolute):
 		return {"ok": false, "status": "live_writer", "errors": []}
 	var lock := UIForgeLock.acquire(absolute)
 	if not lock.get("ok", false):
-		if UIForgeLock.live_lock_held(absolute):
+		if UIForgeLock.lock_blocks_recovery(absolute):
 			return {"ok": false, "status": "live_writer", "errors": []}
 		return {"ok": false, "status": "blocked", "errors": lock.get("errors", [])}
 	var lock_path := str(lock.get("lock_path", ""))

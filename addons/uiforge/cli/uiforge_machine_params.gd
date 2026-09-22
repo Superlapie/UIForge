@@ -45,11 +45,23 @@ static func _validate_batch_params(params: Dictionary) -> Dictionary:
 			var field_error := _validate_field("operations[%d].%s" % [index, field_name], operation[field_name], str(op_schema[field_name]))
 			if not field_error.is_empty():
 				return field_error
+		for field_name in op_schema.keys():
+			var type_name := str(op_schema[field_name])
+			if type_name.ends_with("?"):
+				continue
+			if not operation.has(field_name):
+				return _invalid("operations[%d].%s" % [index, field_name], "Required batch field '%s' is missing." % field_name)
 	return {"ok": true, "params": params}
 
 static func _validate_field(field_path: String, value: Variant, type_name: String) -> Dictionary:
 	var optional := type_name.ends_with("?")
 	var base_type := type_name.trim_suffix("?")
+	if "|" in base_type:
+		var alternatives := base_type.split("|", false)
+		for alternative in alternatives:
+			if _validate_field(field_path, value, str(alternative).strip_edges()).is_empty():
+				return {}
+		return _invalid(field_path, "Parameter '%s' must be one of: %s." % [field_path, base_type.replace("|", ", ")])
 	if base_type == "any":
 		return {}
 	match base_type:

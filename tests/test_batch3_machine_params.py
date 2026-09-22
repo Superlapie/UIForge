@@ -111,6 +111,117 @@ class Batch3MachineParamsTests(unittest.TestCase):
         })
         self.assertTrue(good.get("success"))
 
+    def test_fallback_add_object_form(self) -> None:
+        response = dispatch_machine(_base_request(
+            "add",
+            {
+                "document": self.rel_doc,
+                "parent": "root",
+                "node": {
+                    "id": "machine_added_panel",
+                    "type": "Panel",
+                    "layout": {"position": [10, 10], "size": [100, 80]},
+                    "children": [],
+                },
+            },
+            "add-object",
+        ))
+        self.assertTrue(response.get("success"), response)
+        inspect = dispatch_machine(_base_request(
+            "get",
+            {"document": self.rel_doc, "node": "machine_added_panel", "property": "layout.size"},
+            "add-object-get",
+        ))
+        self.assertTrue(inspect.get("success"), inspect)
+
+    def test_fallback_add_string_form(self) -> None:
+        response = dispatch_machine(_base_request(
+            "add",
+            {
+                "document": self.rel_doc,
+                "parent": "root",
+                "node": "{\"id\":\"machine_added_panel_str\",\"type\":\"Panel\",\"layout\":{\"position\":[10,10],\"size\":[100,80]},\"children\":[]}",
+            },
+            "add-string",
+        ))
+        self.assertTrue(response.get("success"), response)
+
+    def test_batch_required_fields_rejected(self) -> None:
+        cases = [
+            ("batch_missing_set", [{"op": "set", "node": "root"}]),
+            ("batch_missing_move_parent", [{"op": "move", "node": "child_a"}]),
+            ("batch_missing_duplicate_new_id", [{"op": "duplicate", "node": "child_a"}]),
+            ("batch_missing_add_node", [{"op": "add", "parent": "root"}]),
+        ]
+        for label, operations in cases:
+            with self.subTest(label=label):
+                response = dispatch_machine(_base_request("batch", {"document": self.rel_doc, "operations": operations}, label))
+                self.assertFalse(response.get("success"))
+                self.assertEqual(response.get("error", {}).get("code"), "MALFORMED_PARAMS")
+
+    def test_batch_bad_add_node_type(self) -> None:
+        response = dispatch_machine(_base_request(
+            "batch",
+            {
+                "document": self.rel_doc,
+                "operations": [{"op": "add", "parent": "root", "node": "not-json-or-object"}],
+            },
+            "batch-bad-add-node",
+        ))
+        self.assertFalse(response.get("success"))
+        self.assertEqual(response.get("error", {}).get("code"), "MALFORMED_PARAMS")
+
+    def test_batch_bad_move_index(self) -> None:
+        response = dispatch_machine(_base_request(
+            "batch",
+            {
+                "document": self.rel_doc,
+                "operations": [{"op": "move", "node": "child_a", "parent": "parent_b", "index": {"bad": True}}],
+            },
+            "batch-bad-move-index",
+        ))
+        self.assertFalse(response.get("success"))
+        self.assertEqual(response.get("error", {}).get("code"), "MALFORMED_PARAMS")
+
+    def test_batch_valid_object_add_dry_run(self) -> None:
+        before = self.temp_doc.read_bytes()
+        response = dispatch_machine(_base_request(
+            "batch",
+            {
+                "document": self.rel_doc,
+                "dry_run": True,
+                "operations": [{
+                    "op": "add",
+                    "parent": "root",
+                    "node": {"id": "batch_added_panel", "type": "Panel", "layout": {"size": [32, 32]}, "children": []},
+                }],
+            },
+            "batch-valid-add",
+        ))
+        self.assertTrue(response.get("success"), response)
+        self.assertEqual(self.temp_doc.read_bytes(), before)
+
+    def test_batch_dependent_add_then_set_dry_run(self) -> None:
+        before = self.temp_doc.read_bytes()
+        response = dispatch_machine(_base_request(
+            "batch",
+            {
+                "document": self.rel_doc,
+                "dry_run": True,
+                "operations": [
+                    {
+                        "op": "add",
+                        "parent": "root",
+                        "node": {"id": "batch_child", "type": "Panel", "layout": {"size": [32, 32]}, "children": []},
+                    },
+                    {"op": "set", "node": "batch_child", "property": "layout.size", "value": "[64,64]"},
+                ],
+            },
+            "batch-dependent",
+        ))
+        self.assertTrue(response.get("success"), response)
+        self.assertEqual(self.temp_doc.read_bytes(), before)
+
 
 if __name__ == "__main__":
     unittest.main()

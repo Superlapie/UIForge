@@ -206,7 +206,13 @@ static func _set_value(params: Dictionary) -> Dictionary:
 
 static func _add_value(params: Dictionary) -> Dictionary:
 	return _mutation(str(params.get("document", params.get("path", ""))), func(document: UIForgeDocument) -> Dictionary:
-		return UIForgeDocumentOperations.add_value(document, str(params.get("parent", params.get("parent_id", ""))), str(params.get("node_json", params.get("node", ""))))
+		var raw_node: Variant = params.get("node_json", params.get("node", ""))
+		var node_json := ""
+		if raw_node is Dictionary:
+			node_json = JSON.stringify(raw_node)
+		else:
+			node_json = str(raw_node)
+		return UIForgeDocumentOperations.add_value(document, str(params.get("parent", params.get("parent_id", ""))), node_json)
 	, str(params.get("expected_revision", "")))
 
 static func _delete_value(params: Dictionary) -> Dictionary:

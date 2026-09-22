@@ -23,6 +23,7 @@ func _run() -> void:
 	_test_live_writer_before_promotion()
 	_test_crashed_transaction_recovery()
 	_test_reader_waits_for_live_writer()
+	_test_unknown_liveness_blocks_recovery()
 	if failures.is_empty():
 		print(JSON.stringify({"success": true, "passed": checks, "failed": 0}))
 		quit(0)
@@ -108,7 +109,7 @@ func _test_reader_waits_for_live_writer() -> void:
 	var worker := ProjectSettings.globalize_path("res://tests/source_recovery_reader_worker.gd")
 	var pid := OS.create_process(godot_bin, ["--headless", "--path", project, "--script", worker, "--", source_res])
 	OS.delay_msec(20)
-	_assert(UIForgeLock.live_lock_held(absolute), "wait_live_lock_during_read")
+	_assert(UIForgeLock.lock_blocks_recovery(absolute), "wait_lock_blocks_recovery")
 	var pending := FileAccess.open(paths.pending, FileAccess.WRITE)
 	pending.store_string(payload)
 	pending.close()
@@ -125,6 +126,54 @@ func _test_reader_waits_for_live_writer() -> void:
 	_assert(bool(parsed.get("success", false)), "wait_reader_got_document")
 	_assert(str(parsed.get("revision_hash", "")) == UIForgeHash.content_hash(_payload_dict("wait")), "wait_reader_revision")
 	DirAccess.remove_absolute(result_path)
+
+func _test_unknown_liveness_blocks_recovery() -> void:
+	var source_res := "user://source_recovery/unknown_liveness.ui.json"
+	_prepare_source(source_res)
+	var absolute := ProjectSettings.globalize_path(source_res)
+	var paths := _txn_paths(absolute)
+	var lock := UIForgeLock.acquire(absolute)
+	_assert(bool(lock.get("ok", false)), "unknown_lock_acquired")
+	var lock_path := str(lock.get("lock_path", ""))
+	var owner_nonce := str(lock.get("owner_nonce", ""))
+	DirAccess.rename_absolute(absolute, paths.backup)
+	UIForgeProcess.pid_alive_status_hook = func(_meta: Dictionary) -> UIForgeProcess.AliveStatus:
+		return UIForgeProcess.AliveStatus.UNKNOWN
+	var recovery := UIForgeTransaction.try_recover_interrupted_source_for_path(source_res)
+	_assert(str(recovery.get("status", "")) == "live_writer", "unknown_recovery_live_writer")
+	_assert(FileAccess.file_exists(paths.backup), "unknown_backup_preserved")
+	_assert(DirAccess.dir_exists_absolute(lock_path), "unknown_lock_preserved")
+	var load_result := UIForgeSerializer.load_document(source_res)
+	var load_code := ""
+	if load_result.get("errors") is Array and not load_result.errors.is_empty():
+		load_code = str(load_result.errors[0].get("code", ""))
+	_assert(load_code == "SOURCE_WRITE_IN_PROGRESS", "unknown_load_write_in_progress")
+	_assert(FileAccess.file_exists(paths.backup), "unknown_backup_after_load")
+	_assert(not FileAccess.file_exists(absolute), "unknown_source_still_absent")
+	UIForgeProcess.pid_alive_status_hook = Callable()
+	UIForgeLock.release(lock_path, owner_nonce)
+	UIForgeProcess.pid_alive_status_hook = func(_meta: Dictionary) -> UIForgeProcess.AliveStatus:
+		return UIForgeProcess.AliveStatus.DEAD
+	var payload := _make_payload("unknown_dead_recovery")
+	var pending := FileAccess.open(paths.pending, FileAccess.WRITE)
+	pending.store_string(payload)
+	pending.close()
+	var meta := FileAccess.open(paths.meta, FileAccess.WRITE)
+	meta.store_string(JSON.stringify({
+		"transaction_id": "unknown-dead",
+		"target": absolute,
+		"expected_revision": "",
+		"new_revision": UIForgeHash.content_hash(_payload_dict("unknown_dead_recovery")),
+		"pending_hash": _file_hash(paths.pending),
+		"stage": "commit",
+	}))
+	meta.close()
+	var dead_recovery := UIForgeTransaction.try_recover_interrupted_source_for_path(source_res)
+	_assert(str(dead_recovery.get("status", "")) == "recovered", "unknown_dead_recovery_status")
+	UIForgeProcess.pid_alive_status_hook = Callable()
+	var loaded := UIForgeSerializer.load_document(source_res)
+	_assert(loaded.get("document") != null, "unknown_dead_final_parse")
+	_assert(not _has_stale_sidecars(source_res), "unknown_dead_no_sidecars")
 
 func _observe_reader_recovery(source_res: String) -> Dictionary:
 	var recovery := UIForgeTransaction.try_recover_interrupted_source_for_path(source_res)

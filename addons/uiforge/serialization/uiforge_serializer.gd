@@ -14,7 +14,7 @@ static func load_document(path: String) -> Dictionary:
 	while waited_ms < SOURCE_WRITE_WAIT_MS:
 		if FileAccess.file_exists(absolute):
 			return _read_document_file(path, absolute)
-		if UIForgeLock.live_lock_held(absolute):
+		if UIForgeLock.lock_blocks_recovery(absolute):
 			OS.delay_msec(SOURCE_WRITE_WAIT_STEP_MS)
 			waited_ms += SOURCE_WRITE_WAIT_STEP_MS
 			continue
@@ -28,7 +28,7 @@ static func load_document(path: String) -> Dictionary:
 		break
 	if FileAccess.file_exists(absolute):
 		return _read_document_file(path, absolute)
-	if UIForgeLock.live_lock_held(absolute):
+	if UIForgeLock.lock_blocks_recovery(absolute):
 		return {
 			"document": null,
 			"revision_hash": "",

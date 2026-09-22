@@ -50,6 +50,12 @@ def _is_whole_number(value: Any) -> bool:
 def _validate_field(field_path: str, value: Any, type_name: str) -> dict[str, Any] | None:
     optional = type_name.endswith("?")
     base_type = type_name[:-1] if optional else type_name
+    if "|" in base_type:
+        alternatives = [part.strip() for part in base_type.split("|") if part.strip()]
+        for alternative in alternatives:
+            if _validate_field(field_path, value, alternative) is None:
+                return None
+        return _invalid(field_path, f"Parameter '{field_path}' must be one of: {', '.join(alternatives)}.")
     if base_type == "any":
         return None
     if base_type == "string":
@@ -71,10 +77,6 @@ def _validate_field(field_path: str, value: Any, type_name: str) -> dict[str, An
     if base_type == "object":
         if not isinstance(value, dict):
             return _invalid(field_path, f"Parameter '{field_path}' must be an object.")
-        return None
-    if base_type == "object|string":
-        if not isinstance(value, (dict, str)):
-            return _invalid(field_path, f"Parameter '{field_path}' must be an object or string.")
         return None
     return _invalid(field_path, f"Unsupported parameter schema '{type_name}'.")
 
@@ -116,4 +118,12 @@ def _validate_batch_params(params: dict[str, Any]) -> dict[str, Any]:
             field_error = _validate_field(f"operations[{index}].{field_name}", value, op_schema[field_name])
             if field_error is not None:
                 return field_error
+        for field_name, type_name in op_schema.items():
+            if type_name.endswith("?"):
+                continue
+            if field_name not in operation:
+                return _invalid(
+                    f"operations[{index}].{field_name}",
+                    f"Required batch field '{field_name}' is missing.",
+                )
     return {"ok": True, "params": params}
