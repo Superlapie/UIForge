@@ -96,6 +96,11 @@ jobs:
           scripts\ui.cmd capabilities
           scripts\ui.cmd validate examples\specs\inventory.ui.json
           scripts\ui.cmd --machine validate --params .uiforge\tmp_win_params.json
+      - name: Run Windows ui.cmd workflow smoke
+        shell: bash
+        env:
+          GODOT_BIN: ./godot.exe
+        run: python scripts/windows_cmd_smoke.py
       - name: Run Batch 3 Windows benchmarks
         shell: bash
         env:

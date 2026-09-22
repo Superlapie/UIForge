@@ -1,6 +1,7 @@
 extends SceneTree
 
 const REQUEST_PREFIX := "UIFORGE_REQUEST\t"
+const MAX_INTERNAL_LINE_BYTES := 1048592
 
 var _server: TCPServer
 var _peer: StreamPeerTCP
@@ -8,6 +9,8 @@ var _read_buffer: PackedByteArray = PackedByteArray()
 var _running := true
 var _connected := false
 var _expected_token := ""
+var _discarding_oversized_line := false
+var _oversized_error_sent := false
 
 func _init() -> void:
 	_expected_token = OS.get_environment("UIFORGE_SERVER_TOKEN") if OS.has_environment("UIFORGE_SERVER_TOKEN") else ""
@@ -42,15 +45,24 @@ func _start() -> void:
 					break
 				_read_buffer.append_array(chunk)
 			while true:
+				if _discarding_oversized_line:
+					var discard_newline := _read_buffer.find(10)
+					if discard_newline < 0:
+						_read_buffer = PackedByteArray()
+						break
+					_read_buffer = _read_buffer.slice(discard_newline + 1)
+					_discarding_oversized_line = false
+					_oversized_error_sent = false
+					continue
 				var newline_index := _read_buffer.find(10)
 				if newline_index < 0:
-					if _read_buffer.size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES:
-						_drain_oversized_request()
+					if _read_buffer.size() > _max_partial_buffer_bytes():
+						_begin_oversized_discard(false)
 					break
 				var line_bytes: PackedByteArray = _read_buffer.slice(0, newline_index)
 				_read_buffer = _read_buffer.slice(newline_index + 1)
-				if line_bytes.size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES:
-					await _handle_oversized_request()
+				if _line_exceeds_limit(line_bytes):
+					_begin_oversized_discard(true)
 					continue
 				var line := line_bytes.get_string_from_utf8().strip_edges()
 				if line.is_empty():
@@ -64,8 +76,34 @@ func _start() -> void:
 					continue
 				if not line.begins_with(REQUEST_PREFIX):
 					continue
-				await _handle_request_line(line.substr(REQUEST_PREFIX.length()))
+				var raw_json := line.substr(REQUEST_PREFIX.length())
+				if raw_json.to_utf8_buffer().size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES:
+					_send_response(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
+					continue
+				await _handle_request_line(raw_json)
 		await process_frame
+
+func _max_partial_buffer_bytes() -> int:
+	if _connected:
+		return MAX_INTERNAL_LINE_BYTES
+	return UIForgeMachineProtocol.MAX_REQUEST_BYTES + UIForgeMachineProtocol.CONNECT_PREFIX.length() + 128
+
+func _line_exceeds_limit(line_bytes: PackedByteArray) -> bool:
+	if _connected and line_bytes.size() > REQUEST_PREFIX.length():
+		if line_bytes.slice(0, REQUEST_PREFIX.length()).get_string_from_utf8() == REQUEST_PREFIX:
+			return line_bytes.size() > MAX_INTERNAL_LINE_BYTES
+	return line_bytes.size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES
+
+func _begin_oversized_discard(_complete_line: bool) -> void:
+	if not _oversized_error_sent:
+		_send_response(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
+		_oversized_error_sent = true
+	_discarding_oversized_line = true
+	var newline_index := _read_buffer.find(10)
+	if newline_index >= 0:
+		_read_buffer = _read_buffer.slice(newline_index + 1)
+		_discarding_oversized_line = false
+		_oversized_error_sent = false
 
 func _accept_connect_line(line: String) -> bool:
 	if _expected_token.is_empty():
@@ -73,17 +111,6 @@ func _accept_connect_line(line: String) -> bool:
 	if not line.begins_with(UIForgeMachineProtocol.CONNECT_PREFIX):
 		return false
 	return line.substr(UIForgeMachineProtocol.CONNECT_PREFIX.length()) == _expected_token
-
-func _drain_oversized_request() -> void:
-	var newline_index := _read_buffer.find(10)
-	if newline_index >= 0:
-		_read_buffer = _read_buffer.slice(newline_index + 1)
-	else:
-		_read_buffer = PackedByteArray()
-
-func _handle_oversized_request() -> void:
-	_send_response(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
-	_drain_oversized_request()
 
 func _handle_request_line(raw_json: String) -> void:
 	var parser := JSON.new()

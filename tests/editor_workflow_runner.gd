@@ -11,22 +11,7 @@ func _run() -> void:
 	get_root().add_child(studio)
 	_assert(not studio.asset_index_ready, "asset_index_not_ready_during_construction")
 	_assert(studio.asset_paths.is_empty(), "asset_paths_empty_during_construction")
-	var synthetic_root := "user://uiforge_synthetic_assets"
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(synthetic_root))
-	for index in range(80):
-		var folder := "%s/group_%02d" % [synthetic_root, index]
-		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(folder))
-		FileAccess.open("%s/icon_%02d.svg" % [folder, index], FileAccess.WRITE).store_string("<svg/>")
-	studio._refresh_assets()
-	var filter_steps := 0
-	while not studio.asset_index_ready:
-		filter_steps += 1
-		_assert(studio.asset_scan_steps >= 1 or filter_steps < 200, "asset_index_uses_chunked_steps")
-		await process_frame
-	_assert(studio.asset_scan_steps > 1, "asset_index_multiple_steps")
-	var initial_scan_steps := studio.asset_scan_steps
-	studio._on_asset_filter_changed("group_01")
-	_assert(studio.asset_scan_steps == initial_scan_steps, "asset_filter_does_not_rescan")
+	await _test_asset_indexing(studio)
 	var document := UIForgeSerializer.create_default("editor_workflow")
 	studio.set_document(document)
 	var root_id := str(document.root().get("id", ""))
@@ -111,3 +96,89 @@ func _assert(condition: bool, label: String) -> void:
 	checks += 1
 	if not condition:
 		failures.append(label)
+
+func _await_asset_index(studio: UIForgeStudio) -> void:
+	var guard := 0
+	while not studio.asset_index_ready:
+		guard += 1
+		_assert(guard < 500, "asset_index_completed")
+		await process_frame
+
+func _build_synthetic_asset_tree(root: String) -> Array[String]:
+	var expected: Array[String] = []
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(root))
+	var flat_dir := "%s/flat_bulk" % root
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(flat_dir))
+	for index in range(110):
+		var asset_path := "%s/asset_%03d.png" % [flat_dir, index]
+		FileAccess.open(asset_path, FileAccess.WRITE).store_string("PNG")
+		expected.append(asset_path)
+	FileAccess.open("%s/ignore.gd" % flat_dir, FileAccess.WRITE).store_string("extends Node")
+	FileAccess.open("%s/.hidden.png" % flat_dir, FileAccess.WRITE).store_string("PNG")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("%s/.hidden_dir" % flat_dir))
+	FileAccess.open("%s/.hidden_dir/secret.png" % flat_dir, FileAccess.WRITE).store_string("PNG")
+	for index in range(82):
+		var folder := "%s/group_%02d" % [root, index]
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(folder))
+		var icon_path := "%s/icon_%02d.svg" % [folder, index]
+		FileAccess.open(icon_path, FileAccess.WRITE).store_string("<svg/>")
+		expected.append(icon_path)
+		if index % 7 == 0:
+			var nested := "%s/nested/deep/asset_%02d.webp" % [folder, index]
+			DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(nested.get_base_dir()))
+			FileAccess.open(nested, FileAccess.WRITE).store_string("WEBP")
+			expected.append(nested)
+	expected.sort()
+	return expected
+
+func _remove_tree(path: String) -> void:
+	var absolute := ProjectSettings.globalize_path(path)
+	if DirAccess.dir_exists_absolute(absolute):
+		_remove_tree_recursive(absolute)
+
+func _remove_tree_recursive(absolute: String) -> void:
+	var directory := DirAccess.open(absolute)
+	if directory == null:
+		return
+	directory.list_dir_begin()
+	var entry := directory.get_next()
+	while not entry.is_empty():
+		var child := absolute.path_join(entry)
+		if directory.current_is_dir():
+			_remove_tree_recursive(child)
+		else:
+			DirAccess.remove_absolute(child)
+		entry = directory.get_next()
+	directory.list_dir_end()
+	DirAccess.remove_absolute(absolute)
+
+func _test_asset_indexing(studio: UIForgeStudio) -> void:
+	var synthetic_root := "res://tests/synthetic_asset_index"
+	_remove_tree(synthetic_root)
+	var expected := _build_synthetic_asset_tree(synthetic_root)
+	studio.asset_index_root = synthetic_root
+	studio._refresh_assets()
+	await _await_asset_index(studio)
+	_assert(studio.asset_scan_steps >= 3, "asset_index_multiple_steps_for_bulk_directory")
+	_assert(studio.asset_paths.size() == expected.size(), "asset_index_expected_count")
+	for path in expected:
+		_assert(studio.asset_paths.has(path), "asset_index_contains_%s" % path.get_file())
+	var duplicates := {}
+	for path in studio.asset_paths:
+		duplicates[path] = int(duplicates.get(path, 0)) + 1
+	for path in duplicates.keys():
+		_assert(int(duplicates[path]) == 1, "asset_index_unique_%s" % path.get_file())
+	var sorted_copy := studio.asset_paths.duplicate()
+	sorted_copy.sort()
+	_assert(sorted_copy == studio.asset_paths, "asset_index_sorted")
+	var initial_scan_steps := studio.asset_scan_steps
+	studio._on_asset_filter_changed("group_01")
+	_assert(studio.asset_scan_steps == initial_scan_steps, "asset_filter_does_not_rescan")
+	studio._refresh_assets()
+	_assert(not studio.asset_index_ready, "asset_refresh_rebuilds")
+	await _await_asset_index(studio)
+	_assert(studio.asset_paths.size() == expected.size(), "asset_refresh_expected_count")
+	_remove_tree(synthetic_root)
+	studio.asset_index_root = "res://"
+	studio._refresh_assets()
+	await _await_asset_index(studio)

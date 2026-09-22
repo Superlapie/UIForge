@@ -12,6 +12,8 @@ import tempfile
 import time
 from pathlib import Path
 
+from uiforge_machine import MAX_REQUEST_BYTES, validate_public_request_bytes
+
 FRAME_SENTINEL = "UIFORGE_MACHINE_V1\t"
 BOOTSTRAP_MARKER = ".uiforge/bootstrap_complete"
 IMPORT_LOG = ".uiforge/import_boot.log"
@@ -47,18 +49,19 @@ def run_bootstrap(godot_binary: str, root: Path) -> subprocess.CompletedProcess[
     marker_parent.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env["UIFORGE_BOOTSTRAP"] = "1"
-    completed = subprocess.run(
-        [godot_binary, "--headless", "--editor", "--path", str(root), "--quit"],
-        capture_output=True,
-        text=True,
-        timeout=180,
-        env=env,
-    )
+    command = [godot_binary, "--headless", "--editor", "--path", str(root), "--quit"]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+    if os.environ.get("UIFORGE_TRACE_PROCESSES") == "1":
+        print(json.dumps({"uiforge_trace": {"event": "bootstrap_spawned", "pid": process.pid}}), file=sys.stderr, flush=True)
+    stdout, stderr = process.communicate(timeout=180)
+    completed = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
     import_log = root / IMPORT_LOG
     import_log.parent.mkdir(parents=True, exist_ok=True)
     import_log.write_text((completed.stdout or "") + "\n" + (completed.stderr or ""), encoding="utf-8")
     if completed.returncode == 0:
         bootstrap_marker_path(root).write_text(str(time.time()), encoding="utf-8")
+    if os.environ.get("UIFORGE_TRACE_PROCESSES") == "1":
+        print(json.dumps({"uiforge_trace": {"event": "bootstrap_stopped", "pid": process.pid, "returncode": completed.returncode}}), file=sys.stderr, flush=True)
     return completed
 
 
@@ -134,6 +137,19 @@ def run_native_once(godot_binary: str, ui_args: list[str], *, bootstrap: bool | 
 
 def machine_oneshot(godot_binary: str, request: dict[str, object]) -> tuple[int, dict[str, object]]:
     root = project_dir()
+    raw = json.dumps(request, ensure_ascii=False, separators=(",", ":"))
+    ok, size_error = validate_public_request_bytes(raw.encode("utf-8"))
+    if not ok:
+        return 2, {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": str(request.get("request_id", "")),
+            "success": False,
+            "error": {"code": size_error, "message": "Request exceeds max size."},
+            "result": {},
+            "diagnostics": [],
+            "meta": {"backend": "godot-native"},
+        }
     request_dir = root / ".uiforge"
     request_dir.mkdir(parents=True, exist_ok=True)
     handle = tempfile.NamedTemporaryFile(

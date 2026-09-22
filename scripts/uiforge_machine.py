@@ -3,13 +3,14 @@
 
 from __future__ import annotations
 
-import math
 from typing import Any
-
 PROTOCOL_ID = "uiforge.machine"
 PROTOCOL_VERSION = 1
 COMMAND_CONTRACT_VERSION = 1
 MAX_REQUEST_BYTES = 1048576
+INTERNAL_REQUEST_PREFIX = "UIFORGE_REQUEST\t"
+INTERNAL_REQUEST_PREFIX_BYTES = len(INTERNAL_REQUEST_PREFIX.encode("utf-8"))
+MAX_INTERNAL_LINE_BYTES = MAX_REQUEST_BYTES + INTERNAL_REQUEST_PREFIX_BYTES
 FRAME_SENTINEL = "UIFORGE_MACHINE_V1\t"
 CONNECT_PREFIX = "UIFORGE_CONNECT\t"
 
@@ -24,11 +25,17 @@ EXIT_INTERNAL = 70
 def _is_exact_protocol_version(value: Any) -> bool:
     if isinstance(value, bool):
         return False
-    if isinstance(value, int):
-        return value == PROTOCOL_VERSION
-    if isinstance(value, float) and math.isfinite(value):
-        return value == float(PROTOCOL_VERSION) and value == math.floor(value)
-    return False
+    return isinstance(value, int) and value == PROTOCOL_VERSION
+
+
+def public_request_byte_length(raw: str) -> int:
+    return len(raw.encode("utf-8"))
+
+
+def validate_public_request_bytes(raw: bytes) -> tuple[bool, str | None]:
+    if len(raw) > MAX_REQUEST_BYTES:
+        return False, "REQUEST_TOO_LARGE"
+    return True, None
 
 
 def validate_request(payload: Any) -> dict[str, Any]:
@@ -39,7 +46,7 @@ def validate_request(payload: Any) -> dict[str, Any]:
         return {"ok": False, "code": "PROTOCOL_MISMATCH", "message": "Unsupported protocol identifier."}
     if not _is_exact_protocol_version(payload.get("protocol_version")):
         version = payload.get("protocol_version")
-        if isinstance(version, bool) or not isinstance(version, (int, float)):
+        if isinstance(version, bool) or not isinstance(version, int):
             return {"ok": False, "code": "MALFORMED_REQUEST", "message": "protocol_version must be an integer."}
         return {
             "ok": False,

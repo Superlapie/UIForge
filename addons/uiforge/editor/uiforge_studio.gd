@@ -39,8 +39,12 @@ var asset_paths: Array[String] = []
 var asset_index_ready: bool = false
 var asset_index_scanning: bool = false
 var asset_scan_steps: int = 0
+var asset_index_root: String = "res://"
 var _asset_scan_queue: Array[String] = []
+var _asset_scan_dir: DirAccess = null
+var _asset_scan_dir_path: String = ""
 const ASSET_SCAN_BUDGET := 48
+const ASSET_EXTENSIONS := ["png", "jpg", "jpeg", "webp", "svg", "ttf", "otf", "woff", "woff2", "tres", "res", "material", "gdshader", "shader", "json"]
 static var asset_scan_calls_during_init: int = 0
 var status_label: Label
 var file_dialog: FileDialog
@@ -323,7 +327,9 @@ func _refresh_assets() -> void:
 	asset_index_ready = false
 	asset_scan_steps = 0
 	asset_paths.clear()
-	_asset_scan_queue = ["res://"]
+	_asset_scan_dir = null
+	_asset_scan_dir_path = ""
+	_asset_scan_queue = [asset_index_root]
 	call_deferred("_scan_assets_step")
 
 func _scan_assets_step() -> void:
@@ -331,27 +337,31 @@ func _scan_assets_step() -> void:
 		return
 	asset_scan_steps += 1
 	var budget := ASSET_SCAN_BUDGET
-	while budget > 0 and not _asset_scan_queue.is_empty():
-		var path: String = _asset_scan_queue.pop_front()
-		var directory := DirAccess.open(path)
-		if directory == null:
-			budget -= 1
-			continue
-		directory.list_dir_begin()
-		var filename := directory.get_next()
-		while not filename.is_empty() and budget > 0:
-			if filename.begins_with("."):
-				filename = directory.get_next()
+	while budget > 0:
+		if _asset_scan_dir == null:
+			if _asset_scan_queue.is_empty():
+				break
+			_asset_scan_dir_path = _asset_scan_queue.pop_front()
+			_asset_scan_dir = DirAccess.open(_asset_scan_dir_path)
+			if _asset_scan_dir == null:
+				budget -= 1
 				continue
-			var child_path := path.path_join(filename)
-			if directory.current_is_dir():
-				_asset_scan_queue.append(child_path)
-			elif filename.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "svg", "ttf", "otf", "woff", "woff2", "tres", "res", "material", "gdshader", "shader", "json"]:
-				asset_paths.append(child_path)
-			filename = directory.get_next()
-			budget -= 1
-		directory.list_dir_end()
-	if _asset_scan_queue.is_empty():
+			_asset_scan_dir.list_dir_begin()
+		var filename := _asset_scan_dir.get_next()
+		if filename.is_empty():
+			_asset_scan_dir.list_dir_end()
+			_asset_scan_dir = null
+			_asset_scan_dir_path = ""
+			continue
+		budget -= 1
+		if filename.begins_with("."):
+			continue
+		var child_path := _asset_scan_dir_path.path_join(filename)
+		if _asset_scan_dir.current_is_dir():
+			_asset_scan_queue.append(child_path)
+		elif filename.get_extension().to_lower() in ASSET_EXTENSIONS:
+			asset_paths.append(child_path)
+	if _asset_scan_queue.is_empty() and _asset_scan_dir == null:
 		asset_paths.sort()
 		asset_index_scanning = false
 		asset_index_ready = true

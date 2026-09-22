@@ -348,17 +348,28 @@ def commit_batch(path: str, operations: list[dict[str, Any]], expected_revision:
     }, EXIT_SUCCESS
 
 
-def commit_mutation(path: str, mutate) -> tuple[dict[str, Any], int]:
+def commit_mutation(path: str, mutate, expected_revision: str = "") -> tuple[dict[str, Any], int]:
     loaded = load(path)
     data = loaded.get("document")
     if data is None:
-        return {"success": False, "committed": False, "errors": loaded.get("errors", [])}, 1
-    expected_revision = str(loaded.get("revision_hash", ""))
+        return {"success": False, "committed": False, "errors": loaded.get("errors", [])}, EXIT_VALIDATION
+    current_revision = str(loaded.get("revision_hash", ""))
+    if expected_revision and expected_revision != current_revision:
+        return {
+            "success": False,
+            "committed": False,
+            "errors": [{
+                "code": "REVISION_CONFLICT",
+                "message": "Expected revision does not match current document.",
+                "expected_revision": expected_revision,
+                "current_revision": current_revision,
+            }],
+        }, EXIT_CONFLICT
     working = copy.deepcopy(data)
     operation = mutate(working)
     if not operation.get("success"):
         operation["committed"] = False
-        return operation, 1
+        return operation, EXIT_VALIDATION
     validation = validate(working)
     if not validation["success"]:
         return {
@@ -367,17 +378,18 @@ def commit_mutation(path: str, mutate) -> tuple[dict[str, Any], int]:
             "errors": [item for item in validation["diagnostics"] if item.get("severity") == "error"],
             "warnings": validation["warnings"],
             "diagnostics": validation["diagnostics"],
-        }, 1
-    saved = save(path, working, expected_revision)
+        }, EXIT_VALIDATION
+    saved = save(path, working, current_revision)
     if not saved.get("success", False):
         operation["success"] = False
         operation["committed"] = False
         operation["errors"] = saved.get("errors", [{"code": "SAVE_FAILED", "message": path}])
-        return operation, 1
+        return operation, EXIT_IO_TRUST
     operation["success"] = True
     operation["committed"] = True
     operation.pop("saved", None)
-    return operation, 0
+    operation["revision"] = str(saved.get("revision_hash", content_hash(working)))
+    return operation, EXIT_SUCCESS
 
 
 def fs_path(raw: str | Path) -> Path:
@@ -1192,6 +1204,11 @@ def capabilities() -> dict[str, Any]:
         "batch": {"supported": True, "atomic": True, "dry_run": True, "operations": ["set", "add", "delete", "move", "duplicate"]},
         "dry_run": {"supported": True, "methods": ["batch"]},
         "max_request_bytes": MAX_REQUEST_BYTES,
+        "protocol_version_semantics": {
+            "python_requires_json_integer": True,
+            "godot_accepts_whole_number_float": True,
+            "note": "Python transports require protocol_version as a JSON integer. Godot JSON parsing represents numbers as float; native transport accepts whole-number floats equal to a supported version.",
+        },
         "supported_render_states": ["normal", "hover", "pressed", "focused", "disabled", "selected"],
         "supported_transports": ["human_cli", "machine_oneshot"],
         "exit_codes": {
@@ -1343,11 +1360,17 @@ def to_machine_response(request_id: str, legacy: dict[str, Any]) -> dict[str, An
     if isinstance(legacy.get("error"), dict):
         code = str(legacy["error"].get("code", code))
         message = str(legacy["error"].get("message", message))
-    elif legacy.get("errors"):
+    elif isinstance(legacy.get("errors"), list) and legacy["errors"]:
         first = legacy["errors"][0]
         if isinstance(first, dict):
             code = str(first.get("code", code))
             message = str(first.get("message", message))
+    elif isinstance(legacy.get("diagnostics"), list):
+        for item in legacy["diagnostics"]:
+            if isinstance(item, dict) and str(item.get("severity", "")) == "error":
+                code = str(item.get("code", code))
+                message = str(item.get("message", message))
+                break
     diagnostics = legacy.get("diagnostics", legacy.get("errors", []))
     return error_response(
         request_id,
@@ -1413,6 +1436,110 @@ def dispatch_legacy(method: str, params: dict[str, Any]) -> tuple[dict[str, Any]
             "value": get_path(node, property_path),
             "revision": str(loaded.get("revision_hash", "")),
         }, EXIT_SUCCESS
+    if method == "set":
+        document = str(params.get("document", params.get("path", "")))
+        node_id = str(params.get("node", params.get("node_id", "")))
+        property_path = str(params.get("property", params.get("property_path", "")))
+        if not document or not node_id or not property_path:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "set requires document, node, and property."}]}, EXIT_CLI_USAGE
+        raw_value = params.get("value", "")
+        if not isinstance(raw_value, str):
+            raw_value = json.dumps(raw_value, ensure_ascii=False)
+        return commit_mutation(
+            document,
+            lambda working: operation_set(working, node_id, property_path, raw_value),
+            str(params.get("expected_revision", "")),
+        )
+    if method == "add":
+        document = str(params.get("document", params.get("path", "")))
+        parent_id = str(params.get("parent", params.get("parent_id", "")))
+        raw_node = params.get("node", params.get("node_json", ""))
+        if not document or not parent_id or raw_node in ("", None):
+            return {"success": False, "errors": [{"code": "USAGE", "message": "add requires document, parent, and node."}]}, EXIT_CLI_USAGE
+        if isinstance(raw_node, dict):
+            raw_node = json.dumps(raw_node, ensure_ascii=False)
+        return commit_mutation(
+            document,
+            lambda working: operation_add(working, parent_id, str(raw_node)),
+            str(params.get("expected_revision", "")),
+        )
+    if method == "delete":
+        document = str(params.get("document", params.get("path", "")))
+        node_id = str(params.get("node", params.get("node_id", "")))
+        if not document or not node_id:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "delete requires document and node."}]}, EXIT_CLI_USAGE
+        return commit_mutation(
+            document,
+            lambda working: operation_delete(working, node_id),
+            str(params.get("expected_revision", "")),
+        )
+    if method == "move":
+        document = str(params.get("document", params.get("path", "")))
+        node_id = str(params.get("node", params.get("node_id", "")))
+        parent_id = str(params.get("parent", params.get("parent_id", "")))
+        index = int(params.get("index", -1))
+        if not document or not node_id or not parent_id:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "move requires document, node, and parent."}]}, EXIT_CLI_USAGE
+        return commit_mutation(
+            document,
+            lambda working: operation_move(working, node_id, parent_id, index),
+            str(params.get("expected_revision", "")),
+        )
+    if method == "duplicate":
+        document = str(params.get("document", params.get("path", "")))
+        node_id = str(params.get("node", params.get("node_id", "")))
+        new_id = str(params.get("new_id", ""))
+        if not document or not node_id or not new_id:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "duplicate requires document, node, and new_id."}]}, EXIT_CLI_USAGE
+        return commit_mutation(
+            document,
+            lambda working: operation_duplicate(working, node_id, new_id),
+            str(params.get("expected_revision", "")),
+        )
+    if method == "new":
+        template = str(params.get("template", ""))
+        output = str(params.get("output", ""))
+        if not template or not output:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "new requires template and output."}]}, EXIT_CLI_USAGE
+        flags = {
+            "force": bool(params.get("force", False)),
+            "allow_outside_project": bool(params.get("allow_outside_project", False)),
+        }
+        extra: list[str] = []
+        if flags["force"]:
+            extra.append("--force")
+        if flags["allow_outside_project"]:
+            extra.append("--allow-outside-project")
+        return main(["new", template, output, *extra])
+    if method == "build":
+        document = str(params.get("document", params.get("path", "")))
+        if not document:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "build requires document."}]}, EXIT_CLI_USAGE
+        build_args = ["build", document]
+        output = str(params.get("output", ""))
+        if output:
+            build_args.append(output)
+        if bool(params.get("force", False)):
+            build_args.append("--force")
+        if bool(params.get("allow_outside_project", False)):
+            build_args.append("--allow-outside-project")
+        return main(build_args)
+    if method == "build-all":
+        build_args = ["build-all"]
+        if params.get("source_dir"):
+            build_args.append(str(params.get("source_dir")))
+        if params.get("output_dir"):
+            build_args.append(str(params.get("output_dir")))
+        if bool(params.get("force", False)):
+            build_args.append("--force")
+        if bool(params.get("allow_outside_project", False)):
+            build_args.append("--allow-outside-project")
+        return main(build_args)
+    if method == "render":
+        document = str(params.get("document", params.get("path", "")))
+        if not document:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "render requires document."}]}, EXIT_CLI_USAGE
+        return main(["render", document])
     return {"success": False, "errors": [{"code": "UNKNOWN_METHOD", "message": f"Unknown method '{method}'."}]}, EXIT_CLI_USAGE
 
 

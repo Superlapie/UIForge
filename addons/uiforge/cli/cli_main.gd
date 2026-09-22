@@ -17,23 +17,23 @@ func _run_machine_oneshot(machine_args: PackedStringArray) -> void:
 	if machine_args.is_empty():
 		_emit_machine(UIForgeMachineProtocol.error_response("", "USAGE", "machine-oneshot requires a JSON request path or inline payload marker."))
 		return
-	var request: Dictionary = {}
+	var raw_text := ""
 	if str(machine_args[0]) == "--request-json":
-		var parser := JSON.new()
-		if parser.parse(str(machine_args[1]) if machine_args.size() > 1 else "") != OK or not parser.data is Dictionary:
-			_emit_machine(UIForgeMachineProtocol.error_response("", "MALFORMED_REQUEST", "Invalid inline machine request JSON."))
-			return
-		request = parser.data
+		raw_text = str(machine_args[1]) if machine_args.size() > 1 else ""
 	else:
 		var file := FileAccess.open(str(machine_args[0]), FileAccess.READ)
 		if file == null:
 			_emit_machine(UIForgeMachineProtocol.error_response("", "REQUEST_FILE_NOT_FOUND", "Machine request file not found."))
 			return
-		var parser := JSON.new()
-		if parser.parse(file.get_as_text()) != OK or not parser.data is Dictionary:
-			_emit_machine(UIForgeMachineProtocol.error_response("", "MALFORMED_REQUEST", "Machine request file is not valid JSON."))
-			return
-		request = parser.data
+		raw_text = file.get_as_text()
+	if raw_text.to_utf8_buffer().size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES:
+		_emit_machine(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
+		return
+	var parser := JSON.new()
+	if parser.parse(raw_text) != OK or not parser.data is Dictionary:
+		_emit_machine(UIForgeMachineProtocol.error_response("", "MALFORMED_REQUEST", "Machine request file is not valid JSON."))
+		return
+	var request: Dictionary = parser.data
 	var response := await UIForgeCommandDispatcher.dispatch_machine(request)
 	_emit_machine(response)
 

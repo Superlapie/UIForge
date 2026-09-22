@@ -85,6 +85,77 @@ def persistent_read_benchmark(godot: str, count: int = 100) -> dict:
     }
 
 
+def persistent_mixed_benchmark(godot: str, count: int = 100) -> dict:
+    proc = subprocess.Popen(
+        [sys.executable, str(ROOT / "scripts" / "ui_godot.py"), godot, "serve", "--stdio"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    assert proc.stdout is not None
+    assert proc.stdin is not None
+    json.loads(proc.stdout.readline())
+    methods = [
+        ("validate", {"document": "tests/conformance/fixtures/minimal.ui.json"}),
+        ("inspect", {"document": "tests/conformance/fixtures/minimal.ui.json", "scope": "tree"}),
+        ("get", {"document": "tests/conformance/fixtures/minimal.ui.json", "node": "root", "property": "layout.size"}),
+    ]
+    loop_start = time.perf_counter()
+    for index in range(count):
+        method, params = methods[index % len(methods)]
+        request = {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": f"mixed-{index}",
+            "method": method,
+            "params": params,
+        }
+        proc.stdin.write(json.dumps(request) + "\n")
+        proc.stdin.flush()
+        response = json.loads(proc.stdout.readline())
+        if not response.get("success"):
+            proc.kill()
+            raise RuntimeError(response)
+    elapsed = time.perf_counter() - loop_start
+    proc.stdin.close()
+    proc.wait(timeout=60)
+    return {"label": f"persistent_{count}_mixed_reads", "seconds": elapsed, "requests": count}
+
+
+def batch_dry_run_benchmark(godot: str, count: int = 25) -> dict:
+    temp_dir = ROOT / ".uiforge" / "benchmark_batches"
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    temp_doc = temp_dir / "bench_batch.ui.json"
+    shutil.copy(ROOT / "tests/conformance/fixtures/minimal.ui.json", temp_doc)
+    rel_doc = str(temp_doc.relative_to(ROOT)).replace("\\", "/")
+    start = time.perf_counter()
+    for index in range(count):
+        revision = machine_oneshot(godot, {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": f"bench-rev-{index}",
+            "method": "validate",
+            "params": {"document": rel_doc},
+        })[1].get("result", {}).get("revision", "")
+        _code, payload = machine_oneshot(godot, {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": f"bench-batch-{index}",
+            "method": "batch",
+            "params": {
+                "document": rel_doc,
+                "expected_revision": revision,
+                "dry_run": True,
+                "operations": [{"op": "set", "node": "root", "property": "layout.size", "value": "[420,300]"}],
+            },
+        })
+        if not payload.get("success"):
+            raise RuntimeError(payload)
+    elapsed = time.perf_counter() - start
+    return {"label": f"batch_{count}_dry_runs", "seconds": elapsed, "requests": count}
+
+
 def main() -> int:
     godot = godot_bin()
     fixture = "examples/specs/inventory.ui.json"
@@ -116,6 +187,8 @@ def main() -> int:
     results["cases"].append(one_shot_reads)
     persistent = persistent_read_benchmark(godot, 100)
     results["cases"].append(persistent)
+    results["cases"].append(persistent_mixed_benchmark(godot, 100))
+    results["cases"].append(batch_dry_run_benchmark(godot, 25))
     if one_shot_reads["seconds"] > 0 and persistent["seconds"] > 0:
         results["persistent_to_oneshot_ratio"] = one_shot_reads["seconds"] / persistent["seconds"]
     if results.get("persistent_to_oneshot_ratio", 0) < 2.0:

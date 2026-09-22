@@ -6,7 +6,9 @@ const PROTOCOL_VERSION := 1
 const COMMAND_CONTRACT_VERSION := 1
 const FRAME_SENTINEL := "UIFORGE_MACHINE_V1\t"
 const CONNECT_PREFIX := "UIFORGE_CONNECT\t"
+const REQUEST_PREFIX := "UIFORGE_REQUEST\t"
 const MAX_REQUEST_BYTES := 1048576
+const MAX_INTERNAL_LINE_BYTES := 1048592
 
 enum ExitClass {
 	SUCCESS = 0,
@@ -24,11 +26,9 @@ static func validate_request(payload: Variant) -> Dictionary:
 	if typeof(protocol_value) != TYPE_STRING or str(protocol_value) != PROTOCOL_ID:
 		return _invalid("PROTOCOL_MISMATCH", "Unsupported protocol identifier.")
 	var version_value: Variant = payload.get("protocol_version")
-	if typeof(version_value) == TYPE_BOOL:
-		return _invalid("MALFORMED_REQUEST", "protocol_version must be an integer.")
-	if typeof(version_value) != TYPE_INT and typeof(version_value) != TYPE_FLOAT:
-		return _invalid("MALFORMED_REQUEST", "protocol_version must be an integer.")
-	if int(version_value) != PROTOCOL_VERSION:
+	if not _is_exact_protocol_version(version_value):
+		if typeof(version_value) == TYPE_BOOL or (typeof(version_value) != TYPE_INT and typeof(version_value) != TYPE_FLOAT):
+			return _invalid("MALFORMED_REQUEST", "protocol_version must be an integer.")
 		return _invalid("UNSUPPORTED_PROTOCOL_VERSION", "Unsupported protocol version %s." % str(version_value), ExitClass.CLI_USAGE)
 	var request_id_value: Variant = payload.get("request_id")
 	if typeof(request_id_value) != TYPE_STRING or str(request_id_value).is_empty():
@@ -134,3 +134,13 @@ static func _meta() -> Dictionary:
 
 static func _invalid(code: String, message: String, exit_class: int = ExitClass.CLI_USAGE) -> Dictionary:
 	return {"ok": false, "code": code, "message": message, "exit_class": exit_class}
+
+static func _is_exact_protocol_version(value: Variant) -> bool:
+	if typeof(value) == TYPE_BOOL:
+		return false
+	if typeof(value) == TYPE_INT:
+		return int(value) == PROTOCOL_VERSION
+	if typeof(value) == TYPE_FLOAT:
+		var numeric := float(value)
+		return is_finite(numeric) and numeric == float(PROTOCOL_VERSION) and numeric == floor(numeric)
+	return false

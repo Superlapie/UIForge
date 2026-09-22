@@ -17,13 +17,16 @@ from pathlib import Path
 from ui_godot import FRAME_SENTINEL, project_dir, project_needs_bootstrap, run_bootstrap
 from uiforge_machine import (
     CONNECT_PREFIX,
+    INTERNAL_REQUEST_PREFIX,
+    MAX_INTERNAL_LINE_BYTES,
     MAX_REQUEST_BYTES,
     error_response,
     success_response,
+    validate_public_request_bytes,
     validate_request,
 )
 
-REQUEST_PREFIX = "UIFORGE_REQUEST\t"
+REQUEST_PREFIX = INTERNAL_REQUEST_PREFIX
 HANDSHAKE_TIMEOUT_SECONDS = 30.0
 SHUTDOWN_WAIT_SECONDS = 10.0
 
@@ -45,13 +48,27 @@ def _read_bounded_line(source, *, max_bytes: int = MAX_REQUEST_BYTES) -> tuple[b
         if chunk == b"":
             return None, None
         if chunk == b"\n":
-            return b"".join(chunks), None
+            line = b"".join(chunks)
+            ok, size_error = validate_public_request_bytes(line)
+            if not ok:
+                return None, size_error
+            return line, None
         total += len(chunk)
         if total > max_bytes:
             while chunk != b"\n" and chunk != b"":
                 chunk = source.read(1)
             return None, "REQUEST_TOO_LARGE"
         chunks.append(chunk)
+
+
+def _send_native_payload(sock: socket.socket, payload: bytes) -> None:
+    if os.environ.get("UIFORGE_TEST_CHUNKED_SEND") == "1":
+        chunk_size = max(1, int(os.environ.get("UIFORGE_TEST_CHUNK_SIZE", "64")))
+        for offset in range(0, len(payload), chunk_size):
+            sock.sendall(payload[offset:offset + chunk_size])
+            time.sleep(0.001)
+        return
+    sock.sendall(payload)
 
 
 def _read_framed_handshake(stdout, timeout_seconds: float) -> tuple[str, str | None]:
@@ -185,8 +202,8 @@ def serve_stdio(godot_binary: str) -> int:
                     str(validated.get("message", "Malformed request.")),
                 )), flush=True)
                 continue
-            payload = REQUEST_PREFIX + json.dumps(validated["request"], separators=(",", ":")) + "\n"
-            sock.sendall(payload.encode("utf-8"))
+            payload = REQUEST_PREFIX + json.dumps(validated["request"], separators=(",", ":"), ensure_ascii=False) + "\n"
+            _send_native_payload(sock, payload.encode("utf-8"))
             response_line, socket_size_error = _read_line_from_socket(sock, max_bytes=None)
             while response_line and not response_line.startswith(FRAME_SENTINEL) and socket_size_error is None:
                 response_line, socket_size_error = _read_line_from_socket(sock, max_bytes=None)
