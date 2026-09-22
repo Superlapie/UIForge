@@ -12,6 +12,7 @@ run_native() {
 	"$PROJECT_DIR/scripts/ui" validate examples/specs/inventory.ui.json
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/conformance_runner.gd
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/compiler_conformance_runner.gd
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/machine_protocol_runner.gd
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/trust_runner.gd
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/cross_process_lock_runner.gd
 	"$PROJECT_DIR/scripts/ui" build-all examples/specs examples/scenes --force

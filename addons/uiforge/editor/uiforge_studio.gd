@@ -36,6 +36,9 @@ var component_list: ItemList
 var asset_list: UIForgeAssetList
 var asset_search: LineEdit
 var asset_paths: Array[String] = []
+var asset_index_ready: bool = false
+var asset_index_scanning: bool = false
+static var asset_scan_calls_during_init: int = 0
 var status_label: Label
 var file_dialog: FileDialog
 var unsaved_dialog: ConfirmationDialog
@@ -226,7 +229,7 @@ func _build_bottom_panel() -> void:
 	asset_list.item_activated.connect(_on_asset_activated)
 	assets.add_child(asset_list)
 	bottom.add_child(assets)
-	_refresh_assets()
+	call_deferred("_refresh_assets")
 	var theme_view := RichTextLabel.new()
 	theme_view.name = "Theme"
 	theme_view.bbcode_enabled = true
@@ -307,14 +310,21 @@ func _build_bottom_panel() -> void:
 	add_child(status_label)
 
 func _refresh_assets() -> void:
+	if asset_index_scanning:
+		return
+	asset_index_scanning = true
 	asset_paths.clear()
-	# Scan the whole project so a game can keep UI art, fonts, materials, and
-	# theme packages in its own res://ui tree. Hidden/import directories are
-	# skipped by _scan_assets; the list remains filtered/searchable.
-	_scan_assets("res://")
+	call_deferred("_scan_assets", "res://")
+	call_deferred("_finish_asset_index")
+
+func _finish_asset_index() -> void:
+	asset_index_scanning = false
+	asset_index_ready = true
 	_refresh_asset_list(asset_search.text if asset_search != null else "")
 
 func _scan_assets(path: String) -> void:
+	if not asset_index_ready and asset_index_scanning:
+		asset_scan_calls_during_init += 1
 	var directory := DirAccess.open(path)
 	if directory == null:
 		return

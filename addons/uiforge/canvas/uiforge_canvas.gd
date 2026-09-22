@@ -36,21 +36,32 @@ var native_controls: Dictionary = {}
 var native_signature: String = ""
 var native_refresh_time: float = 0.0
 var native_preview_valid: bool = false
+var preview_dirty: bool = true
+var preview_debounce: float = 0.0
+const PREVIEW_DEBOUNCE_SECONDS := 0.12
+static var native_preview_compile_count: int = 0
+
+func invalidate_native_preview() -> void:
+	preview_dirty = true
 
 func _process(delta: float) -> void:
-	native_refresh_time += delta
-	if native_refresh_time < 0.25 or document == null or not is_visible_in_tree():
+	if not preview_dirty or document == null or not is_visible_in_tree():
 		return
-	native_refresh_time = 0.0
+	preview_debounce += delta
+	if preview_debounce < PREVIEW_DEBOUNCE_SECONDS:
+		return
+	preview_debounce = 0.0
+	preview_dirty = false
 	refresh_native_preview()
 
 func refresh_native_preview() -> void:
 	if document == null:
 		return
-	var signature := JSON.stringify(document.data) + preview_state
+	var signature := "%s|%s|%s" % [document.source_path, preview_state, UIForgeHash.document_revision(document)]
 	if signature == native_signature:
 		return
 	native_signature = signature
+	native_preview_compile_count += 1
 	native_preview_valid = false
 	native_controls.clear()
 	var preview := UIForgeCompiler.document_for_preview_state(document, preview_state)
@@ -103,6 +114,7 @@ func set_document(value: UIForgeDocument) -> void:
 	native_preview_valid = false
 	native_controls.clear()
 	selected_ids.clear()
+	invalidate_native_preview()
 	refresh_reference()
 
 func refresh_reference() -> void:
@@ -111,6 +123,7 @@ func refresh_reference() -> void:
 
 func set_preview_state(value: String) -> void:
 	preview_state = value.to_lower()
+	invalidate_native_preview()
 	queue_redraw()
 
 func set_viewport_preview(value: Vector2i) -> void:
@@ -586,6 +599,7 @@ func _commit_drag() -> void:
 		undo_redo.add_do_method(self, "_apply_drag_document_snapshot", after_snapshot)
 		undo_redo.add_undo_method(self, "_apply_drag_document_snapshot", before_snapshot)
 		undo_redo.commit_action()
+	invalidate_native_preview()
 	drag_start_document.clear()
 
 func _apply_drag_document_snapshot(snapshot: Dictionary) -> void:

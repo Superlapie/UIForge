@@ -9,7 +9,12 @@ func _init() -> void:
 func _run() -> void:
 	var studio := UIForgeStudio.new()
 	get_root().add_child(studio)
+	_assert(not studio.asset_index_ready, "asset_index_not_ready_during_construction")
+	_assert(studio.asset_paths.is_empty(), "asset_paths_empty_during_construction")
 	await process_frame
+	await process_frame
+	while not studio.asset_index_ready:
+		await process_frame
 	var document := UIForgeSerializer.create_default("editor_workflow")
 	studio.set_document(document)
 	var root_id := str(document.root().get("id", ""))
@@ -30,6 +35,19 @@ func _run() -> void:
 	_assert(document.get_property("texture_uiforge_gem", "metadata.test") == true, "inspector_writes_metadata")
 	studio._on_inspector_apply({"__native__:process_mode": 3})
 	_assert(document.get_property("texture_uiforge_gem", "properties.godot_overrides.process_mode") == 3, "inspector_writes_native_property")
+	UIForgeCanvas.native_preview_compile_count = 0
+	studio.canvas.preview_dirty = false
+	await process_frame
+	await process_frame
+	await process_frame
+	var idle_compiles := UIForgeCanvas.native_preview_compile_count
+	_assert(idle_compiles == 0, "canvas_idle_no_recompiles")
+	document.set_property(root_id, "layout.size", [960.0, 640.0])
+	studio.canvas.invalidate_native_preview()
+	await process_frame
+	await process_frame
+	await process_frame
+	_assert(UIForgeCanvas.native_preview_compile_count <= idle_compiles + 1, "canvas_single_debounced_recompile")
 	studio.canvas.set_viewport_preview(Vector2i(1280, 720))
 	_assert(is_equal_approx(studio.canvas._display_scale(), 2.0 / 3.0), "viewport_preview_scales_fit_documents")
 	var panel := {"id": "asset_panel", "type": "OrnatePanel", "layout": {"position": [300, 100], "size": [420, 320]}, "children": []}

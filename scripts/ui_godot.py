@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keep the Godot CLI transport machine-readable despite engine banner output."""
+"""Native Godot CLI transport with lazy bootstrap and framed machine protocol."""
 
 from __future__ import annotations
 
@@ -8,64 +8,112 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
+FRAME_SENTINEL = "UIFORGE_MACHINE_V1\t"
+BOOTSTRAP_MARKER = ".uiforge/bootstrap_complete"
+IMPORT_LOG = ".uiforge/import_boot.log"
 
-def main(argv: list[str]) -> int:
-    if len(argv) < 2:
-        print(json.dumps({"success": False, "errors": [{"code": "LAUNCHER_USAGE", "message": "ui_godot.py <godot_binary> <ui_args...>"}]}))
-        return 2
-    godot_binary = argv[0]
-    project_dir = Path(__file__).resolve().parents[1]
+
+def project_dir() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def bootstrap_marker_path(root: Path) -> Path:
+    return root / BOOTSTRAP_MARKER
+
+
+def project_needs_bootstrap(root: Path) -> bool:
+    if os.environ.get("UIFORGE_FORCE_BOOTSTRAP") == "1":
+        return True
+    godot_dir = root / ".godot"
+    if not godot_dir.exists():
+        return True
+    marker = bootstrap_marker_path(root)
+    if not marker.exists():
+        return True
     try:
-        import_process = subprocess.run(
-            [godot_binary, "--headless", "--editor", "--path", str(project_dir), "--quit"],
-            capture_output=True,
-            text=True,
-            timeout=120,
-        )
-    except subprocess.TimeoutExpired:
-        print(json.dumps({
-            "success": False,
-            "errors": [{
-                "code": "GODOT_IMPORT_TIMEOUT",
-                "message": "Godot did not finish project initialization/import within 120 seconds.",
-            }],
-        }, indent="\t"))
-        return 124
-    if import_process.returncode != 0:
-        print(json.dumps({
-            "success": False,
-            "errors": [{
-                "code": "GODOT_IMPORT_FAILED",
-                "message": "Godot could not initialize/import the project before the CLI command.",
-                "stderr": import_process.stderr.strip()[-4000:],
-            }],
-        }, indent="\t"))
-        return import_process.returncode
-    render_with_virtual_display = argv[1] == "render" and not os.environ.get("DISPLAY") and shutil.which("xvfb-run")
+        if godot_dir.stat().st_mtime > marker.stat().st_mtime:
+            return True
+    except OSError:
+        return True
+    return False
+
+
+def run_bootstrap(godot_binary: str, root: Path) -> subprocess.CompletedProcess[str]:
+    marker_parent = bootstrap_marker_path(root).parent
+    marker_parent.mkdir(parents=True, exist_ok=True)
+    env = os.environ.copy()
+    env["UIFORGE_BOOTSTRAP"] = "1"
+    completed = subprocess.run(
+        [godot_binary, "--headless", "--editor", "--path", str(root), "--quit"],
+        capture_output=True,
+        text=True,
+        timeout=180,
+        env=env,
+    )
+    import_log = root / IMPORT_LOG
+    import_log.parent.mkdir(parents=True, exist_ok=True)
+    import_log.write_text((completed.stdout or "") + "\n" + (completed.stderr or ""), encoding="utf-8")
+    if completed.returncode == 0:
+        bootstrap_marker_path(root).write_text(str(time.time()), encoding="utf-8")
+    return completed
+
+
+def godot_command(godot_binary: str, root: Path, ui_args: list[str]) -> list[str]:
+    render_with_virtual_display = len(ui_args) > 0 and ui_args[0] == "render" and not os.environ.get("DISPLAY") and shutil.which("xvfb-run")
     command = ([shutil.which("xvfb-run"), "-a", godot_binary] if render_with_virtual_display else [godot_binary, "--headless"])
-    command.extend([
-        "--path",
-        str(project_dir),
-        "--script",
-        "res://addons/uiforge/cli/cli_main.gd",
-        "--",
-        *argv[1:],
-    ])
+    command.extend(["--path", str(root), "--script", "res://addons/uiforge/cli/cli_main.gd", "--", *ui_args])
+    return [part for part in command if part]
+
+
+def parse_framed_stdout(stdout: str) -> dict[str, object] | None:
+    for line in stdout.splitlines():
+        if line.startswith(FRAME_SENTINEL):
+            return json.loads(line[len(FRAME_SENTINEL):])
+    return None
+
+
+def run_native_once(godot_binary: str, ui_args: list[str], *, bootstrap: bool | None = None) -> tuple[int, dict[str, object]]:
+    root = project_dir()
+    did_bootstrap = False
+    if bootstrap is None:
+        bootstrap = project_needs_bootstrap(root)
+    if bootstrap:
+        did_bootstrap = True
+        boot = run_bootstrap(godot_binary, root)
+        if boot.returncode != 0:
+            return boot.returncode, {
+                "protocol": "uiforge.machine",
+                "protocol_version": 1,
+                "request_id": "",
+                "success": False,
+                "error": {
+                    "code": "GODOT_IMPORT_FAILED",
+                    "message": "Godot could not initialize/import the project before the CLI command.",
+                },
+                "diagnostics": [],
+                "meta": {"backend": "godot-native", "bootstrap": True},
+            }
+    command = godot_command(godot_binary, root, ui_args)
     process = subprocess.run(command, capture_output=True, text=True)
-    decoder = json.JSONDecoder()
-    payload = None
-    for index, character in enumerate(process.stdout):
-        if character != "{":
-            continue
-        try:
-            candidate, _end = decoder.raw_decode(process.stdout[index:])
-            if isinstance(candidate, dict) and "success" in candidate:
-                payload = candidate
-                break
-        except json.JSONDecodeError:
-            continue
+    if os.environ.get("UIFORGE_TRACE_PROCESSES") == "1":
+        print(json.dumps({"uiforge_trace": {"bootstrap": did_bootstrap, "command": command}}), file=sys.stderr)
+    payload = parse_framed_stdout(process.stdout)
+    if payload is None and ui_args and ui_args[0] not in {"serve-internal"}:
+        # Legacy human JSON fallback for transitional commands.
+        decoder = json.JSONDecoder()
+        for index, character in enumerate(process.stdout):
+            if character != "{":
+                continue
+            try:
+                candidate, _end = decoder.raw_decode(process.stdout[index:])
+                if isinstance(candidate, dict) and "success" in candidate:
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
     if payload is None:
         payload = {
             "success": False,
@@ -76,8 +124,101 @@ def main(argv: list[str]) -> int:
                 "stdout": process.stdout.strip()[-4000:],
             }],
         }
+    if did_bootstrap:
+        payload.setdefault("meta", {})
+        if isinstance(payload["meta"], dict):
+            payload["meta"]["bootstrap"] = True
+    return process.returncode, payload
+
+
+def machine_oneshot(godot_binary: str, request: dict[str, object]) -> tuple[int, dict[str, object]]:
+    root = project_dir()
+    request_path = root / ".uiforge/tmp_machine_request.json"
+    request_path.parent.mkdir(parents=True, exist_ok=True)
+    request_path.write_text(json.dumps(request), encoding="utf-8")
+    code, payload = run_native_once(godot_binary, ["machine-oneshot", str(request_path)])
+    try:
+        request_path.unlink(missing_ok=True)
+    except OSError:
+        pass
+    return code, payload
+
+
+def exit_class_from_payload(payload: dict[str, object]) -> int:
+    if payload.get("success"):
+        return 0
+    error = payload.get("error", {})
+    code_name = error.get("code", "") if isinstance(error, dict) else ""
+    if code_name in {"REVISION_CONFLICT", "WRITE_CONFLICT"}:
+        return 4
+    if code_name in {"OUTPUT_OUTSIDE_WORKSPACE", "PATH_CANONICALIZATION_FAILED", "FILE_NOT_FOUND"}:
+        return 5
+    if code_name in {"USAGE", "MALFORMED_REQUEST", "UNKNOWN_METHOD", "PROTOCOL_MISMATCH"}:
+        return 2
+    return 3
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) < 2:
+        print(json.dumps({"success": False, "errors": [{"code": "LAUNCHER_USAGE", "message": "ui_godot.py <godot_binary> <ui_args...>"}]}))
+        return 2
+    godot_binary = argv[0]
+    ui_args = argv[1:]
+    if ui_args[:1] == ["serve"]:
+        if len(ui_args) > 1 and ui_args[1] not in ("--stdio",):
+            print(json.dumps({"success": False, "error": {"code": "USAGE", "message": "Use ui serve --stdio"}}))
+            return 2
+        from ui_serve import serve_stdio
+
+        return serve_stdio(godot_binary)
+    if ui_args[:1] == ["batch"]:
+        if len(ui_args) < 2:
+            print(json.dumps({"success": False, "error": {"code": "USAGE", "message": "ui batch <file.ui.json> [--stdin]"}}))
+            return 2
+        params: dict[str, object] = {"document": ui_args[1].replace("\\", "/")}
+        if "--stdin" in ui_args:
+            params.update(json.loads(sys.stdin.read()))
+        request = {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": os.environ.get("UIFORGE_REQUEST_ID", "batch-cli"),
+            "method": "batch",
+            "params": params,
+        }
+        code, payload = machine_oneshot(godot_binary, request)
+        print(json.dumps(payload, ensure_ascii=False))
+        return 0 if payload.get("success") else exit_class_from_payload(payload)
+    if ui_args[:1] == ["--machine"]:
+        if len(ui_args) < 2:
+            print(json.dumps({"success": False, "error": {"code": "USAGE", "message": "--machine requires method"}}))
+            return 2
+        request = {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": os.environ.get("UIFORGE_REQUEST_ID", "req-cli"),
+            "method": ui_args[1],
+            "params": {},
+        }
+        if "--params" in ui_args:
+            params_index = ui_args.index("--params")
+            params_path = Path(ui_args[params_index + 1])
+            request["params"] = json.loads(params_path.read_text(encoding="utf-8"))
+        code, payload = machine_oneshot(godot_binary, request)
+        print(json.dumps(payload, ensure_ascii=False))
+        if payload.get("success"):
+            return 0
+        error = payload.get("error", {})
+        code_name = error.get("code", "") if isinstance(error, dict) else ""
+        if code_name in {"REVISION_CONFLICT", "WRITE_CONFLICT"}:
+            return 4
+        if code_name in {"OUTPUT_OUTSIDE_WORKSPACE", "PATH_CANONICALIZATION_FAILED", "FILE_NOT_FOUND"}:
+            return 5
+        if code_name in {"USAGE", "MALFORMED_REQUEST", "UNKNOWN_METHOD"}:
+            return 2
+        return 3 if not payload.get("success") else 0
+    exit_code, payload = run_native_once(godot_binary, ui_args)
     print(json.dumps(payload, indent="\t", ensure_ascii=False))
-    return process.returncode
+    return exit_code
 
 
 if __name__ == "__main__":

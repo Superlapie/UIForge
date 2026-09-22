@@ -33,6 +33,22 @@ from uiforge_contract import (
     write_source_atomically,
     write_text_atomically,
 )
+from uiforge_machine import (
+    COMMAND_CONTRACT_VERSION,
+    EXIT_CLI_USAGE,
+    EXIT_CONFLICT,
+    EXIT_IO_TRUST,
+    EXIT_SUCCESS,
+    EXIT_VALIDATION,
+    MAX_REQUEST_BYTES,
+    PROTOCOL_ID,
+    PROTOCOL_VERSION,
+    error_response,
+    exit_class_for_response,
+    normalize_diagnostics,
+    success_response,
+    validate_request,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 THEME_PATH = ROOT / "addons/uiforge/themes/dark_fantasy.theme.json"
@@ -225,6 +241,110 @@ def collect_ids(node: dict[str, Any]) -> set[str]:
         if node_id:
             ids.add(node_id)
     return ids
+
+
+def apply_batch_operation(data: dict[str, Any], op: dict[str, Any]) -> dict[str, Any]:
+    match str(op.get("op", "")):
+        case "set":
+            value = op.get("value", "")
+            raw_value = value if isinstance(value, str) else json.dumps(value)
+            return operation_set(data, str(op.get("node", "")), str(op.get("property", "")), raw_value)
+        case "add":
+            node_payload = op.get("node", op.get("value", {}))
+            raw_node = node_payload if isinstance(node_payload, str) else json.dumps(node_payload)
+            return operation_add(data, str(op.get("parent", op.get("parent_id", ""))), raw_node)
+        case "delete":
+            return operation_delete(data, str(op.get("node", "")))
+        case "move":
+            return operation_move(data, str(op.get("node", "")), str(op.get("parent", op.get("parent_id", ""))), int(op.get("index", -1)))
+        case "duplicate":
+            return operation_duplicate(data, str(op.get("node", "")), str(op.get("new_id", "")))
+        case _:
+            return {"success": False, "error": {"code": "UNKNOWN_OPERATION", "message": f"Unknown batch operation '{op.get('op', '')}'."}}
+
+
+def commit_batch(path: str, operations: list[dict[str, Any]], expected_revision: str = "", dry_run: bool = False) -> tuple[dict[str, Any], int]:
+    loaded = load(path)
+    data = loaded.get("document")
+    if data is None:
+        return {"success": False, "committed": False, "errors": loaded.get("errors", [])}, EXIT_VALIDATION
+    old_revision = str(loaded.get("revision_hash", ""))
+    if expected_revision and expected_revision != old_revision:
+        return {
+            "success": False,
+            "committed": False,
+            "errors": [{
+                "code": "REVISION_CONFLICT",
+                "message": "Expected revision does not match current document.",
+                "expected_revision": expected_revision,
+                "current_revision": old_revision,
+            }],
+        }, EXIT_CONFLICT
+    working = copy.deepcopy(data)
+    operation_results: list[dict[str, Any]] = []
+    for index, op in enumerate(operations):
+        if not isinstance(op, dict):
+            return {
+                "success": False,
+                "committed": False,
+                "old_revision": old_revision,
+                "failed_index": index,
+                "operations": operation_results,
+                "errors": [{"code": "MALFORMED_OPERATION", "message": "Batch operation must be an object.", "index": index}],
+            }, EXIT_CLI_USAGE
+        applied = apply_batch_operation(working, op)
+        operation_results.append({"index": index, "op": str(op.get("op", "")), "success": bool(applied.get("success"))})
+        if not applied.get("success"):
+            error = applied.get("error", applied.get("errors", [{}]))
+            code = str(error.get("code", "OPERATION_FAILED")) if isinstance(error, dict) else "OPERATION_FAILED"
+            message = str(error.get("message", "Batch operation failed.")) if isinstance(error, dict) else "Batch operation failed."
+            return {
+                "success": False,
+                "committed": False,
+                "old_revision": old_revision,
+                "failed_index": index,
+                "failed_op": str(op.get("op", "")),
+                "operations": operation_results,
+                "errors": [{"code": code, "message": message, "index": index}],
+                "diagnostics": applied.get("diagnostics", []),
+            }, EXIT_VALIDATION
+    validation = validate(working)
+    if not validation["success"]:
+        return {
+            "success": False,
+            "committed": False,
+            "old_revision": old_revision,
+            "new_revision": content_hash(working),
+            "operations": operation_results,
+            "errors": [item for item in validation["diagnostics"] if item.get("severity") == "error"],
+            "diagnostics": validation["diagnostics"],
+        }, EXIT_VALIDATION
+    new_revision = content_hash(working)
+    if dry_run:
+        return {
+            "success": True,
+            "committed": False,
+            "dry_run": True,
+            "old_revision": old_revision,
+            "new_revision": new_revision,
+            "operations": operation_results,
+        }, EXIT_SUCCESS
+    saved = save(path, working, old_revision)
+    if not saved.get("success", False):
+        return {
+            "success": False,
+            "committed": False,
+            "old_revision": old_revision,
+            "operations": operation_results,
+            "errors": saved.get("errors", []),
+        }, EXIT_IO_TRUST
+    return {
+        "success": True,
+        "committed": True,
+        "old_revision": old_revision,
+        "new_revision": new_revision,
+        "operations": operation_results,
+    }, EXIT_SUCCESS
 
 
 def commit_mutation(path: str, mutate) -> tuple[dict[str, Any], int]:
@@ -1000,7 +1120,75 @@ def template_catalog() -> dict[str, Any]:
 
 
 def capabilities() -> dict[str, Any]:
-    return {"schema_version": 1, "templates": template_catalog(), "supported_node_types": sorted(NATIVE_TYPES | set(COMPONENTS)), "components": sorted(COMPONENTS), "states": ["normal", "hover", "pressed", "focused", "disabled", "selected"], "viewport_presets": [{"width": w, "height": h} for w, h in [(1280, 720), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160)]], "themes": ["dark_fantasy"], "properties": PROPERTY_GROUPS, "property_schemas": capability_property_schemas(), "native_properties": capability_native_properties(), "operations": ["get", "set", "add", "delete", "move", "duplicate", "validate", "build", "render", "inspect", "new"]}
+    commands = sorted(
+        [
+            "add",
+            "batch",
+            "build",
+            "build-all",
+            "capabilities",
+            "delete",
+            "duplicate",
+            "get",
+            "inspect",
+            "move",
+            "new",
+            "render",
+            "set",
+            "validate",
+        ]
+    )
+    return {
+        "machine_protocol": PROTOCOL_ID,
+        "machine_protocol_versions": [PROTOCOL_VERSION],
+        "command_contract_version": COMMAND_CONTRACT_VERSION,
+        "backend": "python-fallback",
+        "schema_version": SCHEMA_VERSION,
+        "generator_version": "python-fallback",
+        "available_commands": commands,
+        "command_parameter_schemas": {
+            "capabilities": {"params": {}},
+            "validate": {"params": {"document": "string"}},
+            "inspect": {"params": {"document": "string", "scope": "string", "node": "string?"}},
+            "get": {"params": {"document": "string", "node": "string", "property": "string?"}},
+            "batch": {"params": {"document": "string", "operations": "array", "expected_revision": "string?", "dry_run": "boolean?"}},
+        },
+        "batch_operation_schemas": {
+            "set": {"node": "string", "property": "string", "value": "any"},
+            "add": {"parent": "string", "node": "object"},
+            "delete": {"node": "string"},
+            "move": {"node": "string", "parent": "string", "index": "integer?"},
+            "duplicate": {"node": "string", "new_id": "string"},
+        },
+        "supported_node_types": sorted(NATIVE_TYPES | set(COMPONENTS)),
+        "property_schemas": capability_property_schemas(),
+        "native_property_schemas": capability_native_properties(),
+        "components": sorted(COMPONENTS),
+        "component_definitions": {k: {"native_type": v[0], "style": v[1]} for k, v in COMPONENTS.items()},
+        "states": ["normal", "hover", "pressed", "focused", "disabled", "selected"],
+        "viewport_presets": [{"width": w, "height": h} for w, h in [(1280, 720), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160)]],
+        "themes": ["dark_fantasy"],
+        "properties": PROPERTY_GROUPS,
+        "templates": template_catalog(),
+        "operations": ["get", "set", "add", "delete", "move", "duplicate", "validate", "build", "render", "inspect", "new", "batch"],
+        "resource_safety_policy": {"blocked_resource_classes": [], "blocked_extensions": [], "allowed_resource_classes": []},
+        "output_path_policy": {"workspace_relative": True, "allow_outside_project_flag": True},
+        "optimistic_concurrency": {"supported": True, "revision_field": "revision", "expected_revision_param": "expected_revision"},
+        "persistent_server": {"supported": False, "transport": "stdio", "protocol": PROTOCOL_ID},
+        "batch": {"supported": True, "atomic": True, "dry_run": True, "operations": ["set", "add", "delete", "move", "duplicate"]},
+        "dry_run": {"supported": True, "methods": ["batch"]},
+        "max_request_bytes": MAX_REQUEST_BYTES,
+        "supported_render_states": ["normal", "hover", "pressed", "focused", "disabled", "selected"],
+        "supported_transports": ["human_cli", "machine_oneshot"],
+        "exit_codes": {
+            "success": 0,
+            "cli_usage": 2,
+            "validation": 3,
+            "conflict": 4,
+            "io_trust": 5,
+            "internal": 70,
+        },
+    }
 
 
 def add_child(data: dict[str, Any], parent_id: str, node: dict[str, Any], index: int = -1) -> bool:
@@ -1114,6 +1302,105 @@ def operation_duplicate(data: dict[str, Any], node_id: str, new_id: str) -> dict
     return {"success": True, "node": duplicate}
 
 
+def dispatch_machine(request: dict[str, Any]) -> dict[str, Any]:
+    validated = validate_request(request)
+    if not validated.get("ok"):
+        return error_response(
+            str(request.get("request_id", "")),
+            str(validated.get("code", "MALFORMED_REQUEST")),
+            str(validated.get("message", "Malformed request.")),
+            backend="python-fallback",
+        )
+    payload = validated["request"]
+    method = str(payload.get("method", ""))
+    params = payload.get("params", {}) if isinstance(payload.get("params", {}), dict) else {}
+    request_id = str(payload.get("request_id", ""))
+    legacy, _code = dispatch_legacy(method, params)
+    return to_machine_response(request_id, legacy)
+
+
+def to_machine_response(request_id: str, legacy: dict[str, Any]) -> dict[str, Any]:
+    if legacy.get("success"):
+        result = copy.deepcopy(legacy)
+        result.pop("success", None)
+        return success_response(request_id, result, legacy.get("diagnostics", []), backend="python-fallback")
+    code = "COMMAND_FAILED"
+    message = "Command failed."
+    if isinstance(legacy.get("error"), dict):
+        code = str(legacy["error"].get("code", code))
+        message = str(legacy["error"].get("message", message))
+    elif legacy.get("errors"):
+        first = legacy["errors"][0]
+        if isinstance(first, dict):
+            code = str(first.get("code", code))
+            message = str(first.get("message", message))
+    diagnostics = legacy.get("diagnostics", legacy.get("errors", []))
+    return error_response(
+        request_id,
+        code,
+        message,
+        normalize_diagnostics(diagnostics if isinstance(diagnostics, list) else []),
+        backend="python-fallback",
+    )
+
+
+def dispatch_legacy(method: str, params: dict[str, Any]) -> tuple[dict[str, Any], int]:
+    if method == "capabilities":
+        return {"success": True, "capabilities": capabilities()}, EXIT_SUCCESS
+    if method == "batch":
+        document = str(params.get("document", params.get("path", "")))
+        operations = params.get("operations", [])
+        if not document or not isinstance(operations, list) or not operations:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "batch requires document and operations."}]}, EXIT_CLI_USAGE
+        return commit_batch(document, operations, str(params.get("expected_revision", "")), bool(params.get("dry_run", False)))
+    if method == "validate":
+        document = str(params.get("document", params.get("path", "")))
+        loaded = load(document)
+        data = loaded.get("document")
+        if data is None:
+            return {"success": False, "errors": loaded.get("errors", [])}, EXIT_VALIDATION
+        result = validate(data)
+        result["document"] = document
+        result["revision"] = str(loaded.get("revision_hash", ""))
+        return result, EXIT_SUCCESS if result["success"] else EXIT_VALIDATION
+    if method == "inspect":
+        document = str(params.get("document", params.get("path", "")))
+        scope = str(params.get("scope", "tree"))
+        loaded = load(document)
+        data = loaded.get("document")
+        if data is None:
+            return {"success": False, "errors": loaded.get("errors", [])}, EXIT_VALIDATION
+        revision = str(loaded.get("revision_hash", ""))
+        if scope == "tree":
+            return {"success": True, "tree": tree(data["root"]), "revision": revision}, EXIT_SUCCESS
+        node_id = str(params.get("node", ""))
+        if node_id:
+            node, parent = find(data, node_id)
+            if node is None:
+                return {"success": False, "error": {"code": "NODE_NOT_FOUND", "node": node_id}}, EXIT_VALIDATION
+            return {"success": True, "id": node_id, "parent": parent.get("id", "") if parent else "", "node": node, "revision": revision}, EXIT_SUCCESS
+        return {"success": False, "errors": [{"code": "USAGE", "message": "inspect requires scope or node."}]}, EXIT_CLI_USAGE
+    if method == "get":
+        document = str(params.get("document", params.get("path", "")))
+        node_id = str(params.get("node", params.get("node_id", "")))
+        loaded = load(document)
+        data = loaded.get("document")
+        if data is None:
+            return {"success": False, "errors": loaded.get("errors", [])}, EXIT_VALIDATION
+        node, parent = find(data, node_id)
+        if node is None:
+            return {"success": False, "error": {"code": "NODE_NOT_FOUND", "node": node_id}}, EXIT_VALIDATION
+        property_path = str(params.get("property", params.get("property_path", "")))
+        return {
+            "success": True,
+            "id": node_id,
+            "parent": parent.get("id", "") if parent else "",
+            "value": get_path(node, property_path),
+            "revision": str(loaded.get("revision_hash", "")),
+        }, EXIT_SUCCESS
+    return {"success": False, "errors": [{"code": "UNKNOWN_METHOD", "message": f"Unknown method '{method}'."}]}, EXIT_CLI_USAGE
+
+
 def parse_cli_flags(argv: list[str], start_index: int) -> tuple[dict[str, bool], list[str], int]:
     flags = {"force": False, "allow_outside_project": False}
     unknown: list[str] = []
@@ -1139,7 +1426,38 @@ def parse_cli_flags(argv: list[str], start_index: int) -> tuple[dict[str, bool],
 
 def main(argv: list[str]) -> tuple[dict[str, Any], int]:
     if not argv or argv[0] in {"help", "--help", "-h"}:
-        return {"success": True, "help": "Use ui capabilities, validate, inspect [document|tree|node], get, set, add, delete, move, duplicate, build, build-all, or render."}, 0
+        return {"success": True, "help": "Use ui capabilities, validate, inspect [document|tree|node], get, set, add, delete, move, duplicate, batch, build, build-all, or render."}, 0
+    if argv[0] == "--machine":
+        if len(argv) < 2:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "--machine requires method."}]}, EXIT_CLI_USAGE
+        request = {
+            "protocol": PROTOCOL_ID,
+            "protocol_version": PROTOCOL_VERSION,
+            "request_id": "fallback-cli",
+            "method": argv[1],
+            "params": {},
+        }
+        if "--params" in argv:
+            params_index = argv.index("--params")
+            request["params"] = json.loads(Path(argv[params_index + 1]).read_text(encoding="utf-8"))
+        response = dispatch_machine(request)
+        return response, exit_class_for_response(response)
+    if argv[0] == "serve":
+        response = error_response("handshake", "GODOT_UNAVAILABLE", "Persistent server requires native Godot.", backend="python-fallback")
+        return response, exit_class_for_response(response)
+    if argv[0] == "batch":
+        if len(argv) < 2:
+            return {"success": False, "errors": [{"code": "USAGE", "message": "ui batch <file.ui.json> [--stdin]"}]}, EXIT_CLI_USAGE
+        params: dict[str, Any] = {"document": argv[1]}
+        if "--stdin" in argv:
+            params.update(json.loads(sys.stdin.read()))
+        result, code = commit_batch(
+            str(params.get("document", argv[1])),
+            params.get("operations", []),
+            str(params.get("expected_revision", "")),
+            bool(params.get("dry_run", False)),
+        )
+        return result, code
     command = argv[0]
     if command == "capabilities":
         return {"success": True, "capabilities": capabilities()}, 0
@@ -1212,6 +1530,7 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
     if command == "validate":
         result = validate(data)
         result["document"] = argv[1]
+        result["revision"] = str(loaded.get("revision_hash", ""))
         return result, 0 if result["success"] else 1
     if command == "inspect":
         scope = argv[2] if len(argv) > 2 else "tree"
@@ -1219,7 +1538,7 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
             root = data.get("root", {}) if isinstance(data.get("root", {}), dict) else {}
             return {"success": True, "document": {"schema_version": data.get("schema_version", 1), "name": data.get("name", ""), "source": argv[1], "viewport": data.get("viewport", {}), "theme": data.get("theme", "dark_fantasy"), "root_id": root.get("id", ""), "root_type": root.get("type", ""), "node_count": sum(1 for _node, _parent in walk(root)), "components": sorted((data.get("components", {}) if isinstance(data.get("components", {}), dict) else {}).keys()), "metadata": data.get("metadata", {}), "reference": data.get("reference", {})},}, 0
         if scope == "tree":
-            return {"success": True, "tree": tree(data["root"])}, 0
+            return {"success": True, "tree": tree(data["root"]), "revision": str(loaded.get("revision_hash", ""))}, 0
         if scope == "node":
             if len(argv) < 4:
                 return {"success": False, "errors": [{"code": "USAGE", "message": "ui inspect <file.ui.json> node <node_id>"}]}, 1
@@ -1245,7 +1564,7 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
         node, parent = find(data, argv[2])
         if node is None:
             return {"success": False, "error": {"code": "NODE_NOT_FOUND", "node": argv[2]}}, 1
-        return {"success": True, "id": argv[2], "parent": parent.get("id", "") if parent else "", "value": get_path(node, argv[3] if len(argv) > 3 else "")}, 0
+        return {"success": True, "id": argv[2], "parent": parent.get("id", "") if parent else "", "value": get_path(node, argv[3] if len(argv) > 3 else ""), "revision": str(loaded.get("revision_hash", ""))}, 0
     if command == "set":
         if len(argv) < 5:
             return {"success": False, "errors": [{"code": "USAGE", "message": "ui set <file> <node_id> <property.path> <value>"}]}, 1

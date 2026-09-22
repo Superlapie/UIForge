@@ -2,16 +2,4 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PROJECT_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
-
-if [ -n "${GODOT_BIN:-}" ] && [ -e "$GODOT_BIN" ]; then
-	:
-elif command -v godot >/dev/null 2>&1; then
-	GODOT_BIN=$(command -v godot)
-elif command -v godot4 >/dev/null 2>&1; then
-	GODOT_BIN=$(command -v godot4)
-else
-	exec python3 "$PROJECT_DIR/scripts/ui_fallback.py" "$@"
-fi
-
-exec python3 "$PROJECT_DIR/scripts/ui_godot.py" "$GODOT_BIN" "$@"
+exec python3 "$SCRIPT_DIR/ui_launcher.py" "$@"
