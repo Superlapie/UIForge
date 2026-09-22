@@ -44,5 +44,5 @@ func _emit_machine(response: Dictionary) -> void:
 func _emit_human_result(result: Dictionary) -> void:
 	if result.has("capabilities"):
 		result["backend"] = "godot-native"
-	print(JSON.stringify(result, "\t"))
+	print(UIForgeMachineProtocol.frame_line(result))
 	quit(0 if bool(result.get("success", false)) else 1)

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -20,9 +21,12 @@ def godot_bin() -> str:
     env = os.environ.get("GODOT_BIN", "")
     if env and Path(env).exists():
         return env
-    found = subprocess.run(["bash", "-lc", "command -v godot"], capture_output=True, text=True)
-    if found.returncode == 0 and found.stdout.strip():
-        return found.stdout.strip()
+    for candidate in ("godot", "godot4", "./godot.exe", "godot.exe"):
+        found = shutil.which(candidate)
+        if not found and (ROOT / candidate).exists():
+            found = str(ROOT / candidate)
+        if found and Path(found).exists():
+            return found
     raise SystemExit("Godot not available")
 
 
@@ -48,8 +52,10 @@ def persistent_read_benchmark(godot: str, count: int = 100) -> dict:
     )
     assert proc.stdout is not None
     assert proc.stdin is not None
-    start = time.perf_counter()
+    startup_start = time.perf_counter()
     json.loads(proc.stdout.readline())
+    startup_seconds = time.perf_counter() - startup_start
+    loop_start = time.perf_counter()
     for index in range(count):
         request = {
             "protocol": "uiforge.machine",
@@ -68,17 +74,24 @@ def persistent_read_benchmark(godot: str, count: int = 100) -> dict:
         if not response.get("success"):
             proc.kill()
             raise RuntimeError(response)
-    elapsed = time.perf_counter() - start
+    elapsed = time.perf_counter() - loop_start
     proc.stdin.close()
     proc.wait(timeout=60)
-    return {"label": f"persistent_{count}_get", "seconds": elapsed, "requests": count}
+    return {
+        "label": f"persistent_{count}_get",
+        "startup_seconds": startup_seconds,
+        "seconds": elapsed,
+        "requests": count,
+    }
 
 
 def main() -> int:
     godot = godot_bin()
     fixture = "examples/specs/inventory.ui.json"
+    platform_name = "windows" if os.name == "nt" else "linux"
     results = {
         "platform": sys.platform,
+        "platform_name": platform_name,
         "godot": godot,
         "cases": [],
     }
@@ -86,14 +99,6 @@ def main() -> int:
     results["cases"].append(timed("warm_capabilities_1", lambda: run_native_once(godot, ["capabilities"], bootstrap=False)))
     results["cases"].append(timed("warm_capabilities_2", lambda: run_native_once(godot, ["capabilities"], bootstrap=False)))
     results["cases"].append(timed("warm_validate", lambda: run_native_once(godot, ["validate", fixture], bootstrap=False)))
-    request = {
-        "protocol": "uiforge.machine",
-        "protocol_version": 1,
-        "request_id": "bench-cap",
-        "method": "capabilities",
-        "params": {},
-    }
-    results["cases"].append(timed("machine_capabilities", lambda: machine_oneshot(godot, request)))
     one_shot_reads = timed("oneshot_100_get", lambda: [
         machine_oneshot(godot, {
             "protocol": "uiforge.machine",
@@ -111,9 +116,11 @@ def main() -> int:
     results["cases"].append(one_shot_reads)
     persistent = persistent_read_benchmark(godot, 100)
     results["cases"].append(persistent)
-    if one_shot_reads["seconds"] > 0:
+    if one_shot_reads["seconds"] > 0 and persistent["seconds"] > 0:
         results["persistent_to_oneshot_ratio"] = one_shot_reads["seconds"] / persistent["seconds"]
-    out = ROOT / ".uiforge/benchmarks/batch3.json"
+    if results.get("persistent_to_oneshot_ratio", 0) < 2.0:
+        raise SystemExit("Persistent throughput must be materially faster than 100 one-shot reads.")
+    out = ROOT / ".uiforge/benchmarks" / f"batch3-{platform_name}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(results, indent=2), encoding="utf-8")
     print(json.dumps({"success": True, "artifact": str(out), "cases": len(results["cases"])}, indent=2))

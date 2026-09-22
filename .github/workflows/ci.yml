@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
       - name: Run Windows filesystem and trust tests
         shell: bash
-        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security tests.test_batch2_5_security tests.test_batch2_5_1_security tests.test_batch2_5_2_security tests.test_batch2_5_3_security tests.test_batch3_machine_protocol -v
+        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security tests.test_batch2_5_security tests.test_batch2_5_1_security tests.test_batch2_5_2_security tests.test_batch2_5_3_security tests.test_batch3_fallback_parity -v
 
   godot-linux:
     runs-on: ubuntu-latest
@@ -45,6 +45,20 @@ jobs:
         env:
           GODOT_BIN: godot
         run: PATH="$HOME/.local/bin:$PATH" ./scripts/test
+      - name: Run native persistent protocol integration
+        env:
+          GODOT_BIN: godot
+          UIFORGE_RUN_NATIVE_PROTOCOL_TESTS: "1"
+        run: python3 scripts/native_protocol_integration.py
+      - name: Run Batch 3 Linux benchmarks
+        env:
+          GODOT_BIN: godot
+        run: python3 scripts/benchmark_batch3.py
+      - name: Upload Linux benchmark artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: batch3-linux-benchmark
+          path: .uiforge/benchmarks/batch3-linux.json
 
   godot-windows:
     runs-on: windows-latest
@@ -63,3 +77,32 @@ jobs:
         env:
           GODOT_BIN: ./godot.exe
         run: ./scripts/test
+      - name: Run native persistent protocol integration
+        shell: bash
+        env:
+          GODOT_BIN: ./godot.exe
+          UIFORGE_RUN_NATIVE_PROTOCOL_TESTS: "1"
+        run: python scripts/native_protocol_integration.py
+      - name: Prepare Windows machine params file
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .uiforge | Out-Null
+          '{"document":"examples/specs/inventory.ui.json"}' | Set-Content -Encoding utf8 .uiforge/tmp_win_params.json
+      - name: Test Windows launcher via ui.cmd
+        shell: cmd
+        env:
+          GODOT_BIN: godot.exe
+        run: |
+          scripts\ui.cmd capabilities
+          scripts\ui.cmd validate examples\specs\inventory.ui.json
+          scripts\ui.cmd --machine validate --params .uiforge\tmp_win_params.json
+      - name: Run Batch 3 Windows benchmarks
+        shell: bash
+        env:
+          GODOT_BIN: ./godot.exe
+        run: python scripts/benchmark_batch3.py
+      - name: Upload Windows benchmark artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: batch3-windows-benchmark
+          path: .uiforge/benchmarks/batch3-windows.json

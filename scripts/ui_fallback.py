@@ -45,6 +45,7 @@ from uiforge_machine import (
     PROTOCOL_VERSION,
     error_response,
     exit_class_for_response,
+    machine_failure_result,
     normalize_diagnostics,
     success_response,
     validate_request,
@@ -1148,10 +1149,19 @@ def capabilities() -> dict[str, Any]:
         "available_commands": commands,
         "command_parameter_schemas": {
             "capabilities": {"params": {}},
+            "new": {"params": {"template": "string", "output": "string", "force": "boolean?", "allow_outside_project": "boolean?"}},
             "validate": {"params": {"document": "string"}},
             "inspect": {"params": {"document": "string", "scope": "string", "node": "string?"}},
             "get": {"params": {"document": "string", "node": "string", "property": "string?"}},
+            "set": {"params": {"document": "string", "node": "string", "property": "string", "value": "any", "expected_revision": "string?"}},
+            "add": {"params": {"document": "string", "parent": "string", "node": "object|string", "expected_revision": "string?"}},
+            "delete": {"params": {"document": "string", "node": "string", "expected_revision": "string?"}},
+            "move": {"params": {"document": "string", "node": "string", "parent": "string", "index": "integer?", "expected_revision": "string?"}},
+            "duplicate": {"params": {"document": "string", "node": "string", "new_id": "string", "expected_revision": "string?"}},
             "batch": {"params": {"document": "string", "operations": "array", "expected_revision": "string?", "dry_run": "boolean?"}},
+            "build": {"params": {"document": "string", "output": "string?", "force": "boolean?", "allow_outside_project": "boolean?"}},
+            "build-all": {"params": {"source_dir": "string?", "output_dir": "string?", "force": "boolean?", "allow_outside_project": "boolean?"}},
+            "render": {"params": {"document": "string", "viewport": "string?", "output": "string?", "state": "string?", "force": "boolean?", "allow_outside_project": "boolean?"}},
         },
         "batch_operation_schemas": {
             "set": {"node": "string", "property": "string", "value": "any"},
@@ -1171,7 +1181,11 @@ def capabilities() -> dict[str, Any]:
         "properties": PROPERTY_GROUPS,
         "templates": template_catalog(),
         "operations": ["get", "set", "add", "delete", "move", "duplicate", "validate", "build", "render", "inspect", "new", "batch"],
-        "resource_safety_policy": {"blocked_resource_classes": [], "blocked_extensions": [], "allowed_resource_classes": []},
+        "resource_safety_policy": {
+            "blocked_resource_classes": sorted(["Script", "GDScript", "CSharpScript", "PackedScene", "Shader"]),
+            "blocked_extensions": sorted([".gd", ".cs", ".tscn", ".scn", ".shader", ".gdshader"]),
+            "allowed_resource_classes": ["Texture2D", "FontFile", "Material", "Theme"],
+        },
         "output_path_policy": {"workspace_relative": True, "allow_outside_project_flag": True},
         "optimistic_concurrency": {"supported": True, "revision_field": "revision", "expected_revision_param": "expected_revision"},
         "persistent_server": {"supported": False, "transport": "stdio", "protocol": PROTOCOL_ID},
@@ -1341,6 +1355,7 @@ def to_machine_response(request_id: str, legacy: dict[str, Any]) -> dict[str, An
         message,
         normalize_diagnostics(diagnostics if isinstance(diagnostics, list) else []),
         backend="python-fallback",
+        result=machine_failure_result(legacy),
     )
 
 

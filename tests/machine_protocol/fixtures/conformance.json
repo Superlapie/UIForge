@@ -1,0 +1,122 @@
+[
+  {
+    "id": "capabilities",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "fx-capabilities",
+      "method": "capabilities",
+      "params": {}
+    },
+    "expect": {"success": true}
+  },
+  {
+    "id": "validate_success",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "fx-validate",
+      "method": "validate",
+      "params": {"document": "tests/conformance/fixtures/minimal.ui.json"}
+    },
+    "expect": {"success": true, "result_has": ["revision"]}
+  },
+  {
+    "id": "inspect_tree",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "fx-inspect",
+      "method": "inspect",
+      "params": {"document": "tests/conformance/fixtures/minimal.ui.json", "scope": "tree"}
+    },
+    "expect": {"success": true, "result_has": ["tree", "revision"]}
+  },
+  {
+    "id": "get_property",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "fx-get",
+      "method": "get",
+      "params": {
+        "document": "tests/conformance/fixtures/minimal.ui.json",
+        "node": "root",
+        "property": "layout.size"
+      }
+    },
+    "expect": {"success": true, "result_has": ["value", "revision"]}
+  },
+  {
+    "id": "protocol_mismatch",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {"method": "validate", "params": {}},
+    "expect": {"success": false, "error_code": "PROTOCOL_MISMATCH"}
+  },
+  {
+    "id": "protocol_version_string",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": "banana",
+      "request_id": "fx-banana",
+      "method": "validate",
+      "params": {"document": "tests/conformance/fixtures/minimal.ui.json"}
+    },
+    "expect": {"success": false, "error_code": "MALFORMED_REQUEST"}
+  },
+  {
+    "id": "unsupported_protocol_version",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 99,
+      "request_id": "fx-old",
+      "method": "validate",
+      "params": {"document": "tests/conformance/fixtures/minimal.ui.json"}
+    },
+    "expect": {"success": false, "error_code": "UNSUPPORTED_PROTOCOL_VERSION"}
+  },
+  {
+    "id": "missing_request_id",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "method": "capabilities",
+      "params": {}
+    },
+    "expect": {"success": false, "error_code": "MALFORMED_REQUEST"}
+  },
+  {
+    "id": "unknown_method",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "fx-unknown",
+      "method": "definitely_not_a_method",
+      "params": {}
+    },
+    "expect": {"success": false}
+  },
+  {
+    "id": "node_not_found",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1,
+      "request_id": "fx-missing-node",
+      "method": "get",
+      "params": {
+        "document": "tests/conformance/fixtures/minimal.ui.json",
+        "node": "missing_node_xyz"
+      }
+    },
+    "expect": {"success": false}
+  }
+]

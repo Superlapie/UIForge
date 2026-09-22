@@ -65,11 +65,19 @@ static func as_dict() -> Dictionary:
 static func _command_parameter_schemas() -> Dictionary:
 	return {
 		"capabilities": {"params": {}},
+		"new": {"params": {"template": "string", "output": "string", "force": "boolean?", "allow_outside_project": "boolean?"}},
 		"validate": {"params": {"document": "string"}},
 		"inspect": {"params": {"document": "string", "scope": "string", "node": "string?"}},
 		"get": {"params": {"document": "string", "node": "string", "property": "string?"}},
 		"set": {"params": {"document": "string", "node": "string", "property": "string", "value": "any", "expected_revision": "string?"}},
+		"add": {"params": {"document": "string", "parent": "string", "node": "object|string", "expected_revision": "string?"}},
+		"delete": {"params": {"document": "string", "node": "string", "expected_revision": "string?"}},
+		"move": {"params": {"document": "string", "node": "string", "parent": "string", "index": "integer?", "expected_revision": "string?"}},
+		"duplicate": {"params": {"document": "string", "node": "string", "new_id": "string", "expected_revision": "string?"}},
 		"batch": {"params": {"document": "string", "operations": "array", "expected_revision": "string?", "dry_run": "boolean?"}},
+		"build": {"params": {"document": "string", "output": "string?", "force": "boolean?", "allow_outside_project": "boolean?"}},
+		"build-all": {"params": {"source_dir": "string?", "output_dir": "string?", "force": "boolean?", "allow_outside_project": "boolean?"}},
+		"render": {"params": {"document": "string", "viewport": "string?", "output": "string?", "state": "string?", "force": "boolean?", "allow_outside_project": "boolean?"}},
 		"shutdown": {"params": {}},
 	}
 

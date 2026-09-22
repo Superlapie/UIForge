@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -69,10 +70,23 @@ def godot_command(godot_binary: str, root: Path, ui_args: list[str]) -> list[str
 
 
 def parse_framed_stdout(stdout: str) -> dict[str, object] | None:
+    frames: list[dict[str, object]] = []
     for line in stdout.splitlines():
         if line.startswith(FRAME_SENTINEL):
-            return json.loads(line[len(FRAME_SENTINEL):])
-    return None
+            frames.append(json.loads(line[len(FRAME_SENTINEL):]))
+    if not frames:
+        return None
+    if len(frames) > 1:
+        return {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": "",
+            "success": False,
+            "error": {"code": "PROTOCOL_DESYNC", "message": "Multiple framed responses were returned."},
+            "diagnostics": [],
+            "meta": {"backend": "godot-native"},
+        }
+    return frames[0]
 
 
 def run_native_once(godot_binary: str, ui_args: list[str], *, bootstrap: bool | None = None) -> tuple[int, dict[str, object]]:
@@ -101,25 +115,12 @@ def run_native_once(godot_binary: str, ui_args: list[str], *, bootstrap: bool | 
     if os.environ.get("UIFORGE_TRACE_PROCESSES") == "1":
         print(json.dumps({"uiforge_trace": {"bootstrap": did_bootstrap, "command": command}}), file=sys.stderr)
     payload = parse_framed_stdout(process.stdout)
-    if payload is None and ui_args and ui_args[0] not in {"serve-internal"}:
-        # Legacy human JSON fallback for transitional commands.
-        decoder = json.JSONDecoder()
-        for index, character in enumerate(process.stdout):
-            if character != "{":
-                continue
-            try:
-                candidate, _end = decoder.raw_decode(process.stdout[index:])
-                if isinstance(candidate, dict) and "success" in candidate:
-                    payload = candidate
-                    break
-            except json.JSONDecodeError:
-                continue
     if payload is None:
         payload = {
             "success": False,
             "errors": [{
-                "code": "GODOT_CLI_NO_JSON",
-                "message": "Godot did not return a structured CLI result.",
+                "code": "GODOT_CLI_NO_FRAME",
+                "message": "Godot did not return a framed CLI result.",
                 "stderr": process.stderr.strip()[-2000:],
                 "stdout": process.stdout.strip()[-4000:],
             }],
@@ -133,15 +134,27 @@ def run_native_once(godot_binary: str, ui_args: list[str], *, bootstrap: bool | 
 
 def machine_oneshot(godot_binary: str, request: dict[str, object]) -> tuple[int, dict[str, object]]:
     root = project_dir()
-    request_path = root / ".uiforge/tmp_machine_request.json"
-    request_path.parent.mkdir(parents=True, exist_ok=True)
-    request_path.write_text(json.dumps(request), encoding="utf-8")
-    code, payload = run_native_once(godot_binary, ["machine-oneshot", str(request_path)])
+    request_dir = root / ".uiforge"
+    request_dir.mkdir(parents=True, exist_ok=True)
+    handle = tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        suffix=".json",
+        prefix="uiforge_req_",
+        dir=str(request_dir),
+        delete=False,
+    )
+    request_path = Path(handle.name)
     try:
-        request_path.unlink(missing_ok=True)
-    except OSError:
-        pass
-    return code, payload
+        json.dump(request, handle, ensure_ascii=False)
+        handle.close()
+        code, payload = run_native_once(godot_binary, ["machine-oneshot", str(request_path)])
+        return code, payload
+    finally:
+        try:
+            request_path.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 def exit_class_from_payload(payload: dict[str, object]) -> int:
@@ -217,6 +230,9 @@ def main(argv: list[str]) -> int:
             return 2
         return 3 if not payload.get("success") else 0
     exit_code, payload = run_native_once(godot_binary, ui_args)
+    if payload.get("protocol") == "uiforge.machine":
+        print(json.dumps(payload, indent="\t", ensure_ascii=False))
+        return exit_class_from_payload(payload) if not payload.get("success") else 0
     print(json.dumps(payload, indent="\t", ensure_ascii=False))
     return exit_code
 

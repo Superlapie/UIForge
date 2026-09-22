@@ -38,6 +38,9 @@ var asset_search: LineEdit
 var asset_paths: Array[String] = []
 var asset_index_ready: bool = false
 var asset_index_scanning: bool = false
+var asset_scan_steps: int = 0
+var _asset_scan_queue: Array[String] = []
+const ASSET_SCAN_BUDGET := 48
 static var asset_scan_calls_during_init: int = 0
 var status_label: Label
 var file_dialog: FileDialog
@@ -309,39 +312,52 @@ func _build_bottom_panel() -> void:
 	status_label.add_theme_color_override("font_color", Color("#8d97a7"))
 	add_child(status_label)
 
+func _notify_document_changed() -> void:
+	if canvas != null:
+		canvas.invalidate_native_preview()
+
 func _refresh_assets() -> void:
 	if asset_index_scanning:
 		return
 	asset_index_scanning = true
+	asset_index_ready = false
+	asset_scan_steps = 0
 	asset_paths.clear()
-	call_deferred("_scan_assets", "res://")
-	call_deferred("_finish_asset_index")
+	_asset_scan_queue = ["res://"]
+	call_deferred("_scan_assets_step")
 
-func _finish_asset_index() -> void:
-	asset_index_scanning = false
-	asset_index_ready = true
-	_refresh_asset_list(asset_search.text if asset_search != null else "")
-
-func _scan_assets(path: String) -> void:
-	if not asset_index_ready and asset_index_scanning:
-		asset_scan_calls_during_init += 1
-	var directory := DirAccess.open(path)
-	if directory == null:
+func _scan_assets_step() -> void:
+	if not asset_index_scanning:
 		return
-	directory.list_dir_begin()
-	var filename := directory.get_next()
-	while not filename.is_empty():
-		if filename.begins_with("."):
-			filename = directory.get_next()
+	asset_scan_steps += 1
+	var budget := ASSET_SCAN_BUDGET
+	while budget > 0 and not _asset_scan_queue.is_empty():
+		var path: String = _asset_scan_queue.pop_front()
+		var directory := DirAccess.open(path)
+		if directory == null:
+			budget -= 1
 			continue
-		var child_path := path.path_join(filename)
-		if directory.current_is_dir():
-			_scan_assets(child_path)
-		elif filename.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "svg", "ttf", "otf", "woff", "woff2", "tres", "res", "material", "gdshader", "shader", "json"]:
-			asset_paths.append(child_path)
-		filename = directory.get_next()
-	directory.list_dir_end()
-	asset_paths.sort()
+		directory.list_dir_begin()
+		var filename := directory.get_next()
+		while not filename.is_empty() and budget > 0:
+			if filename.begins_with("."):
+				filename = directory.get_next()
+				continue
+			var child_path := path.path_join(filename)
+			if directory.current_is_dir():
+				_asset_scan_queue.append(child_path)
+			elif filename.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "svg", "ttf", "otf", "woff", "woff2", "tres", "res", "material", "gdshader", "shader", "json"]:
+				asset_paths.append(child_path)
+			filename = directory.get_next()
+			budget -= 1
+		directory.list_dir_end()
+	if _asset_scan_queue.is_empty():
+		asset_paths.sort()
+		asset_index_scanning = false
+		asset_index_ready = true
+		_refresh_asset_list(asset_search.text if asset_search != null else "")
+		return
+	call_deferred("_scan_assets_step")
 
 func _refresh_asset_list(query: String = "") -> void:
 	if asset_list == null:
@@ -662,15 +678,18 @@ func _record_document_change(action_name: String, before: Dictionary) -> void:
 	var before_snapshot := before.duplicate(true)
 	var after_snapshot := document.data.duplicate(true)
 	if editor_undo_redo == null:
+		_notify_document_changed()
 		return
 	editor_undo_redo.create_action(action_name)
 	editor_undo_redo.add_do_method(self, "_apply_document_snapshot", after_snapshot)
 	editor_undo_redo.add_undo_method(self, "_apply_document_snapshot", before_snapshot)
 	editor_undo_redo.commit_action()
+	_notify_document_changed()
 
 func _apply_document_snapshot(snapshot: Dictionary) -> void:
 	document.data = snapshot.duplicate(true)
 	canvas.set_document(document)
+	_notify_document_changed()
 	_refresh_tree()
 	_update_inspector()
 
@@ -682,6 +701,7 @@ func _on_canvas_selected(_node_id: String) -> void:
 
 func _on_canvas_changed(_node_id: String) -> void:
 	dirty = true
+	_notify_document_changed()
 	_update_status()
 	_refresh_tree()
 
@@ -729,6 +749,7 @@ func _on_inspector_apply(changes: Dictionary) -> void:
 		editor_undo_redo.add_undo_method(self, "_apply_node_snapshot", node_id, before.duplicate(true))
 		editor_undo_redo.commit_action()
 	dirty = true
+	_notify_document_changed()
 	_refresh_tree()
 	canvas.queue_redraw()
 	_update_inspector()
@@ -739,6 +760,7 @@ func _replace_node(node_id: String, value: Dictionary) -> void:
 	if not target.is_empty():
 		target.clear()
 		target.merge(value, true)
+		_notify_document_changed()
 		canvas.queue_redraw()
 		_update_inspector()
 

@@ -11,10 +11,22 @@ func _run() -> void:
 	get_root().add_child(studio)
 	_assert(not studio.asset_index_ready, "asset_index_not_ready_during_construction")
 	_assert(studio.asset_paths.is_empty(), "asset_paths_empty_during_construction")
-	await process_frame
-	await process_frame
+	var synthetic_root := "user://uiforge_synthetic_assets"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(synthetic_root))
+	for index in range(80):
+		var folder := "%s/group_%02d" % [synthetic_root, index]
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(folder))
+		FileAccess.open("%s/icon_%02d.svg" % [folder, index], FileAccess.WRITE).store_string("<svg/>")
+	studio._refresh_assets()
+	var filter_steps := 0
 	while not studio.asset_index_ready:
+		filter_steps += 1
+		_assert(studio.asset_scan_steps >= 1 or filter_steps < 200, "asset_index_uses_chunked_steps")
 		await process_frame
+	_assert(studio.asset_scan_steps > 1, "asset_index_multiple_steps")
+	var initial_scan_steps := studio.asset_scan_steps
+	studio._on_asset_filter_changed("group_01")
+	_assert(studio.asset_scan_steps == initial_scan_steps, "asset_filter_does_not_rescan")
 	var document := UIForgeSerializer.create_default("editor_workflow")
 	studio.set_document(document)
 	var root_id := str(document.root().get("id", ""))
@@ -42,12 +54,29 @@ func _run() -> void:
 	await process_frame
 	var idle_compiles := UIForgeCanvas.native_preview_compile_count
 	_assert(idle_compiles == 0, "canvas_idle_no_recompiles")
-	document.set_property(root_id, "layout.size", [960.0, 640.0])
-	studio.canvas.invalidate_native_preview()
+	studio._on_inspector_apply({"layout.size": [180.0, 180.0]})
 	await process_frame
 	await process_frame
 	await process_frame
-	_assert(UIForgeCanvas.native_preview_compile_count <= idle_compiles + 1, "canvas_single_debounced_recompile")
+	_assert(UIForgeCanvas.native_preview_compile_count <= idle_compiles + 1, "inspector_apply_debounced_recompile")
+	UIForgeCanvas.native_preview_compile_count = 0
+	studio._on_asset_drop("res://examples/assets/uiforge_gem.svg", root_id, Vector2(220, 120))
+	await process_frame
+	await process_frame
+	await process_frame
+	_assert(UIForgeCanvas.native_preview_compile_count <= 1, "asset_drop_debounced_recompile")
+	UIForgeCanvas.native_preview_compile_count = 0
+	studio._on_tree_node_drop("texture_uiforge_gem", root_id)
+	await process_frame
+	await process_frame
+	await process_frame
+	_assert(UIForgeCanvas.native_preview_compile_count <= 1, "reparent_debounced_recompile")
+	var before_undo := document.data.duplicate(true)
+	studio._apply_document_snapshot(before_undo)
+	await process_frame
+	await process_frame
+	await process_frame
+	_assert(UIForgeCanvas.native_preview_compile_count <= 2, "undo_snapshot_rebuild")
 	studio.canvas.set_viewport_preview(Vector2i(1280, 720))
 	_assert(is_equal_approx(studio.canvas._display_scale(), 2.0 / 3.0), "viewport_preview_scales_fit_documents")
 	var panel := {"id": "asset_panel", "type": "OrnatePanel", "layout": {"position": [300, 100], "size": [420, 320]}, "children": []}

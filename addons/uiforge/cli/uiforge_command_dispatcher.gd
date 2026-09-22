@@ -71,7 +71,8 @@ static func _to_machine_response(request_id: String, legacy: Dictionary) -> Dict
 	elif not legacy.get("errors", []).is_empty() and legacy.errors[0] is Dictionary:
 		code = str(legacy.errors[0].get("code", code))
 		message = str(legacy.errors[0].get("message", message))
-	return UIForgeMachineProtocol.error_response(request_id, code, message, legacy.get("diagnostics", legacy.get("errors", [])))
+	var failure_result := UIForgeMachineProtocol.machine_failure_result(legacy)
+	return UIForgeMachineProtocol.error_response(request_id, code, message, legacy.get("diagnostics", legacy.get("errors", [])), failure_result)
 
 static func _wrap(result: Dictionary) -> Dictionary:
 	if not result.has("success"):

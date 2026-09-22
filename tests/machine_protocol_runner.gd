@@ -10,8 +10,10 @@ func _run() -> void:
 	await _test_capabilities_self_description()
 	await _test_machine_validate()
 	_test_malformed_request()
+	_test_missing_request_id()
 	await _test_batch_dry_run()
 	await _test_revision_conflict()
+	await _test_batch_failure_detail()
 	if failures.is_empty():
 		print(JSON.stringify({"success": true, "passed": passed, "fixtures": passed}))
 		quit(0)
@@ -32,6 +34,19 @@ func _test_capabilities_self_description() -> void:
 	_assert(str(caps.get("machine_protocol", "")) == UIForgeMachineProtocol.PROTOCOL_ID, "capabilities_protocol_id")
 	_assert(bool(caps.get("persistent_server", {}).get("supported", false)), "capabilities_persistent")
 	_assert(bool(caps.get("batch", {}).get("supported", false)), "capabilities_batch")
+	var schemas: Dictionary = caps.get("command_parameter_schemas", {})
+	for command in caps.get("available_commands", []):
+		_assert(schemas.has(str(command)), "capabilities_schema_%s" % str(command))
+
+func _test_missing_request_id() -> void:
+	var validated := UIForgeMachineProtocol.validate_request({
+		"protocol": "uiforge.machine",
+		"protocol_version": 1,
+		"method": "capabilities",
+		"params": {},
+	})
+	_assert(not bool(validated.get("ok", false)), "missing_request_id_failed")
+	_assert(str(validated.get("code", "")) == "MALFORMED_REQUEST", "missing_request_id_code")
 
 func _test_machine_validate() -> void:
 	var response := await UIForgeCommandDispatcher.dispatch_machine({
@@ -84,6 +99,22 @@ func _test_revision_conflict() -> void:
 	})
 	_assert(not bool(response.get("success", false)), "revision_conflict_failed")
 	_assert(str(response.get("error", {}).get("code", "")) == "REVISION_CONFLICT", "revision_conflict_code")
+	_assert(bool(response.get("result", {}).get("committed", true)) == false, "revision_conflict_committed_false")
+
+func _test_batch_failure_detail() -> void:
+	var response := await UIForgeCommandDispatcher.dispatch_machine({
+		"protocol": "uiforge.machine",
+		"protocol_version": 1,
+		"request_id": "batch-fail-detail",
+		"method": "batch",
+		"params": {
+			"document": "res://tests/conformance/fixtures/minimal.ui.json",
+			"operations": [{"op": "set", "node": "missing_node", "property": "layout.size", "value": "[1,1]"}],
+		},
+	})
+	_assert(not bool(response.get("success", false)), "batch_failure")
+	_assert(response.get("result", {}).get("failed_index", -1) >= 0, "batch_failed_index")
+	_assert(not bool(response.get("result", {}).get("committed", true)), "batch_failure_committed_false")
 
 func _assert(condition: bool, name: String) -> void:
 	if condition:

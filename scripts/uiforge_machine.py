@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 PROTOCOL_ID = "uiforge.machine"
@@ -10,6 +11,7 @@ PROTOCOL_VERSION = 1
 COMMAND_CONTRACT_VERSION = 1
 MAX_REQUEST_BYTES = 1048576
 FRAME_SENTINEL = "UIFORGE_MACHINE_V1\t"
+CONNECT_PREFIX = "UIFORGE_CONNECT\t"
 
 EXIT_SUCCESS = 0
 EXIT_CLI_USAGE = 2
@@ -19,23 +21,71 @@ EXIT_IO_TRUST = 5
 EXIT_INTERNAL = 70
 
 
+def _is_exact_protocol_version(value: Any) -> bool:
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int):
+        return value == PROTOCOL_VERSION
+    if isinstance(value, float) and math.isfinite(value):
+        return value == float(PROTOCOL_VERSION) and value == math.floor(value)
+    return False
+
+
 def validate_request(payload: Any) -> dict[str, Any]:
     if not isinstance(payload, dict):
         return {"ok": False, "code": "MALFORMED_REQUEST", "message": "Request must be a JSON object."}
-    if str(payload.get("protocol", "")) != PROTOCOL_ID:
+    protocol = payload.get("protocol")
+    if not isinstance(protocol, str) or protocol != PROTOCOL_ID:
         return {"ok": False, "code": "PROTOCOL_MISMATCH", "message": "Unsupported protocol identifier."}
-    if int(payload.get("protocol_version", 0)) != PROTOCOL_VERSION:
+    if not _is_exact_protocol_version(payload.get("protocol_version")):
+        version = payload.get("protocol_version")
+        if isinstance(version, bool) or not isinstance(version, (int, float)):
+            return {"ok": False, "code": "MALFORMED_REQUEST", "message": "protocol_version must be an integer."}
         return {
             "ok": False,
             "code": "UNSUPPORTED_PROTOCOL_VERSION",
-            "message": f"Unsupported protocol version {payload.get('protocol_version', 0)}.",
+            "message": f"Unsupported protocol version {version}.",
         }
-    if not str(payload.get("method", "")):
+    request_id = payload.get("request_id")
+    if not isinstance(request_id, str) or not request_id:
+        return {"ok": False, "code": "MALFORMED_REQUEST", "message": "request_id is required."}
+    method = payload.get("method")
+    if not isinstance(method, str) or not method:
         return {"ok": False, "code": "MALFORMED_REQUEST", "message": "Request method is required."}
-    params = payload.get("params", {})
-    if params is not None and not isinstance(params, dict):
-        return {"ok": False, "code": "MALFORMED_REQUEST", "message": "Request params must be an object when present."}
+    if "params" in payload:
+        params = payload.get("params")
+        if not isinstance(params, dict):
+            return {"ok": False, "code": "MALFORMED_REQUEST", "message": "Request params must be an object when present."}
     return {"ok": True, "request": payload}
+
+
+def machine_failure_result(legacy: dict[str, Any]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key in (
+        "committed",
+        "failed_index",
+        "failed_op",
+        "old_revision",
+        "new_revision",
+        "operations",
+        "dry_run",
+        "expected_revision",
+        "current_revision",
+        "revision",
+        "document",
+    ):
+        if key in legacy:
+            result[key] = legacy[key]
+    if not result.get("committed") and "committed" not in legacy and legacy.get("success") is False:
+        result["committed"] = False
+    errors = legacy.get("errors", [])
+    if isinstance(errors, list) and errors:
+        first = errors[0]
+        if isinstance(first, dict):
+            for key in ("expected_revision", "current_revision", "index"):
+                if key in first and key not in result:
+                    result[key] = first[key]
+    return result
 
 
 def _meta(backend: str) -> dict[str, Any]:

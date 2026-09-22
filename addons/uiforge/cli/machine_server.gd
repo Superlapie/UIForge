@@ -6,8 +6,11 @@ var _server: TCPServer
 var _peer: StreamPeerTCP
 var _read_buffer: PackedByteArray = PackedByteArray()
 var _running := true
+var _connected := false
+var _expected_token := ""
 
 func _init() -> void:
+	_expected_token = OS.get_environment("UIFORGE_SERVER_TOKEN") if OS.has_environment("UIFORGE_SERVER_TOKEN") else ""
 	call_deferred("_start")
 
 func _start() -> void:
@@ -41,27 +44,64 @@ func _start() -> void:
 			while true:
 				var newline_index := _read_buffer.find(10)
 				if newline_index < 0:
+					if _read_buffer.size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES:
+						_drain_oversized_request()
 					break
 				var line_bytes: PackedByteArray = _read_buffer.slice(0, newline_index)
 				_read_buffer = _read_buffer.slice(newline_index + 1)
-				var line := line_bytes.get_string_from_utf8().strip_edges()
-				if line.is_empty() or not line.begins_with(REQUEST_PREFIX):
+				if line_bytes.size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES:
+					await _handle_oversized_request()
 					continue
-				await _handle_request_line(line)
+				var line := line_bytes.get_string_from_utf8().strip_edges()
+				if line.is_empty():
+					continue
+				if not _connected:
+					if not _accept_connect_line(line):
+						_send_response(UIForgeMachineProtocol.error_response("", "CONNECT_FAILED", "Invalid server connect token."))
+						_shutdown()
+						return
+					_connected = true
+					continue
+				if not line.begins_with(REQUEST_PREFIX):
+					continue
+				await _handle_request_line(line.substr(REQUEST_PREFIX.length()))
 		await process_frame
 
-func _handle_request_line(line: String) -> void:
+func _accept_connect_line(line: String) -> bool:
+	if _expected_token.is_empty():
+		return line.begins_with(UIForgeMachineProtocol.CONNECT_PREFIX)
+	if not line.begins_with(UIForgeMachineProtocol.CONNECT_PREFIX):
+		return false
+	return line.substr(UIForgeMachineProtocol.CONNECT_PREFIX.length()) == _expected_token
+
+func _drain_oversized_request() -> void:
+	var newline_index := _read_buffer.find(10)
+	if newline_index >= 0:
+		_read_buffer = _read_buffer.slice(newline_index + 1)
+	else:
+		_read_buffer = PackedByteArray()
+
+func _handle_oversized_request() -> void:
+	_send_response(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
+	_drain_oversized_request()
+
+func _handle_request_line(raw_json: String) -> void:
 	var parser := JSON.new()
-	if parser.parse(line.substr(REQUEST_PREFIX.length())) != OK or not parser.data is Dictionary:
+	if parser.parse(raw_json) != OK or not parser.data is Dictionary:
 		_send_response(UIForgeMachineProtocol.error_response("", "MALFORMED_REQUEST", "Request line was not valid JSON."))
 		return
 	var request: Dictionary = parser.data
-	if JSON.stringify(request).length() > UIForgeMachineProtocol.MAX_REQUEST_BYTES:
-		_send_response(UIForgeMachineProtocol.error_response(str(request.get("request_id", "")), "REQUEST_TOO_LARGE", "Request exceeds max size."))
+	var validated := UIForgeMachineProtocol.validate_request(request)
+	if not bool(validated.get("ok", false)):
+		_send_response(UIForgeMachineProtocol.error_response(
+			str(request.get("request_id", "")),
+			str(validated.get("code", "MALFORMED_REQUEST")),
+			str(validated.get("message", "Malformed request."))
+		))
 		return
-	var response := await UIForgeCommandDispatcher.dispatch_machine(request)
+	var response := await UIForgeCommandDispatcher.dispatch_machine(validated.request)
 	_send_response(response)
-	if str(request.get("method", "")) == "shutdown" and bool(response.get("success", false)):
+	if str(validated.request.get("method", "")) == "shutdown" and bool(response.get("success", false)):
 		_shutdown()
 
 func _send_response(payload: Dictionary) -> void:
