@@ -41,7 +41,7 @@ class Batch23SecurityTests(unittest.TestCase):
             _write_replace_meta(
                 meta,
                 {
-                    "transaction_id": "txn-backup-restore",
+                    "transaction_id": "0123456789abcdef0123456789abcdef",
                     "target": str(destination),
                     "stage": "backup",
                     "backup_hash": _file_text_hash(backup),
@@ -64,7 +64,7 @@ class Batch23SecurityTests(unittest.TestCase):
             _write_replace_meta(
                 meta,
                 {
-                    "transaction_id": "txn-commit-clean",
+                    "transaction_id": "fedcba9876543210fedcba9876543210",
                     "target": str(destination),
                     "stage": "commit",
                     "backup_hash": _file_text_hash(backup),
@@ -135,7 +135,7 @@ class Batch23SecurityTests(unittest.TestCase):
             _write_replace_meta(
                 meta,
                 {
-                    "transaction_id": "txn-backup-sidecars",
+                    "transaction_id": "aaaabbbbccccddddeeeeffffaaaabbbb",
                     "target": str(destination),
                     "stage": "backup",
                     "backup_hash": _file_text_hash(backup),

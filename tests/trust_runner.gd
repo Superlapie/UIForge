@@ -22,6 +22,7 @@ func _run() -> void:
 	_test_resource_provenance()
 	_test_native_cli_backend()
 	if OS.get_name() == "Windows":
+		_test_windows_resolver_fail_closed()
 		_test_windows_path_forms()
 		_test_windows_junction_containment()
 		_test_windows_junction_descendant_containment()
@@ -129,6 +130,8 @@ func _test_reclaim_guard_ownership() -> void:
 	_assert(not UIForgeLock.reclaim_stale_guard(UIForgeLock.reclaim_guard_path(target), target), "reclaim_guard_grace_protected")
 	UIForgeLock.release_reclaim_guard(target, "wrong-nonce")
 	_assert(DirAccess.dir_exists_absolute(UIForgeLock.reclaim_guard_path(target)), "reclaim_guard_wrong_nonce_keeps_guard")
+	UIForgeLock.release_reclaim_guard(target, "")
+	_assert(DirAccess.dir_exists_absolute(UIForgeLock.reclaim_guard_path(target)), "reclaim_guard_empty_nonce_noop")
 	UIForgeLock.release_reclaim_guard(target, str(fresh.get("guard_nonce", "")))
 	var reacquire := UIForgeLock.acquire(target)
 	_assert(reacquire.get("ok", false), "reclaim_guard_write_after_recovery")
@@ -271,7 +274,20 @@ func _test_replacement_recovery_states() -> void:
 	var backup_stage := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
 	_assert(not backup_stage.get("ok", false), "recovery_dest_backup_backup_stage_conflict")
 	state_count += 1
-	_assert(state_count >= 4, "recovery_state_table_count_%d" % state_count)
+	_cleanup_sidecars(dest_abs)
+	FileAccess.open(dest_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	_write_replace_meta(meta_abs, _replace_meta_payload(dest_abs, "backup", _text_hash(dest_abs), "sha256:%s" % "1".repeat(64)))
+	var pre_backup := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(pre_backup.get("ok", false) and pre_backup.get("status", "") == "clean", "recovery_pre_backup_crash_clean")
+	state_count += 1
+	_cleanup_sidecars(dest_abs)
+	FileAccess.open(backup_abs, FileAccess.WRITE).store_string(HUMAN_SCENE)
+	_write_replace_meta(meta_abs, _replace_meta_payload(dest_abs, "commit", _text_hash(backup_abs), "sha256:%s" % "2".repeat(64)))
+	var pre_install := UIForgeTransaction.recover_interrupted_replace_for_path(dest_res)
+	_assert(pre_install.get("ok", false) and pre_install.get("status", "") == "recovered", "recovery_pre_install_commit_restored")
+	_assert(FileAccess.get_file_as_string(dest_abs) == HUMAN_SCENE, "recovery_pre_install_commit_bytes")
+	state_count += 1
+	_assert(state_count >= 6, "recovery_state_table_count_%d" % state_count)
 
 func _test_scene_verification() -> void:
 	_prepare_trust_dir("scene/valid.tscn")
@@ -400,6 +416,15 @@ func _test_windows_nested_junction_containment() -> void:
 	_teardown_windows_junction(outer_link)
 	_teardown_windows_junction(inner_link)
 
+func _test_windows_resolver_fail_closed() -> void:
+	_prepare_trust_dir("paths/resolver_fail.tscn")
+	var target := _trust_path("paths/resolver_fail.tscn")
+	UIForgePaths.windows_resolver_force_failure = true
+	var checked := UIForgePaths.validate_output(target, UIForgePaths.ArtifactKind.SCENE, false)
+	UIForgePaths.windows_resolver_force_failure = false
+	_assert(not checked.ok, "windows_resolver_fail_closed")
+	_assert(_has_error_code_dict(checked, "PATH_CANONICALIZATION_FAILED"), "windows_resolver_fail_closed_code")
+
 func _test_windows_path_forms() -> void:
 	var workspace := UIForgePaths.workspace_root()
 	var sample := "%s/.uiforge/trust/paths/windows_sample.tscn" % workspace
@@ -421,6 +446,26 @@ func _test_windows_path_forms() -> void:
 
 func _test_native_cli_backend() -> void:
 	var project := ProjectSettings.globalize_path("res://")
+	var copy_spec := _trust_abs("cli/copy_inventory.ui.json")
+	_prepare_trust_dir("cli/copy_inventory.ui.json")
+	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://examples/specs/inventory.ui.json"), copy_spec)
+	var build_output := _trust_abs("cli/copy_inventory.tscn")
+	var commands := [
+		["capabilities"],
+		["validate", "examples/specs/inventory.ui.json"],
+		["inspect", "examples/specs/inventory.ui.json", "document"],
+		["get", "examples/specs/inventory.ui.json", "inventory_grid", "properties.columns"],
+		["set", copy_spec, "inventory_grid", "properties.columns", "10"],
+		["build", copy_spec, build_output, "--force", "--allow-outside-project"],
+	]
+	for command in commands:
+		var payload: Variant = _run_native_cli(command)
+		_assert(payload is Dictionary and payload.get("success", false), "native_cli_%s" % str(command[0]))
+		if str(command[0]) == "capabilities":
+			_assert(str(payload.get("backend", "")) == "godot-native", "native_cli_backend_godot_native")
+
+func _run_native_cli(args: Array) -> Variant:
+	var project := ProjectSettings.globalize_path("res://")
 	var output: Array = []
 	var exit_code := -1
 	if OS.get_name() == "Windows":
@@ -428,24 +473,19 @@ func _test_native_cli_backend() -> void:
 		if OS.has_environment("GODOT_BIN"):
 			godot_bin = OS.get_environment("GODOT_BIN")
 		var launcher := "%s/scripts/ui_godot.py" % project
-		exit_code = OS.execute("python3", PackedStringArray([launcher, godot_bin, "capabilities"]), output, true, false)
+		var command := PackedStringArray([launcher, godot_bin])
+		for arg in args:
+			command.append(str(arg))
+		exit_code = OS.execute("python3", command, output, true, false)
 	else:
 		var ui_script := "%s/scripts/ui" % project
-		exit_code = OS.execute("bash", PackedStringArray([ui_script, "capabilities"]), output, true, false)
-	_assert(exit_code == 0, "native_cli_capabilities_exit")
-	var payload: Variant = _parse_cli_json(output)
-	_assert(payload is Dictionary and payload.get("success", false), "native_cli_capabilities_success")
-	_assert(str(payload.get("backend", "")) == "godot-native", "native_cli_backend_godot_native")
-	if OS.get_name() == "Windows":
-		var godot_bin := "./godot.exe"
-		if OS.has_environment("GODOT_BIN"):
-			godot_bin = OS.get_environment("GODOT_BIN")
-		var launcher := "%s/scripts/ui_godot.py" % project
-		exit_code = OS.execute("python3", PackedStringArray([launcher, godot_bin, "validate", "examples/specs/inventory.ui.json"]), output, true, false)
-	else:
-		var ui_script := "%s/scripts/ui" % project
-		exit_code = OS.execute("bash", PackedStringArray([ui_script, "validate", "examples/specs/inventory.ui.json"]), output, true, false)
-	_assert(exit_code == 0, "native_cli_validate_exit")
+		var command := PackedStringArray([ui_script])
+		for arg in args:
+			command.append(str(arg))
+		exit_code = OS.execute("bash", command, output, true, false)
+	if exit_code != 0:
+		return null
+	return _parse_cli_json(output)
 
 func _setup_windows_junction(link_path: String, target_path: String) -> void:
 	if DirAccess.dir_exists_absolute(link_path):
@@ -534,6 +574,12 @@ func _cleanup_sidecars(dest_abs: String) -> void:
 		var path := "%s%s" % [dest_abs, suffix]
 		if DirAccess.dir_exists_absolute(path):
 			DirAccess.remove_absolute(path)
+
+func _has_error_code_dict(result: Dictionary, code: String) -> bool:
+	for item in result.get("errors", []):
+		if str(item.get("code", "")) == code:
+			return true
+	return false
 
 func _has_error_code(result: Dictionary, code: String) -> bool:
 	for item in result.get("errors", []):

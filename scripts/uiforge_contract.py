@@ -22,6 +22,7 @@ GENERATOR_VERSION = "uiforge/0.1.0"
 SCHEMA_VERSION = 1
 MAX_HEADER_LINES = 32
 HASH_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
+TRANSACTION_ID_PATTERN = re.compile(r"^[0-9a-f]{32}$")
 THEME_IDENTIFIER = re.compile(r"^[A-Za-z0-9_-]+$")
 METADATA_IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 RESERVED_PREFIXES = ("uiforge_", "aether_")
@@ -72,10 +73,48 @@ def fs_path(raw: str | Path) -> Path:
     return resolve_real_path(ROOT / value)
 
 
-def resolve_real_path(absolute: Path) -> Path:
+FORCE_WINDOWS_PATH_RESOLVER_FAILURE = False
+
+
+def resolve_physical_path(absolute: Path) -> dict[str, Any]:
+    if os.name == "nt":
+        return _windows_canonical_path_secure(absolute)
+    cursor = absolute
+    suffix_parts: list[str] = []
+    while not cursor.exists() and cursor.name:
+        suffix_parts.insert(0, cursor.name)
+        parent = cursor.parent
+        if parent == cursor:
+            break
+        cursor = parent
+    if not cursor.exists() and not cursor.is_dir():
+        return {
+            "ok": False,
+            "code": "PATH_CANONICALIZATION_FAILED",
+            "message": f"Could not resolve existing prefix for {absolute}.",
+        }
     try:
-        if os.name == "nt":
-            return _windows_canonical_path(absolute)
+        resolved_base = cursor.resolve()
+    except OSError:
+        return {
+            "ok": False,
+            "code": "PATH_CANONICALIZATION_FAILED",
+            "message": f"Could not canonicalize directory {cursor}.",
+        }
+    if suffix_parts:
+        resolved_path = resolved_base.joinpath(*suffix_parts)
+    else:
+        resolved_path = resolved_base
+    return {"ok": True, "path": resolved_path}
+
+
+def resolve_real_path(absolute: Path) -> Path:
+    resolved = resolve_physical_path(absolute)
+    if resolved.get("ok"):
+        return Path(str(resolved["path"]))
+    if os.name == "nt":
+        return Path(str(absolute).replace("\\", "/"))
+    try:
         return absolute.resolve()
     except OSError:
         return absolute
@@ -100,6 +139,13 @@ def _same_absolute_path(left: str | Path, right: str | Path) -> bool:
 
 
 def _windows_canonical_path(absolute: Path) -> Path:
+    resolved = _windows_canonical_path_secure(absolute)
+    if resolved.get("ok"):
+        return Path(str(resolved["path"]))
+    return Path(str(absolute).replace("\\", "/"))
+
+
+def _windows_canonical_path_secure(absolute: Path) -> dict[str, Any]:
     cursor = absolute
     suffix_parts: list[str] = []
     while not cursor.exists() and cursor.name:
@@ -108,13 +154,22 @@ def _windows_canonical_path(absolute: Path) -> Path:
         if parent == cursor:
             break
         cursor = parent
-    resolved_base = _windows_resolve_existing_prefix(cursor)
-    if not suffix_parts:
+    resolved_base = _windows_resolve_existing_prefix_secure(cursor)
+    if not resolved_base.get("ok"):
         return resolved_base
-    return resolved_base.joinpath(*suffix_parts)
+    resolved_path = Path(str(resolved_base["path"]))
+    if suffix_parts:
+        resolved_path = resolved_path.joinpath(*suffix_parts)
+    return {"ok": True, "path": resolved_path}
 
 
-def _windows_resolve_existing_prefix(existing_path: Path) -> Path:
+def _windows_resolve_existing_prefix_secure(existing_path: Path) -> dict[str, Any]:
+    if FORCE_WINDOWS_PATH_RESOLVER_FAILURE:
+        return {
+            "ok": False,
+            "code": "PATH_CANONICALIZATION_FAILED",
+            "message": f"Windows path canonicalization is unavailable for {existing_path}.",
+        }
     script = (
         "function Resolve-UIForgeExistingPath([string]$InputPath) { "
         "$InputPath = $InputPath -replace '/','\\'; "
@@ -153,9 +208,24 @@ def _windows_resolve_existing_prefix(existing_path: Path) -> Path:
             check=False,
         )
     except OSError:
-        return existing_path
+        return {
+            "ok": False,
+            "code": "PATH_CANONICALIZATION_FAILED",
+            "message": f"Windows path canonicalization failed for {existing_path}.",
+        }
     if completed.returncode == 0 and completed.stdout.strip():
-        return Path(completed.stdout.strip())
+        return {"ok": True, "path": Path(completed.stdout.strip())}
+    return {
+        "ok": False,
+        "code": "PATH_CANONICALIZATION_FAILED",
+        "message": f"Windows path canonicalization failed for {existing_path}.",
+    }
+
+
+def _windows_resolve_existing_prefix(existing_path: Path) -> Path:
+    resolved = _windows_resolve_existing_prefix_secure(existing_path)
+    if resolved.get("ok"):
+        return Path(str(resolved["path"]))
     return existing_path
 
 
@@ -189,6 +259,20 @@ def project_relative(absolute: Path) -> str:
     return f"res://{relative.as_posix()}"
 
 
+def _physical_path_within_workspace(absolute: Path) -> dict[str, Any]:
+    resolved = resolve_physical_path(absolute)
+    if not resolved.get("ok"):
+        return resolved
+    root = resolve_physical_path(workspace_root())
+    if not root.get("ok"):
+        return root
+    try:
+        Path(str(resolved["path"])).relative_to(Path(str(root["path"])))
+    except ValueError:
+        return {"ok": True, "within": False}
+    return {"ok": True, "within": True}
+
+
 def validate_output(path: str | Path, extension: str, allow_outside_project: bool = False) -> dict[str, Any]:
     absolute = fs_path(path)
     errors: list[dict[str, Any]] = []
@@ -199,10 +283,14 @@ def validate_output(path: str | Path, extension: str, allow_outside_project: boo
             "path": str(path),
         })
     if not allow_outside_project:
-        root = workspace_root()
-        try:
-            resolve_real_path(absolute).relative_to(root)
-        except ValueError:
+        containment = _physical_path_within_workspace(absolute)
+        if not containment.get("ok"):
+            errors.append({
+                "code": str(containment.get("code", "PATH_CANONICALIZATION_FAILED")),
+                "message": str(containment.get("message", "Could not canonicalize output path for workspace containment.")),
+                "path": str(path),
+            })
+        elif not containment.get("within"):
             errors.append({
                 "code": "OUTPUT_OUTSIDE_WORKSPACE",
                 "message": f"Output '{path}' is outside the project workspace. Pass --allow-outside-project to override.",
@@ -616,13 +704,10 @@ def _acquire_reclaim_guard(target_absolute: Path) -> bool:
     return _begin_reclaim_guard(target_absolute).get("ok", False)
 
 
-def _release_reclaim_guard(target_absolute: Path, guard_nonce: str = "") -> None:
-    if guard_nonce:
-        _release_reclaim_guard_owned(target_absolute, guard_nonce)
+def _release_reclaim_guard(target_absolute: Path, guard_nonce: str) -> None:
+    if not guard_nonce:
         return
-    guard = _reclaim_guard_path(target_absolute)
-    if guard.exists():
-        shutil.rmtree(guard, ignore_errors=True)
+    _release_reclaim_guard_owned(target_absolute, guard_nonce)
 
 
 def _try_reclaim_stale_lock(lock_dir: Path) -> bool:
@@ -696,13 +781,17 @@ def _replace_conflict(code: str, message: str) -> dict[str, Any]:
     return {"ok": False, "status": "conflict", "errors": [{"code": code, "message": message}]}
 
 
+def _validate_transaction_id(value: str) -> bool:
+    return TRANSACTION_ID_PATTERN.fullmatch(str(value)) is not None
+
+
 def _validate_replace_meta(meta: dict[str, Any], dest_absolute: Path, stage: str) -> dict[str, Any]:
     if not _same_absolute_path(meta.get("target", ""), dest_absolute):
         return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction target mismatch."}
     if str(meta.get("stage", "")) != stage:
         return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction stage mismatch."}
-    if not str(meta.get("transaction_id", "")):
-        return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction id missing."}
+    if not _validate_transaction_id(str(meta.get("transaction_id", ""))):
+        return {"ok": False, "code": "REPLACE_TXN_INVALID", "message": "Replace transaction id invalid."}
     for field in ("backup_hash", "new_hash"):
         value = str(meta.get(field, ""))
         if not value or HASH_PATTERN.fullmatch(value) is None:
@@ -725,6 +814,15 @@ def recover_interrupted_replace(absolute: Path) -> dict[str, Any]:
         stage = str(meta.get("stage", ""))
         if stage == "backup":
             valid = _validate_replace_meta(meta, absolute, "backup")
+            if not valid.get("ok"):
+                return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+            if str(meta.get("backup_hash", "")) != _file_text_hash(backup_path):
+                return _replace_conflict("REPLACE_BACKUP_INVALID", f"Replace backup hash mismatch for {absolute}.")
+            os.replace(backup_path, absolute)
+            _cleanup_replace_sidecars(absolute)
+            return {"ok": True, "status": "recovered", "errors": []}
+        if stage == "commit":
+            valid = _validate_replace_meta(meta, absolute, "commit")
             if not valid.get("ok"):
                 return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
             if str(meta.get("backup_hash", "")) != _file_text_hash(backup_path):
@@ -757,6 +855,14 @@ def recover_interrupted_replace(absolute: Path) -> dict[str, Any]:
         if not meta:
             return {"ok": True, "status": "clean", "errors": []}
         stage = str(meta.get("stage", ""))
+        if stage == "backup":
+            valid = _validate_replace_meta(meta, absolute, "backup")
+            if not valid.get("ok"):
+                return _replace_conflict(str(valid.get("code", "REPLACE_TXN_INVALID")), str(valid.get("message", "")))
+            if _file_text_hash(absolute) != str(meta.get("backup_hash", "")):
+                return _replace_conflict("REPLACE_BACKUP_INVALID", f"Destination hash mismatch for {absolute}.")
+            _cleanup_replace_sidecars(absolute)
+            return {"ok": True, "status": "clean", "errors": []}
         if stage in {"commit", "complete"}:
             valid = _validate_replace_meta(meta, absolute, stage)
             if not valid.get("ok"):

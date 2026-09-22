@@ -33,7 +33,10 @@ MINIMAL_SCENE = "[gd_scene load_steps=1 format=3]\n\n[node name=\"Root\" type=\"
 UPDATED_SCENE = "[gd_scene load_steps=1 format=3]\n\n[node name=\"Updated\" type=\"Control\"]\n"
 
 
-def _full_meta(destination: Path, stage: str, backup_hash: str, new_hash: str, txn_id: str = "txn-test") -> dict[str, str]:
+VALID_TXN = "0123456789abcdef0123456789abcdef"
+
+
+def _full_meta(destination: Path, stage: str, backup_hash: str, new_hash: str, txn_id: str = VALID_TXN) -> dict[str, str]:
     return {
         "transaction_id": txn_id,
         "target": str(destination),
@@ -178,11 +181,16 @@ class Batch25SecurityTests(unittest.TestCase):
                         dest_hash = _file_text_hash(destination) if destination.exists() else "sha256:" + "a" * 64
                         backup_hash = _file_text_hash(backup) if backup.exists() else "sha256:" + "b" * 64
                         if spec.get("missing_new"):
-                            payload = {"transaction_id": "txn-missing", "target": str(destination), "stage": stage, "backup_hash": backup_hash}
+                            payload = {
+                                "transaction_id": VALID_TXN,
+                                "target": str(destination),
+                                "stage": stage,
+                                "backup_hash": backup_hash,
+                            }
                         elif spec.get("match") is False:
-                            payload = _full_meta(destination, stage, backup_hash, "sha256:" + "f" * 64, "txn-wrong")
+                            payload = _full_meta(destination, stage, backup_hash, "sha256:" + "f" * 64, VALID_TXN)
                         else:
-                            payload = _full_meta(destination, stage, backup_hash, dest_hash, f"txn-{name}")
+                            payload = _full_meta(destination, stage, backup_hash, dest_hash, secrets.token_hex(16))
                         _write_replace_meta(meta, payload)
                     recovery = recover_interrupted_replace(destination)
                     if expected_status == "conflict":

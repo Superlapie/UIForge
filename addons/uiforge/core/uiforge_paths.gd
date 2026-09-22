@@ -9,6 +9,8 @@ const EXTENSIONS: Dictionary = {
 	ArtifactKind.IMAGE: [".png"],
 }
 
+static var windows_resolver_force_failure: bool = false
+
 static func workspace_root() -> String:
 	return ProjectSettings.globalize_path("res://").replace("\\", "/").trim_suffix("/")
 
@@ -43,13 +45,20 @@ static func validate_output(path: String, kind: ArtifactKind, allow_outside_proj
 			"message": "Output '%s' must use one of: %s." % [path, ", ".join(PackedStringArray(expected))],
 			"path": path,
 		})
-	var workspace := workspace_root()
-	if not allow_outside_project and not _is_within_workspace(absolute, workspace):
-		errors.append({
-			"code": "OUTPUT_OUTSIDE_WORKSPACE",
-			"message": "Output '%s' is outside the project workspace. Pass --allow-outside-project to override." % path,
-			"path": path,
-		})
+	if not allow_outside_project:
+		var containment := _containment_check(absolute, workspace_root())
+		if not containment.get("ok", false):
+			errors.append({
+				"code": str(containment.get("code", "PATH_CANONICALIZATION_FAILED")),
+				"message": str(containment.get("message", "Could not canonicalize output path for workspace containment.")),
+				"path": path,
+			})
+		elif not bool(containment.get("within", false)):
+			errors.append({
+				"code": "OUTPUT_OUTSIDE_WORKSPACE",
+				"message": "Output '%s' is outside the project workspace. Pass --allow-outside-project to override." % path,
+				"path": path,
+			})
 	return {"ok": errors.is_empty(), "normalized": absolute, "project_relative": _project_relative(absolute), "errors": errors}
 
 static func validate_source_read(path: String) -> Dictionary:
@@ -63,7 +72,10 @@ static func resolve_real_path(absolute: String) -> String:
 	if path.is_empty():
 		return path
 	if OS.get_name() == "Windows":
-		return _windows_canonical_path(path)
+		var resolved := resolve_physical_path(path)
+		if resolved.get("ok", false):
+			return str(resolved.get("path", path))
+		return normalized_fallback(path)
 	var cursor := path
 	var suffix := ""
 	while not cursor.is_empty() and not DirAccess.dir_exists_absolute(cursor) and not FileAccess.file_exists(cursor):
@@ -79,7 +91,31 @@ static func resolve_real_path(absolute: String) -> String:
 		return resolved_base
 	return ("%s%s" % [resolved_base, suffix]).replace("\\", "/").simplify_path()
 
-static func _windows_canonical_path(path: String) -> String:
+static func resolve_physical_path(absolute: String) -> Dictionary:
+	var path := _godot_absolute(absolute)
+	if path.is_empty():
+		return {"ok": false, "code": "PATH_CANONICALIZATION_FAILED", "message": "Empty path cannot be canonicalized."}
+	if OS.get_name() == "Windows":
+		return _windows_canonical_path_secure(path)
+	var cursor := path
+	var suffix := ""
+	while not cursor.is_empty() and not DirAccess.dir_exists_absolute(cursor) and not FileAccess.file_exists(cursor):
+		var base := cursor.get_file()
+		if base.is_empty():
+			break
+		suffix = "/%s%s" % [base, suffix]
+		cursor = cursor.get_base_dir()
+	if cursor.is_empty():
+		return {"ok": false, "code": "PATH_CANONICALIZATION_FAILED", "message": "Could not resolve existing prefix for %s." % path}
+	var resolved_base := _realpath_directory_secure(cursor)
+	if not resolved_base.get("ok", false):
+		return resolved_base
+	var resolved_path := str(resolved_base.get("path", cursor))
+	if not suffix.is_empty():
+		resolved_path = ("%s%s" % [resolved_path, suffix]).replace("\\", "/").simplify_path()
+	return {"ok": true, "path": resolved_path}
+
+static func _windows_canonical_path_secure(path: String) -> Dictionary:
 	var cursor := path
 	var suffix := ""
 	while not cursor.is_empty() and not DirAccess.dir_exists_absolute(cursor) and not FileAccess.file_exists(cursor):
@@ -90,12 +126,21 @@ static func _windows_canonical_path(path: String) -> String:
 		cursor = cursor.get_base_dir()
 	if cursor.is_empty():
 		cursor = path
-	var resolved_base := _windows_resolve_existing_prefix(cursor)
-	if suffix.is_empty():
+	var resolved_base := _windows_resolve_existing_prefix_secure(cursor)
+	if not resolved_base.get("ok", false):
 		return resolved_base
-	return ("%s%s" % [resolved_base, suffix]).replace("\\", "/").simplify_path()
+	var resolved_path := str(resolved_base.get("path", cursor))
+	if not suffix.is_empty():
+		resolved_path = ("%s%s" % [resolved_path, suffix]).replace("\\", "/").simplify_path()
+	return {"ok": true, "path": resolved_path}
 
-static func _windows_resolve_existing_prefix(existing_path: String) -> String:
+static func _windows_resolve_existing_prefix_secure(existing_path: String) -> Dictionary:
+	if windows_resolver_force_failure:
+		return {
+			"ok": false,
+			"code": "PATH_CANONICALIZATION_FAILED",
+			"message": "Windows path canonicalization is unavailable for %s." % existing_path,
+		}
 	var output: Array = []
 	var escaped := existing_path.replace("'", "''")
 	var script := (
@@ -130,18 +175,32 @@ static func _windows_resolve_existing_prefix(existing_path: String) -> String:
 	) % escaped
 	var exit_code := OS.execute("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], output, true, false)
 	if exit_code == 0 and not output.is_empty():
-		return str(output[0]).strip_edges().replace("\\", "/")
-	return normalized_fallback(existing_path)
+		return {"ok": true, "path": str(output[0]).strip_edges().replace("\\", "/")}
+	return {
+		"ok": false,
+		"code": "PATH_CANONICALIZATION_FAILED",
+		"message": "Windows path canonicalization failed for %s." % existing_path,
+	}
 
-static func _realpath_directory(dir_path: String) -> String:
+static func _realpath_directory_secure(dir_path: String) -> Dictionary:
 	var normalized := _godot_absolute(dir_path)
 	if OS.get_name() == "Windows":
-		return _windows_resolve_existing_prefix(normalized)
+		return _windows_resolve_existing_prefix_secure(normalized)
 	var output: Array = []
 	var exit_code := OS.execute("realpath", ["-m", normalized], output, true, false)
 	if exit_code == 0 and not output.is_empty():
-		return str(output[0]).strip_edges().replace("\\", "/")
-	return normalized.simplify_path()
+		return {"ok": true, "path": str(output[0]).strip_edges().replace("\\", "/")}
+	return {
+		"ok": false,
+		"code": "PATH_CANONICALIZATION_FAILED",
+		"message": "Could not canonicalize directory %s." % normalized,
+	}
+
+static func _realpath_directory(dir_path: String) -> String:
+	var resolved := _realpath_directory_secure(dir_path)
+	if resolved.get("ok", false):
+		return str(resolved.get("path", dir_path))
+	return normalized_fallback(dir_path)
 
 static func normalized_fallback(path: String) -> String:
 	return _godot_absolute(path).simplify_path()
@@ -149,12 +208,21 @@ static func normalized_fallback(path: String) -> String:
 static func _godot_absolute(path: String) -> String:
 	return path.replace("\\", "/").simplify_path()
 
-static func _is_within_workspace(absolute: String, workspace: String) -> bool:
-	var normalized := resolve_real_path(absolute).to_lower() if OS.get_name() == "Windows" else resolve_real_path(absolute)
-	var root := resolve_real_path(workspace).to_lower() if OS.get_name() == "Windows" else resolve_real_path(workspace)
-	if normalized == root:
-		return true
-	return normalized.begins_with("%s/" % root)
+static func _containment_check(absolute: String, workspace: String) -> Dictionary:
+	var resolved := resolve_physical_path(absolute)
+	if not resolved.get("ok", false):
+		return resolved
+	var root := resolve_physical_path(workspace)
+	if not root.get("ok", false):
+		return root
+	var normalized := str(resolved.get("path", ""))
+	var project_resolved := str(root.get("path", ""))
+	if OS.get_name() == "Windows":
+		normalized = normalized.to_lower()
+		project_resolved = project_resolved.to_lower()
+	if normalized == project_resolved:
+		return {"ok": true, "within": true}
+	return {"ok": true, "within": normalized.begins_with("%s/" % project_resolved)}
 
 static func _project_relative(absolute: String) -> String:
 	var project := workspace_root()
