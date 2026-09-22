@@ -89,7 +89,7 @@ def _windows_resolved_path(absolute: Path) -> Path:
     ).format(path=str(absolute).replace("'", "''"))
     try:
         completed = subprocess.run(
-            ["powershell", "-NoProfile", "-Command", script],
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
             capture_output=True,
             text=True,
             check=False,
@@ -99,6 +99,26 @@ def _windows_resolved_path(absolute: Path) -> Path:
     if completed.returncode != 0 or not completed.stdout.strip():
         return absolute
     return Path(completed.stdout.strip())
+
+
+def _query_windows_tasklist(pid: int) -> dict[str, Any]:
+    try:
+        completed = subprocess.run(
+            ["cmd.exe", "/c", f'tasklist /FI "PID eq {pid}" /NH /FO CSV'],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return {"ok": False, "unknown": True}
+    combined = completed.stdout.strip()
+    if not combined or "No tasks are running" in combined or "INFO: No tasks" in combined:
+        return {"ok": False, "dead": True}
+    if str(pid) in combined:
+        return {"ok": True, "pid": pid, "start_ticks": ""}
+    if completed.returncode != 0:
+        return {"ok": False, "unknown": True}
+    return {"ok": False, "dead": True}
 
 
 def project_relative(absolute: Path) -> str:
@@ -363,21 +383,20 @@ def _query_process_identity(pid: int) -> dict[str, Any]:
         )
         try:
             completed = subprocess.run(
-                ["powershell", "-NoProfile", "-Command", script],
+                ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
                 capture_output=True,
                 text=True,
                 check=False,
             )
         except OSError:
-            return {"ok": False, "unknown": True}
+            return _query_windows_tasklist(pid)
         if completed.returncode == 2:
             return {"ok": False, "dead": True}
-        if completed.returncode != 0 or not completed.stdout.strip():
-            return {"ok": False, "unknown": True}
-        parts = completed.stdout.strip().split("|")
-        if len(parts) < 2:
-            return {"ok": False, "unknown": True}
-        return {"ok": True, "pid": int(parts[0]), "start_ticks": parts[1]}
+        if completed.returncode == 0 and completed.stdout.strip():
+            parts = completed.stdout.strip().split("|")
+            if len(parts) >= 2:
+                return {"ok": True, "pid": int(parts[0]), "start_ticks": parts[1]}
+        return _query_windows_tasklist(pid)
     if not Path(f"/proc/{pid}").exists():
         return {"ok": False, "dead": True}
     try:

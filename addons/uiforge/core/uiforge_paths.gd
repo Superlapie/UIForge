@@ -95,7 +95,7 @@ static func _windows_resolved_path(path: String) -> String:
 		+ "if ($null -eq $item) { exit 2 }; "
 		+ "Write-Output $item.FullName"
 	) % escaped
-	var exit_code := OS.execute("powershell", ["-NoProfile", "-Command", script], output, true, false)
+	var exit_code := OS.execute("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], output, true, false)
 	if exit_code == 0 and not output.is_empty():
 		return str(output[0]).strip_edges().replace("\\", "/")
 	return normalized_fallback(path)

@@ -245,15 +245,29 @@ func _test_symlink_containment() -> void:
 
 func _test_windows_junction_containment() -> void:
 	var workspace := UIForgePaths.workspace_root()
-	var outside := "C:/Windows/Temp/uiforge_outside_%d" % Time.get_ticks_usec()
+	var temp_root := OS.get_environment("TEMP") if OS.has_environment("TEMP") else "C:/Windows/Temp"
+	var outside := "%s/uiforge_outside_%d" % [temp_root.replace("\\", "/"), Time.get_ticks_usec()]
 	DirAccess.make_dir_recursive_absolute(outside)
 	var link_parent := "%s/trust_junctions" % workspace
 	DirAccess.make_dir_recursive_absolute(link_parent)
 	var link_path := "%s/escape_link" % link_parent
 	if DirAccess.dir_exists_absolute(link_path):
-		OS.execute("cmd", ["/c", "rmdir", link_path], [], true, false)
+		OS.execute("cmd.exe", ["/c", "rmdir", link_path.replace("/", "\\")], [], true, false)
 	var output: Array = []
-	var exit_code := OS.execute("cmd", ["/c", "mklink", "/J", link_path, outside], output, true, false)
+	var ps_script := (
+		"$target='%s'; $link='%s'; "
+		+ "if (Test-Path -LiteralPath $link) { Remove-Item -LiteralPath $link -Force -Recurse -ErrorAction SilentlyContinue }; "
+		+ "New-Item -ItemType Junction -Path $link -Target $target | Out-Null"
+	) % [outside.replace("'", "''"), link_path.replace("'", "''")]
+	var exit_code := OS.execute("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", ps_script], output, true, false)
+	if exit_code != 0:
+		exit_code = OS.execute(
+			"cmd.exe",
+			["/c", "mklink", "/J", link_path.replace("/", "\\"), outside.replace("/", "\\")],
+			output,
+			true,
+			false
+		)
 	if exit_code != 0:
 		failures.append("windows_junction_setup_failed")
 		return
@@ -262,7 +276,7 @@ func _test_windows_junction_containment() -> void:
 	_assert(not checked.ok, "windows_junction_escape_blocked")
 	if not checked.errors.is_empty():
 		_assert(str(checked.errors[0].get("code", "")) == "OUTPUT_OUTSIDE_WORKSPACE", "windows_junction_escape_code")
-	OS.execute("cmd", ["/c", "rmdir", link_path], [], true, false)
+	OS.execute("cmd.exe", ["/c", "rmdir", link_path.replace("/", "\\")], [], true, false)
 
 func _generated_scene_text(source_identity_value: String, source_hash: String) -> String:
 	var header_lines := UIForgeArtifact.provenance_header(source_identity_value, source_hash)
