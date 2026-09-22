@@ -16,6 +16,12 @@
     {"id": "decorations", "source": "res://tests/compiler_conformance/fixtures/decorations.ui.json"},
     {"id": "item_grid", "source": "res://tests/compiler_conformance/fixtures/item_grid.ui.json"},
     {"id": "foo_bar", "source": "res://tests/compiler_conformance/fixtures/foo-bar.ui.json"},
-    {"id": "foo_bar_pair", "source": "res://tests/compiler_conformance/fixtures/foo_bar_pair.ui.json"}
+    {"id": "foo_bar_pair", "source": "res://tests/compiler_conformance/fixtures/foo_bar_pair.ui.json"},
+    {"id": "quest_entry_style", "source": "res://tests/compiler_conformance/fixtures/quest_entry_style.ui.json", "compare_snapshot": false, "assertions": [{"node_id": "quest_entry_root", "style_state": "normal", "style_class": "StyleBoxFlat"}]},
+    {"id": "sidebar_entry_style", "source": "res://tests/compiler_conformance/fixtures/sidebar_entry_style.ui.json", "compare_snapshot": false, "assertions": [{"node_id": "sidebar_entry_root", "style_state": "normal", "style_class": "StyleBoxFlat"}]},
+    {"id": "resource_bar_fill", "source": "res://tests/compiler_conformance/fixtures/resource_bar_fill.ui.json", "compare_snapshot": false, "assertions": [{"node_id": "health_bar_root", "style_state": "fill", "style_class": "StyleBoxTexture"}]},
+    {"id": "typed_literals", "source": "res://tests/compiler_conformance/fixtures/typed_literals.ui.json"},
+    {"id": "plain_numeric_array", "source": "res://tests/compiler_conformance/fixtures/plain_numeric_array.ui.json"},
+    {"id": "godot_override_valid", "source": "res://tests/compiler_conformance/fixtures/godot_override_valid.ui.json"}
   ]
 }

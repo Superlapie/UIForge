@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "name": "quest_entry_style",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "quest_entry_root",
+    "type": "QuestEntry",
+    "layout": {"position": [20, 20], "size": [280, 40]},
+    "properties": {"text": "Quest title"},
+    "children": []
+  }
+}

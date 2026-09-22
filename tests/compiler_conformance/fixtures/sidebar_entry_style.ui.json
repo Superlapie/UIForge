@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "name": "sidebar_entry_style",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "sidebar_entry_root",
+    "type": "SidebarEntry",
+    "layout": {"position": [20, 20], "size": [220, 36]},
+    "properties": {"text": "Inventory"},
+    "children": []
+  }
+}

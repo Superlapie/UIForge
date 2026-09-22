@@ -11,7 +11,7 @@ const BLOCKED_PROPERTIES: Array[String] = [
 ]
 const BLOCKED_RESOURCE_HINTS: Array[String] = ["script", "gdscript", "csharp", "shader", "packedscene", "scene"]
 
-static func validate_override(property_name: String, native_type: String, allow_unsafe: bool = false) -> Dictionary:
+static func validate_override(property_name: String, native_type: String) -> Dictionary:
 	var name := str(property_name)
 	if name.is_empty() or name.contains("\n") or name.contains("\r") or name.contains("="):
 		return _error("GODOT_OVERRIDE_INVALID", "Property path '%s' contains invalid syntax." % name)
@@ -22,14 +22,14 @@ static func validate_override(property_name: String, native_type: String, allow_
 			return _error("GODOT_OVERRIDE_FORBIDDEN", "Property '%s' is reserved for generated metadata." % name)
 	for blocked in BLOCKED_PROPERTIES:
 		if name == blocked or name.ends_with("/%s" % blocked):
-			return _error("GODOT_OVERRIDE_FORBIDDEN", "Property '%s' is blocked by default." % name, allow_unsafe)
-	if not allow_unsafe and _is_execution_surface(name):
-		return _error("GODOT_OVERRIDE_UNSAFE", "Property '%s' can attach executable resources and is blocked by default." % name, allow_unsafe)
+			return _error("GODOT_OVERRIDE_FORBIDDEN", "Property '%s' is blocked by UIForge." % name)
+	if _is_execution_surface(name):
+		return _error("GODOT_OVERRIDE_UNSAFE", "Property '%s' can attach executable resources and is blocked by UIForge." % name)
 	if _is_theme_override(name):
 		return _validate_theme_override(name)
 	return _validate_native_property(name, native_type)
 
-static func validate_overrides(overrides: Variant, native_type: String, node_id: String, allow_unsafe: bool = false) -> Array:
+static func validate_overrides(overrides: Variant, native_type: String, node_id: String) -> Array:
 	var diagnostics: Array = []
 	if overrides == null:
 		return diagnostics
@@ -40,7 +40,7 @@ static func validate_overrides(overrides: Variant, native_type: String, node_id:
 		})
 		return diagnostics
 	for property_name in overrides:
-		var diagnostic := validate_override(str(property_name), native_type, allow_unsafe)
+		var diagnostic := validate_override(str(property_name), native_type)
 		if not diagnostic.is_empty():
 			diagnostic["node"] = node_id
 			diagnostics.append(diagnostic)
@@ -76,8 +76,11 @@ static func _is_execution_surface(name: String) -> bool:
 			return true
 	return false
 
-static func _error(code: String, message: String, allow_unsafe: bool = false) -> Dictionary:
-	var recommendation := "Remove the override or pass an explicit unsafe opt-in if your workflow truly requires it."
-	if allow_unsafe:
-		recommendation = "This workflow requested unsafe overrides; enable unsafe compilation explicitly."
-	return {"severity": "error", "code": code, "message": message, "node": "", "recommendation": recommendation}
+static func _error(code: String, message: String) -> Dictionary:
+	return {
+		"severity": "error",
+		"code": code,
+		"message": message,
+		"node": "",
+		"recommendation": "Remove the override or choose a supported Godot property path.",
+	}

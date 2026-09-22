@@ -1298,19 +1298,53 @@ def validate_authored_metadata_key(key: str) -> dict[str, Any]:
 
 
 def validate_godot_override(property_name: str, native_type: str = "") -> dict[str, Any]:
+    from contract_snapshots import native_property_names
+
     name = str(property_name)
     if not name or any(ch in name for ch in "\n\r="):
         return {"severity": "error", "code": "GODOT_OVERRIDE_INVALID", "message": f"Property path '{name}' contains invalid syntax.", "node": ""}
-    if name.startswith("metadata/"):
+    if name.startswith("metadata/") or name.startswith("metadata\\"):
         return {"severity": "error", "code": "GODOT_OVERRIDE_FORBIDDEN", "message": "Cannot write metadata through godot_overrides.", "node": ""}
+    for reserved in GENERATED_METADATA_KEYS:
+        if name == reserved or name.endswith(f"/{reserved}"):
+            return {"severity": "error", "code": "GODOT_OVERRIDE_FORBIDDEN", "message": f"Property '{name}' is reserved for generated metadata.", "node": ""}
+    blocked_properties = {"script", "process_thread_group", "process_thread_messages", "process_thread_group_order"}
+    for blocked in blocked_properties:
+        if name == blocked or name.endswith(f"/{blocked}"):
+            return {
+                "severity": "error",
+                "code": "GODOT_OVERRIDE_FORBIDDEN",
+                "message": f"Property '{name}' is blocked by UIForge.",
+                "node": "",
+                "recommendation": "Remove the override. UIForge blocks script, process, and generated-metadata execution surfaces.",
+            }
     lowered = name.lower()
-    if "script" in lowered or name in GENERATED_METADATA_KEYS:
-        return {"severity": "error", "code": "GODOT_OVERRIDE_UNSAFE", "message": f"Property '{name}' is blocked by default.", "node": ""}
-    if name.startswith("theme_override_") and "/" in name:
+    blocked_resource_hints = ("script", "gdscript", "csharp", "shader", "packedscene", "scene")
+    if any(token in lowered for token in blocked_resource_hints):
+        return {
+            "severity": "error",
+            "code": "GODOT_OVERRIDE_UNSAFE",
+            "message": f"Property '{name}' can attach executable resources and is blocked by UIForge.",
+            "node": "",
+            "recommendation": "Remove the override or choose a non-executable Godot property.",
+        }
+    theme_override_prefixes = (
+        "theme_override_colors/", "theme_override_constants/", "theme_override_fonts/",
+        "theme_override_font_sizes/", "theme_override_icons/", "theme_override_styles/",
+    )
+    if name.startswith(theme_override_prefixes):
+        parts = name.split("/")
+        if len(parts) != 2 or not parts[0] or not parts[1]:
+            return {"severity": "error", "code": "GODOT_OVERRIDE_INVALID", "message": f"Theme override path '{name}' is malformed.", "node": ""}
+        if GODOT_ID_PATTERN.fullmatch(parts[1]) is None:
+            return {"severity": "error", "code": "GODOT_OVERRIDE_INVALID", "message": f"Theme override key '{parts[1]}' must be a Godot-safe identifier.", "node": ""}
         return {}
     if "/" in name:
         return {"severity": "error", "code": "GODOT_OVERRIDE_UNKNOWN", "message": f"Unknown or unsupported property path '{name}'.", "node": ""}
-    return {}
+    resolved_native = str(native_type or "Control")
+    if name in native_property_names(resolved_native):
+        return {}
+    return {"severity": "error", "code": "GODOT_OVERRIDE_UNKNOWN", "message": f"Unknown property '{name}' for {resolved_native}.", "node": ""}
 
 
 def types_compatible(actual: str, requested: str) -> bool:

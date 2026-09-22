@@ -1,0 +1,11 @@
+{
+	"godot_version": "4.7.2.stable.ed1daf0bf001b61586d9930840f2f1394092c079",
+	"schema_version": 1.0,
+	"snapshot_files": [
+		"semantic_property_schemas.json",
+		"property_groups.json",
+		"component_definitions.json",
+		"supported_node_types.json",
+		"native_property_inventory.json"
+	]
+}

@@ -213,8 +213,7 @@ func _emit_node(node: Dictionary, parent_path: String, lines: Array[String], is_
 	_emit_layout(resolved.get("layout", {}), lines)
 	_emit_properties(resolved, native_type, node_id, lines)
 	_emit_styles(resolved, native_type, node_id, lines)
-	if not is_root:
-		lines.append("")
+	lines.append("")
 	var children := _children_for(resolved)
 	for child in children:
 		if child is Dictionary:
@@ -525,7 +524,7 @@ func _emit_godot_overrides(properties: Dictionary, native_type: String, node_id:
 		var name := str(property_name)
 		if name.is_empty() or typed_properties.has(name):
 			continue
-		var override_diagnostic := UIForgePropertyGuard.validate_override(name, native_type, false)
+		var override_diagnostic := UIForgePropertyGuard.validate_override(name, native_type)
 		if not override_diagnostic.is_empty():
 			override_diagnostic["node"] = node_id
 			compile_errors.append(override_diagnostic)

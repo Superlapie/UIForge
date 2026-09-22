@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "godot_override_valid",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "valid_override_root",
+    "type": "LineEdit",
+    "layout": {"position": [20, 20], "size": [240, 36]},
+    "properties": {
+      "text": "Search",
+      "godot_overrides": {
+        "caret_blink_interval": 0.65,
+        "theme_override_constants/minimum_character_width": 4
+      }
+    },
+    "children": []
+  }
+}

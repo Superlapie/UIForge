@@ -60,10 +60,18 @@ func _run() -> void:
 		var native_root := native_scene.instantiate()
 		var fallback_snapshot := _semantic_snapshot_root(fallback_root)
 		var native_snapshot := _semantic_snapshot_root(native_root)
+		failures.append_array(_fixture_assertions(entry, native_root, fallback_root))
+		if fixture_id == "typed_literals":
+			failures.append_array(_assert_typed_literals(native_root, fallback_root))
+		if fixture_id == "plain_numeric_array":
+			failures.append_array(_assert_plain_numeric_array(native_root, fallback_root))
 		fallback_root.free()
 		native_root.free()
 		if JSON.stringify(fallback_snapshot) != JSON.stringify(native_snapshot):
-			failures.append("%s semantic snapshot mismatch" % fixture_id)
+			if not bool(entry.get("compare_snapshot", true)):
+				pass
+			else:
+				failures.append("%s semantic snapshot mismatch" % fixture_id)
 		if fixture_id == "sibling_order":
 			var ordered := _authored_sibling_indices(native_snapshot, ["first", "second", "third"])
 			if ordered.size() != 3 or ordered[0] >= ordered[1] or ordered[1] >= ordered[2]:
@@ -170,6 +178,83 @@ func _authored_sibling_indices(snapshot: Dictionary, expected_ids: Array) -> Arr
 		if expected_ids.has(child_id):
 			indices.append(int(child.get("child_index", -1)))
 	return indices
+
+func _fixture_assertions(entry: Dictionary, native_root: Node, fallback_root: Node) -> Array[String]:
+	var failures: Array[String] = []
+	var fixture_id := str(entry.get("id", "fixture"))
+	var assertions: Array = entry.get("assertions", [])
+	for item in assertions:
+		if not item is Dictionary:
+			continue
+		var node_id := str(item.get("node_id", ""))
+		var native_node := _find_node_by_id(native_root, node_id)
+		var fallback_node := _find_node_by_id(fallback_root, node_id)
+		if native_node == null or fallback_node == null:
+			failures.append("%s missing node %s for assertion" % [fixture_id, node_id])
+			continue
+		if item.has("style_state"):
+			var style_state := str(item.get("style_state", "normal"))
+			var expected_class := str(item.get("style_class", ""))
+			for label in ["native", "fallback"]:
+				var node := native_node if label == "native" else fallback_node
+				if not node is Control:
+					failures.append("%s %s node %s is not a Control" % [fixture_id, label, node_id])
+					continue
+				var style := (node as Control).get_theme_stylebox(style_state)
+				var actual_class := style.get_class() if style != null else ""
+				if actual_class != expected_class:
+					failures.append("%s %s style %s expected %s got %s" % [fixture_id, label, style_state, expected_class, actual_class])
+			continue
+		var property_name := str(item.get("property", ""))
+		var expected: Variant = item.get("value")
+		var native_value: Variant = _normalize_values(native_node.get(property_name))
+		var fallback_value: Variant = _normalize_values(fallback_node.get(property_name))
+		if JSON.stringify(native_value) != JSON.stringify(expected) or JSON.stringify(fallback_value) != JSON.stringify(expected):
+			failures.append("%s assertion failed %s.%s expected %s native %s fallback %s" % [fixture_id, node_id, property_name, JSON.stringify(expected), JSON.stringify(native_value), JSON.stringify(fallback_value)])
+	return failures
+
+func _find_node_by_id(root: Node, node_id: String) -> Node:
+	if UIForgeMetadata.read_node_id(root) == node_id:
+		return root
+	for child in root.get_children():
+		var found := _find_node_by_id(child, node_id)
+		if found != null:
+			return found
+	return null
+
+func _assert_typed_literals(native_root: Node, fallback_root: Node) -> Array[String]:
+	var failures: Array[String] = []
+	var native_panel := _find_node_by_id(native_root, "typed_root")
+	var fallback_panel := _find_node_by_id(fallback_root, "typed_root")
+	if native_panel is Control and fallback_panel is Control:
+		var expected_pivot := Vector2(12, 8)
+		if (native_panel as Control).pivot_offset != expected_pivot or (fallback_panel as Control).pivot_offset != expected_pivot:
+			failures.append("typed_literals pivot_offset mismatch")
+		var expected_color := Color("#d7b269")
+		var native_color := (native_panel as Control).get_theme_color("accent")
+		var fallback_color := (fallback_panel as Control).get_theme_color("accent")
+		if not _colors_close(native_color, expected_color) or not _colors_close(fallback_color, expected_color):
+			failures.append("typed_literals theme accent color mismatch")
+	return failures
+
+func _colors_close(left: Color, right: Color) -> bool:
+	return abs(left.r - right.r) < 0.001 and abs(left.g - right.g) < 0.001 and abs(left.b - right.b) < 0.001 and abs(left.a - right.a) < 0.001
+
+func _assert_plain_numeric_array(_native_root: Node, _fallback_root: Node) -> Array[String]:
+	var failures: Array[String] = []
+	var native_file_path := "user://compiler_conformance/native_plain_numeric_array.tscn"
+	var fallback_file_path := "user://compiler_conformance/fallback_plain_numeric_array.tscn"
+	for label in ["native", "fallback"]:
+		var scene_path := native_file_path if label == "native" else fallback_file_path
+		if not FileAccess.file_exists(scene_path):
+			failures.append("plain_numeric_array missing %s scene" % label)
+			continue
+		var text := FileAccess.get_file_as_string(scene_path)
+		if "pivot_offset = Vector2(" in text:
+			failures.append("plain_numeric_array %s scene must not coerce plain arrays into Vector2" % label)
+		if "pivot_offset = [" not in text:
+			failures.append("plain_numeric_array %s scene missing array literal pivot_offset" % label)
+	return failures
 
 func _semantic_entry(node: Node, parent_id: String, child_index: int) -> Dictionary:
 	var node_id := UIForgeMetadata.read_node_id(node)
@@ -313,6 +398,7 @@ func _property_snapshot(node: Node) -> Dictionary:
 	elif node is LineEdit:
 		result["text"] = (node as LineEdit).text
 		result["placeholder"] = (node as LineEdit).placeholder_text
+		result["caret_blink_interval"] = (node as LineEdit).caret_blink_interval
 	elif node is Range:
 		var range_node := node as Range
 		result["value"] = range_node.value
@@ -325,6 +411,12 @@ func _property_snapshot(node: Node) -> Dictionary:
 			result["texture"] = _normalize_resource_value(texture)
 		result["expand_mode"] = (node as TextureRect).expand_mode
 		result["stretch_mode"] = (node as TextureRect).stretch_mode
+	elif node is NinePatchRect:
+		var patch := node as NinePatchRect
+		if patch.texture != null:
+			result["texture"] = _normalize_resource_value(patch.texture)
+		var region: Rect2 = patch.region_rect
+		result["region_rect"] = [region.position.x, region.position.y, region.size.x, region.size.y]
 	elif node is ProgressBar:
 		var bar := node as ProgressBar
 		result["value"] = bar.value

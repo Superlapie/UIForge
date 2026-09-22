@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "name": "plain_numeric_array",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "array_root",
+    "type": "Panel",
+    "layout": {"position": [20, 20], "size": [240, 120]},
+    "properties": {
+      "godot_overrides": {
+        "pivot_offset": [10, 20]
+      }
+    },
+    "children": []
+  }
+}

@@ -98,10 +98,34 @@ Adversarial fixtures live under `tests/conformance/fixtures/`.
 
 - Portable CI runs `tests/test_conformance.py` against `scripts/ui_fallback.py`.
 - Native CI runs `tests/conformance_runner.gd`, which validates the same manifest through both `UIForgeValidator` and `scripts/ui validate`.
+- Native CI runs `tests/compiler_conformance_runner.gd`, which builds each manifest fixture with native and fallback compilers, loads the generated scenes in Godot, and compares semantic/runtime snapshots.
+- Contract snapshots under `contract/snapshots/` are exported from native Godot (`scripts/export_contract_snapshots.gd`) and consumed by the fallback for semantic property schemas, component definitions, property groups, and native-property validation. `scripts/check_contract_snapshots.gd` fails CI when committed snapshots are stale.
+- `tests/capabilities_parity_runner.gd` and `tests/test_batch4_contract_parity.py` compare portable capability fields between native and fallback after normalizing backend-specific differences.
+
+## Capability contract parity
+
+Portable/invariant capability fields (must match across native one-shot, native persistent where applicable, and fallback after normalization):
+
+- `command_contract_version`, `schema_version`, shared command schemas, batch schemas, supported node types
+- semantic `property_schemas`, `properties` groups, `components`, `component_definitions`
+- templates, operations, resource safety policy, output-path policy, optimistic-concurrency contract, batch/dry-run declarations, protocol-version semantics, exit-code contract
+
+Backend-specific capability fields (excluded from parity comparison):
+
+- `backend`, `generator_version`, `persistent_server`, `supported_transports`
+- `native_property_schemas` (ClassDB inventory requires Godot; fallback uses the committed `contract/snapshots/native_property_inventory.json` at validation time instead)
+- `shutdown` availability on fallback
+
+## Godot override safety
+
+Bare property names in `properties.godot_overrides` must exist on the resolved native node type. Both native and fallback reject unknown bare names with `GODOT_OVERRIDE_UNKNOWN`. Fallback validation uses the committed ClassDB property snapshot for Godot 4.7.2.
+
+Structured native values in overrides use explicit `$type` wrappers (see `docs/AI_AUTHORING.md`). Untyped JSON arrays are not coerced into `Vector2`/`Vector3`/`Vector4` by fallback.
+
+Script, process, generated-metadata, and executable resource surfaces are blocked by UIForge. There is no public unsafe bypass; `--allow-unsafe` remains an unknown CLI option.
 
 ## Known intentional differences
 
 - Resource existence checks (`RESOURCE_NOT_FOUND`) require Godot resource loading or filesystem access and may differ when assets are absent in a bare checkout.
 - PNG rendering is native-only; the fallback returns `GODOT_UNAVAILABLE`.
-- Native/fallback compiler semantic snapshot parity is not yet enforced in CI; portable and native validators/build policy are shared.
 - Runtime and editor code may still read legacy `aether_*` metadata or drag payloads for compatibility with scenes generated before the UIForge ABI migration.

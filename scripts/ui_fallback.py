@@ -17,7 +17,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from contract_snapshots import (
+    component_definitions,
+    component_names,
+    fill_style_name,
+    native_type as contract_native_type,
+    property_groups,
+    semantic_property_schemas,
+    style_name as contract_style_name,
+    supported_node_types,
+)
 from uiforge_contract import (
+    ALLOWED_RESOURCE_TYPES,
+    BLOCKED_RESOURCE_EXTENSIONS,
+    BLOCKED_RESOURCE_TYPES,
     check_create_allowed,
     check_replace_allowed,
     content_hash,
@@ -80,109 +93,12 @@ NATIVE_TYPES = {
     "AspectRatioContainer", "FlowContainer", "HSplitContainer", "VSplitContainer", "ColorRect", "NinePatchRect",
     "TabButton", "Separator", "Spacer",
 }
-COMPONENTS = {
-    "WindowFrame": ("Panel", "window"), "OrnatePanel": ("Panel", "panel"),
-    "SimplePanel": ("Panel", "inset"), "SectionPanel": ("Panel", "panel"),
-    "PrimaryButton": ("Button", "button_primary"), "SecondaryButton": ("Button", "button_secondary"),
-    "IconButton": ("TextureButton", "button_secondary"), "TabBar": ("TabBar", "tab"),
-    "TabButton": ("Button", "tab"), "ItemSlot": ("Panel", "slot"), "ItemGrid": ("GridContainer", "inset"),
-    "EquipmentSlot": ("Panel", "slot"), "EquipmentLayout": ("Panel", "inset"),
-    "InventoryPanel": ("Panel", "panel"), "BankPanel": ("Panel", "panel"),
-    "QuestEntry": ("Button", "button_secondary"), "QuestList": ("VBoxContainer", "inset"),
-    "ScrollList": ("ScrollContainer", "inset"), "Tooltip": ("Panel", "panel"),
-    "ContextMenu": ("Panel", "panel"), "ContextMenuEntry": ("Button", "button_secondary"),
-    "ModalDialog": ("Panel", "window"), "ProgressDisplay": ("ProgressBar", "panel"),
-    "StatusBar": ("ProgressBar", "panel"), "CurrencyDisplay": ("HBoxContainer", "inset"),
-    "SearchBox": ("LineEdit", "inset"), "Dropdown": ("OptionButton", "inset"), "CheckToggle": ("CheckButton", "button_secondary"), "SidebarNavigation": ("VBoxContainer", "inset"),
-    "SidebarEntry": ("Button", "button_secondary"), "GameplaySidebar": ("Panel", "sidebar_rail"),
-    "GameplaySidebarTab": ("Button", "sidebar_tab"), "GameplaySidebarToggle": ("Button", "sidebar_toggle"),
-    "EnemyTargetFrame": ("Panel", "target_frame"), "EnemyTargetHealthBar": ("ProgressBar", "target_track"),
-    "EnemyStatusEffect": ("Panel", "status_effect"), "CharacterPreviewFrame": ("Panel", "window"),
-    "NotificationToast": ("Panel", "panel"), "LootPopup": ("Panel", "panel"),
-    "CombatHUD": ("Panel", "hud_shell"), "ResourceBar": ("ProgressBar", "status_track"),
-    "HealthBar": ("ProgressBar", "status_track"), "PrayerBar": ("ProgressBar", "status_track"),
-    "RunBar": ("ProgressBar", "status_track"), "SpecialBar": ("ProgressBar", "status_track"),
-    "HUDMedallion": ("Panel", "hud_medallion"), "ActionSlot": ("Button", "action_slot"),
-}
-FILL_STYLES = {"HealthBar": "status_health", "PrayerBar": "status_prayer", "RunBar": "status_run", "SpecialBar": "status_special", "EnemyTargetHealthBar": "target_health"}
 NATIVE_MAP = {
     "RichText": "RichTextLabel", "Texture": "TextureRect", "Slider": "HSlider",
     "Grid": "GridContainer", "HBox": "HBoxContainer", "VBox": "VBoxContainer",
     "Separator": "HSeparator", "Spacer": "Control",
 }
-PROPERTY_GROUPS = {
-    "Layout": [
-        "layout.position", "layout.size", "layout.min_size", "layout.max_size", "layout.anchors",
-        "layout.offsets", "layout.anchors_preset", "layout.grow_horizontal", "layout.grow_vertical",
-        "layout.size_flags_horizontal", "layout.size_flags_vertical", "layout.size_flags_stretch_ratio",
-        "layout.pivot", "layout.rotation_degrees", "layout.scale", "properties.clip_contents",
-        "properties.fit_content", "properties.expand_mode", "properties.stretch_mode", "properties.columns",
-        "properties.separation", "properties.alignment",
-    ],
-    "Content": [
-        "properties.text", "properties.title", "properties.label", "properties.count", "properties.show_label", "properties.icon", "properties.texture", "properties.texture_region", "properties.slot_size", "properties.gap", "properties.value", "properties.min_value",
-        "properties.max_value", "properties.step", "properties.placeholder", "properties.max_length",
-        "properties.tick_count", "properties.show_percentage", "properties.flip_h", "properties.flip_v",
-    ],
-    "Typography": [
-        "properties.font", "properties.font_size", "properties.color", "properties.outline_size",
-        "properties.font_outline_color", "properties.font_shadow_color", "properties.horizontal_alignment",
-        "properties.vertical_alignment", "properties.autowrap", "properties.clip_text",
-        "properties.text_overrun_behavior",
-    ],
-    "Style": [
-        "style", "background_style", "fill_style", "properties.modulate", "properties.self_modulate", "properties.opacity", "properties.material",
-        "properties.theme", "properties.theme_type_variation", "properties.texture_filter", "properties.texture_repeat",
-    ],
-    "Interaction": [
-        "action", "binding", "effects", "properties.tooltip", "properties.disabled", "properties.editable",
-        "properties.focus_mode", "properties.mouse_default_cursor_shape", "properties.toggle_mode",
-        "properties.button_pressed", "properties.secret", "properties.clear_button_enabled", "properties.context_menu_enabled",
-        "properties.horizontal_scroll_mode", "properties.vertical_scroll_mode",
-    ],
-    "Accessibility": ["properties.accessibility_name", "properties.accessibility_description", "properties.auto_translate", "properties.layout_direction"],
-    "Advanced": ["properties.visible", "properties.show_behind_parent", "properties.top_level", "properties.z_as_relative", "properties.y_sort_enabled", "properties.godot_overrides", "decorations", "transitions", "metadata"],
-}
-
-
-def capability_property_schemas() -> dict[str, list[dict[str, Any]]]:
-    """Expose the portable property contract when Godot is unavailable.
-
-    The native CLI gets richer type/default information from the shared
-    GDScript catalog. The fallback still returns a deterministic per-node
-    schema so an agent can discover the same property paths in CI or on a
-    machine that has not installed Godot yet.
-    """
-    schemas: dict[str, list[dict[str, Any]]] = {}
-    all_types = sorted(NATIVE_TYPES | set(COMPONENTS))
-    for node_type in all_types:
-        fields: list[dict[str, Any]] = []
-        for category, paths in PROPERTY_GROUPS.items():
-            for path in paths:
-                value_type = "string"
-                if path in {"layout.position", "layout.size", "layout.min_size", "layout.max_size", "layout.pivot", "layout.scale"}:
-                    value_type = "vec2"
-                elif path.startswith("layout.anchors") or path.startswith("layout.offsets") or path in {"layout.size_flags_stretch_ratio", "properties.opacity", "properties.value", "properties.min_value", "properties.max_value", "properties.step"}:
-                    value_type = "float"
-                elif path in {"properties.columns", "properties.outline_size", "properties.max_length", "properties.tick_count"}:
-                    value_type = "int"
-                elif path.startswith("properties.") and path not in {"properties.text", "properties.icon", "properties.texture", "properties.font", "properties.font_size", "properties.color", "properties.font_outline_color", "properties.font_shadow_color", "properties.material", "properties.theme", "properties.theme_type_variation", "properties.tooltip", "properties.accessibility_name", "properties.accessibility_description", "properties.godot_overrides"}:
-                    value_type = "bool"
-                if path in {"metadata", "decorations", "transitions", "properties.godot_overrides", "properties.texture_region"}:
-                    value_type = "json"
-                fields.append({"path": path, "category": category, "type": value_type})
-        schemas[node_type] = fields
-    return schemas
-
-
-def capability_native_properties() -> dict[str, list[dict[str, Any]]]:
-    """Keep the native-property capability key stable without an engine.
-
-    Godot's ClassDB is the authoritative source for this list. The fallback
-    cannot introspect an engine that is not installed, so it returns an empty
-    list per supported type while still exposing the portable semantic schema.
-    """
-    return {node_type: [] for node_type in sorted(NATIVE_TYPES | set(COMPONENTS))}
+SUPPORTED_NODE_TYPES = set(supported_node_types())
 
 
 def is_valid_id(node_id: str) -> bool:
@@ -582,12 +498,12 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         for key in node.keys():
             if str(key) not in NODE_KEYS:
                 add("error", "UNKNOWN_NODE_KEY", f"Unknown node key '{key}'.", node_id, "Remove the key or extend the UIForge V1 contract deliberately.")
-        if node_type not in NATIVE_TYPES and node_type not in COMPONENTS and node_type != "ComponentInstance":
+        if node_type not in SUPPORTED_NODE_TYPES and node_type != "ComponentInstance":
             add("error", "UNKNOWN_NODE_TYPE", f"Unknown node type '{node_type}'.", node_id)
         if node_type == "ComponentInstance":
             component_name = str(node.get("component", ""))
             custom_components = data.get("components", {}) if isinstance(data.get("components", {}), dict) else {}
-            if component_name not in COMPONENTS and component_name not in custom_components:
+            if component_name not in component_names() and component_name not in custom_components:
                 add("error", "UNKNOWN_COMPONENT", f"Unknown component '{component_name}'.", node_id, "Define the component or query capabilities.")
         display_name = str(node.get("name", node_id))
         if display_name in names:
@@ -665,7 +581,7 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
                 add("error", "GODOT_OVERRIDES_INVALID", "properties.godot_overrides must be an object.", node_id)
             else:
                 for property_name in overrides_value:
-                    diagnostic = validate_godot_override(str(property_name))
+                    diagnostic = validate_godot_override(str(property_name), native(node_type))
                     if diagnostic:
                         add(diagnostic["severity"], diagnostic["code"], diagnostic["message"], node_id, diagnostic.get("recommendation", ""))
         if "metadata" in node:
@@ -717,13 +633,11 @@ def color(value: Any, fallback: str = "#151a22", tokens: dict[str, Any] | None =
 
 
 def native(node_type: str) -> str:
-    return COMPONENTS.get(node_type, (NATIVE_MAP.get(node_type, node_type), "panel"))[0]
+    return contract_native_type(node_type)
 
 
 def style_name(node_type: str) -> str:
-    if node_type in ("CheckBox", "QuestEntry", "SidebarEntry"):
-        return "checkbox" if node_type == "CheckBox" else "list_row"
-    return COMPONENTS.get(node_type, (node_type, "panel"))[1]
+    return contract_style_name(node_type)
 
 
 def merge_node(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
@@ -751,11 +665,11 @@ def materialize(node: dict[str, Any], custom: dict[str, Any]) -> dict[str, Any]:
             definition = materialize({"type": "ComponentInstance", "component": base_name}, custom)
         if isinstance(custom_definition, dict):
             definition = merge_node(definition, custom_definition)
-    elif component_name in COMPONENTS:
+    elif component_name in component_names():
         definition = {"type": component_name}
     base_definition = definition.get("node", definition)
     base_type = str(base_definition.get("type", component_name)) if isinstance(base_definition, dict) else component_name
-    inferred_native = definition.get("native_type") or (COMPONENTS.get(base_type, (base_type, "panel"))[0])
+    inferred_native = definition.get("native_type") or contract_native_type(base_type)
     result = merge_node(base_definition, result)
     if isinstance(result.get("overrides"), dict):
         result = merge_node(result, result["overrides"])
@@ -795,8 +709,85 @@ def scene_value(value: Any) -> str:
     return quote(str(value))
 
 
+def scene_number(value: Any) -> str:
+    if isinstance(value, bool):
+        return str(value).lower()
+    if isinstance(value, int) and not isinstance(value, bool):
+        return str(value)
+    return f"{float(value):.4f}"
+
+
+def typed_godot_literal(type_name: str, payload: Any, property_name: str, external_resource, tokens: dict[str, Any] | None = None) -> str:
+    values = payload if isinstance(payload, list) else []
+    if type_name == "Color":
+        return color(payload, "#ffffff", tokens)
+    if type_name in {"Vector2", "Vector2i"} and len(values) >= 2:
+        return f"{type_name}({scene_number(values[0])}, {scene_number(values[1])})"
+    if type_name in {"Vector3", "Vector3i"} and len(values) >= 3:
+        return f"{type_name}({scene_number(values[0])}, {scene_number(values[1])}, {scene_number(values[2])})"
+    if type_name in {"Vector4", "Vector4i"} and len(values) >= 4:
+        return f"{type_name}({scene_number(values[0])}, {scene_number(values[1])}, {scene_number(values[2])}, {scene_number(values[3])})"
+    if type_name in {"Rect2", "Rect2i"} and len(values) >= 4:
+        return (
+            f"{type_name}(Vector2({scene_number(values[0])}, {scene_number(values[1])}), "
+            f"Vector2({scene_number(values[2])}, {scene_number(values[3])}))"
+        )
+    if type_name == "Transform2D" and len(values) >= 6:
+        return (
+            "Transform2D("
+            f"Vector2({scene_number(values[0])}, {scene_number(values[1])}), "
+            f"Vector2({scene_number(values[2])}, {scene_number(values[3])}), "
+            f"Vector2({scene_number(values[4])}, {scene_number(values[5])}))"
+        )
+    if type_name == "Plane" and len(values) >= 4:
+        return f"Plane(Vector3({scene_number(values[0])}, {scene_number(values[1])}, {scene_number(values[2])}), {scene_number(values[3])})"
+    if type_name == "Quaternion" and len(values) >= 4:
+        return f"Quaternion({scene_number(values[0])}, {scene_number(values[1])}, {scene_number(values[2])}, {scene_number(values[3])})"
+    if type_name == "AABB" and len(values) >= 6:
+        return (
+            "AABB("
+            f"Vector3({scene_number(values[0])}, {scene_number(values[1])}, {scene_number(values[2])}), "
+            f"Vector3({scene_number(values[3])}, {scene_number(values[4])}, {scene_number(values[5])}))"
+        )
+    if type_name == "Basis" and len(values) >= 9:
+        return (
+            "Basis("
+            f"Vector3({scene_number(values[0])}, {scene_number(values[1])}, {scene_number(values[2])}), "
+            f"Vector3({scene_number(values[3])}, {scene_number(values[4])}, {scene_number(values[5])}), "
+            f"Vector3({scene_number(values[6])}, {scene_number(values[7])}, {scene_number(values[8])}))"
+        )
+    if type_name == "Transform3D" and len(values) >= 12:
+        basis = typed_godot_literal("Basis", values[:9], property_name, external_resource, tokens)
+        return f"Transform3D({basis}, Vector3({scene_number(values[9])}, {scene_number(values[10])}, {scene_number(values[11])}))"
+    if type_name == "Array[NodePath]":
+        node_paths = []
+        for entry in values:
+            path = str(entry.get("$node_path", "")) if isinstance(entry, dict) else str(entry)
+            node_paths.append(f"NodePath({quote(path)})")
+        return "[" + ", ".join(node_paths) + "]"
+    packed_types = {
+        "PackedByteArray", "PackedInt32Array", "PackedInt64Array", "PackedFloat32Array",
+        "PackedFloat64Array", "PackedStringArray", "PackedVector2Array", "PackedVector3Array",
+        "PackedColorArray",
+    }
+    if type_name in packed_types:
+        return f"{type_name}({godot_literal(property_name, values, external_resource, tokens)})"
+    if isinstance(payload, list):
+        return godot_literal(property_name, payload, external_resource, tokens)
+    return scene_value(payload)
+
+
 def godot_literal(property_name: str, value: Any, external_resource, tokens: dict[str, Any] | None = None) -> str:
     if isinstance(value, dict):
+        tagged_type = str(value.get("$type", ""))
+        if tagged_type:
+            return typed_godot_literal(
+                tagged_type,
+                value.get("value", value.get("values", [])),
+                property_name,
+                external_resource,
+                tokens,
+            )
         resource_path = str(value.get("$resource", value.get("resource", "")))
         if resource_path.startswith("res://"):
             resource_type = str(value.get("type", "Texture2D"))
@@ -814,8 +805,6 @@ def godot_literal(property_name: str, value: Any, external_resource, tokens: dic
             return color(value, "#ffffff", tokens)
         return quote(value)
     if isinstance(value, list):
-        if len(value) in (2, 3, 4) and all(isinstance(item, (int, float)) and not isinstance(item, bool) for item in value):
-            return "Vector%d(%s)" % (len(value), ", ".join(f"{float(item):.4f}" for item in value))
         return "[" + ", ".join(godot_literal(property_name, item, external_resource, tokens) for item in value) + "]"
     return scene_value(value)
 
@@ -851,9 +840,7 @@ def build_tscn(data: dict[str, Any], source: str) -> tuple[str, list[dict[str, A
         cache = f"{node_id}|{state}|{json.dumps(node_style, sort_keys=True)}"
         if cache in emitted_styles:
             return emitted_styles[cache]
-        chosen = styles.get(node_style if isinstance(node_style, str) else "panel", styles.get("panel", {})).copy()
-        if isinstance(node_style, dict):
-            chosen.update(node_style)
+        chosen = node_style.copy() if isinstance(node_style, dict) else styles.get(str(node_style), styles.get("panel", {})).copy()
         state_key = f"{state}_background"
         if state_key in chosen:
             chosen["background"] = chosen[state_key]
@@ -1025,7 +1012,7 @@ def build_tscn(data: dict[str, Any], source: str) -> tuple[str, list[dict[str, A
             resource_id = external_resource(icon_ref, "Texture2D", f"theme_override_icons/{key}", node_id)
             if resource_id:
                 lines.append(f'theme_override_icons/{key} = ExtResource("{resource_id}")')
-        typed_properties = {"text", "placeholder_text", "visible", "clip_contents", "show_behind_parent", "top_level", "z_as_relative", "y_sort_enabled", "use_parent_material", "clip_children", "light_mask", "visibility_layer", "texture_filter", "texture_repeat", "layout_direction", "mouse_default_cursor_shape", "tooltip_text", "focus_mode", "value", "min_value", "max_value", "step", "columns", "editable", "disabled", "autowrap_mode", "horizontal_alignment", "vertical_alignment", "show_percentage", "bbcode_enabled", "fit_content", "scroll_active", "toggle_mode", "button_pressed", "secret", "clear_button_enabled", "caret_blink", "selecting_enabled", "ticks_on_borders", "allow_greater", "allow_lesser", "ignore_texture_size", "flip_h", "flip_v", "max_length", "tick_count", "horizontal_scroll_mode", "vertical_scroll_mode", "alignment", "clip_text", "flat", "expand_icon", "icon_alignment", "text_overrun_behavior", "theme_type_variation", "accessibility_name", "accessibility_description", "auto_translate", "separation", "modulate", "self_modulate", "material", "theme", "icon", "texture", "expand_mode", "stretch_mode", "patch_margin_left", "patch_margin_top", "patch_margin_right", "patch_margin_bottom", "font", "font_size", "outline_size", "color", "font_color", "font_outline_color", "font_shadow_color"}
+        typed_properties = {"text", "placeholder_text", "visible", "clip_contents", "show_behind_parent", "top_level", "z_as_relative", "y_sort_enabled", "use_parent_material", "clip_children", "light_mask", "visibility_layer", "texture_filter", "texture_repeat", "layout_direction", "mouse_default_cursor_shape", "tooltip_text", "focus_mode", "value", "min_value", "max_value", "step", "columns", "editable", "disabled", "autowrap_mode", "horizontal_alignment", "vertical_alignment", "show_percentage", "bbcode_enabled", "fit_content", "scroll_active", "toggle_mode", "button_pressed", "secret", "clear_button_enabled", "caret_blink", "selecting_enabled", "ticks_on_borders", "allow_greater", "allow_lesser", "ignore_texture_size", "flip_h", "flip_v", "max_length", "tick_count", "horizontal_scroll_mode", "vertical_scroll_mode", "alignment", "clip_text", "flat", "expand_icon", "icon_alignment", "text_overrun_behavior", "theme_type_variation", "accessibility_name", "accessibility_description", "auto_translate", "separation", "material", "theme", "icon", "texture", "expand_mode", "stretch_mode", "patch_margin_left", "patch_margin_top", "patch_margin_right", "patch_margin_bottom", "font", "font_size", "outline_size", "color", "font_color", "font_outline_color", "font_shadow_color"}
         if isinstance(raw_overrides, dict):
             for property_name, raw_value in raw_overrides.items():
                 property_name = str(property_name)
@@ -1046,7 +1033,7 @@ def build_tscn(data: dict[str, Any], source: str) -> tuple[str, list[dict[str, A
                 property_name = "background"
             lines.append(f'theme_override_styles/{property_name} = SubResource("{style_id}")')
             if native_type == "ProgressBar":
-                fill_style = node.get("fill_style", FILL_STYLES.get(node_type, "button_primary"))
+                fill_style = node.get("fill_style", fill_style_name(node_type))
                 fill_id = make_style(node_id, "fill", fill_style)
                 lines.append(f'theme_override_styles/fill = SubResource("{fill_id}")')
             states = node.get("states", {}) if isinstance(node.get("states", {}), dict) else {}
@@ -1183,21 +1170,21 @@ def capabilities() -> dict[str, Any]:
             "move": {"node": "string", "parent": "string", "index": "integer?"},
             "duplicate": {"node": "string", "new_id": "string"},
         },
-        "supported_node_types": sorted(NATIVE_TYPES | set(COMPONENTS)),
-        "property_schemas": capability_property_schemas(),
-        "native_property_schemas": capability_native_properties(),
-        "components": sorted(COMPONENTS),
-        "component_definitions": {k: {"native_type": v[0], "style": v[1]} for k, v in COMPONENTS.items()},
+        "supported_node_types": supported_node_types(),
+        "property_schemas": semantic_property_schemas(),
+        "native_property_schemas": {node_type: [] for node_type in supported_node_types()},
+        "components": sorted(component_names()),
+        "component_definitions": component_definitions(),
         "states": ["normal", "hover", "pressed", "focused", "disabled", "selected"],
         "viewport_presets": [{"width": w, "height": h} for w, h in [(1280, 720), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160)]],
         "themes": ["dark_fantasy"],
-        "properties": PROPERTY_GROUPS,
+        "properties": property_groups(),
         "templates": template_catalog(),
         "operations": ["get", "set", "add", "delete", "move", "duplicate", "validate", "build", "render", "inspect", "new", "batch"],
         "resource_safety_policy": {
-            "blocked_resource_classes": sorted(["Script", "GDScript", "CSharpScript", "PackedScene", "Shader"]),
-            "blocked_extensions": sorted([".gd", ".cs", ".tscn", ".scn", ".shader", ".gdshader"]),
-            "allowed_resource_classes": ["Texture2D", "FontFile", "Material", "Theme"],
+            "blocked_resource_classes": sorted(BLOCKED_RESOURCE_TYPES),
+            "blocked_extensions": sorted(BLOCKED_RESOURCE_EXTENSIONS),
+            "allowed_resource_classes": sorted(ALLOWED_RESOURCE_TYPES),
         },
         "output_path_policy": {"workspace_relative": True, "allow_outside_project_flag": True},
         "optimistic_concurrency": {"supported": True, "revision_field": "revision", "expected_revision_param": "expected_revision"},
@@ -1702,7 +1689,7 @@ def main(argv: list[str]) -> tuple[dict[str, Any], int]:
             theme_data = merge_dicts(theme(data), overrides) if isinstance(overrides, dict) else theme(data)
             return {"success": True, "theme": data.get("theme", "dark_fantasy"), "tokens": theme_data.get("tokens", {})}, 0
         if scope == "components":
-            return {"success": True, "components": {k: {"native_type": v[0], "style": v[1]} for k, v in COMPONENTS.items()}, "custom": data.get("components", {})}, 0
+            return {"success": True, "components": component_definitions(), "custom": data.get("components", {})}, 0
         if scope == "diagnostics":
             result = validate(data)
             return {"success": result["success"], "diagnostics": result["diagnostics"]}, 0 if result["success"] else 1

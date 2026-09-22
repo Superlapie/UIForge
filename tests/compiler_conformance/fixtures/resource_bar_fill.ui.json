@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "name": "resource_bar_fill",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "health_bar_root",
+    "type": "HealthBar",
+    "layout": {"position": [20, 20], "size": [240, 18]},
+    "properties": {"value": 72, "max_value": 100},
+    "children": []
+  }
+}

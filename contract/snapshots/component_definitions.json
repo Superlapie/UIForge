@@ -1,0 +1,207 @@
+{
+	"ActionSlot": {
+		"native_type": "Button",
+		"style": "action_slot"
+	},
+	"BankPanel": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"CharacterPreviewFrame": {
+		"native_type": "Panel",
+		"style": "window"
+	},
+	"CheckBox": {
+		"native_type": "CheckBox",
+		"style": "checkbox"
+	},
+	"CheckButton": {
+		"native_type": "CheckButton",
+		"style": "button_secondary"
+	},
+	"CheckToggle": {
+		"native_type": "CheckButton",
+		"style": "button_secondary"
+	},
+	"CombatHUD": {
+		"native_type": "Panel",
+		"style": "hud_shell"
+	},
+	"ContextMenu": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"ContextMenuEntry": {
+		"native_type": "Button",
+		"style": "button_secondary"
+	},
+	"CurrencyDisplay": {
+		"native_type": "HBoxContainer",
+		"style": "inset"
+	},
+	"Dropdown": {
+		"native_type": "OptionButton",
+		"style": "inset"
+	},
+	"EnemyStatusEffect": {
+		"native_type": "Panel",
+		"style": "status_effect"
+	},
+	"EnemyTargetFrame": {
+		"native_type": "Panel",
+		"style": "target_frame"
+	},
+	"EnemyTargetHealthBar": {
+		"fill_style": "target_health",
+		"native_type": "ProgressBar",
+		"style": "target_track"
+	},
+	"EquipmentLayout": {
+		"native_type": "Panel",
+		"style": "inset"
+	},
+	"EquipmentSlot": {
+		"native_type": "Panel",
+		"style": "slot"
+	},
+	"GameplaySidebar": {
+		"native_type": "Panel",
+		"style": "sidebar_rail"
+	},
+	"GameplaySidebarTab": {
+		"native_type": "Button",
+		"style": "sidebar_tab"
+	},
+	"GameplaySidebarToggle": {
+		"native_type": "Button",
+		"style": "sidebar_toggle"
+	},
+	"HUDMedallion": {
+		"native_type": "Panel",
+		"style": "hud_medallion"
+	},
+	"HealthBar": {
+		"fill_style": "status_health",
+		"native_type": "ProgressBar",
+		"style": "status_track"
+	},
+	"IconButton": {
+		"native_type": "TextureButton",
+		"style": "button_secondary"
+	},
+	"InventoryPanel": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"ItemGrid": {
+		"native_type": "GridContainer",
+		"style": "inset"
+	},
+	"ItemSlot": {
+		"native_type": "Panel",
+		"style": "slot"
+	},
+	"LineEdit": {
+		"native_type": "LineEdit",
+		"style": "inset"
+	},
+	"LootPopup": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"ModalDialog": {
+		"native_type": "Panel",
+		"style": "window"
+	},
+	"NotificationToast": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"OrnatePanel": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"PrayerBar": {
+		"fill_style": "status_prayer",
+		"native_type": "ProgressBar",
+		"style": "status_track"
+	},
+	"PrimaryButton": {
+		"native_type": "Button",
+		"style": "button_primary"
+	},
+	"ProgressDisplay": {
+		"native_type": "ProgressBar",
+		"style": "panel"
+	},
+	"QuestEntry": {
+		"native_type": "Button",
+		"style": "list_row"
+	},
+	"QuestList": {
+		"native_type": "VBoxContainer",
+		"style": "inset"
+	},
+	"ResourceBar": {
+		"native_type": "ProgressBar",
+		"style": "status_track"
+	},
+	"RunBar": {
+		"fill_style": "status_run",
+		"native_type": "ProgressBar",
+		"style": "status_track"
+	},
+	"ScrollList": {
+		"native_type": "ScrollContainer",
+		"style": "inset"
+	},
+	"SearchBox": {
+		"native_type": "LineEdit",
+		"style": "inset"
+	},
+	"SecondaryButton": {
+		"native_type": "Button",
+		"style": "button_secondary"
+	},
+	"SectionPanel": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"SidebarEntry": {
+		"native_type": "Button",
+		"style": "list_row"
+	},
+	"SidebarNavigation": {
+		"native_type": "VBoxContainer",
+		"style": "inset"
+	},
+	"SimplePanel": {
+		"native_type": "Panel",
+		"style": "inset"
+	},
+	"SpecialBar": {
+		"fill_style": "status_special",
+		"native_type": "ProgressBar",
+		"style": "status_track"
+	},
+	"StatusBar": {
+		"native_type": "ProgressBar",
+		"style": "panel"
+	},
+	"TabBar": {
+		"native_type": "TabBar",
+		"style": "tab"
+	},
+	"TabButton": {
+		"native_type": "Button",
+		"style": "tab"
+	},
+	"Tooltip": {
+		"native_type": "Panel",
+		"style": "panel"
+	},
+	"WindowFrame": {
+		"native_type": "Panel",
+		"style": "window"
+	}
+}

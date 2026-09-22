@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "name": "typed_literals",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "typed_root",
+    "type": "Panel",
+    "layout": {"position": [20, 20], "size": [320, 180]},
+    "properties": {
+      "godot_overrides": {
+        "pivot_offset": {"$type": "Vector2", "value": [12, 8]},
+        "theme_override_colors/accent": {"$type": "Color", "value": "$colors.gold"}
+      }
+    },
+    "children": []
+  }
+}

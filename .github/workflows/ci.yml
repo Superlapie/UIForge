@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
       - name: Run Windows filesystem and trust tests
         shell: bash
-        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security tests.test_batch2_5_security tests.test_batch2_5_1_security tests.test_batch2_5_2_security tests.test_batch2_5_3_security tests.test_batch3_fallback_parity tests.test_batch3_machine_params tests.test_batch3_positive_commands -v
+        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security tests.test_batch2_5_security tests.test_batch2_5_1_security tests.test_batch2_5_2_security tests.test_batch2_5_3_security tests.test_batch3_fallback_parity tests.test_batch3_machine_params tests.test_batch3_positive_commands tests.test_batch4_contract_parity -v
 
   godot-linux:
     runs-on: ubuntu-latest
