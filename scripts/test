@@ -19,7 +19,9 @@ run_native() {
 	"$PROJECT_DIR/scripts/ui" render examples/specs/combat_hud.ui.json --viewport 1280x720 --output .uiforge/test/combat_hud_1280.png --force
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/render_output_runner.gd
 }
-if command -v godot >/dev/null 2>&1; then
+if [ -n "${GODOT_BIN:-}" ]; then
+	run_native "$GODOT_BIN"
+elif command -v godot >/dev/null 2>&1; then
 	run_native "$(command -v godot)"
 elif command -v godot4 >/dev/null 2>&1; then
 	run_native "$(command -v godot4)"

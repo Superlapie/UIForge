@@ -125,8 +125,8 @@ def _windows_resolve_existing_prefix(existing_path: Path) -> Path:
         "$resolved = [System.IO.Path]::GetFullPath($target) "
         "} else { $resolved = $item.FullName } }; "
         "Write-Output ($resolved -replace '\\\\','/') }; "
-        "Resolve-UIForgeExistingPath '{path}'"
-    ).format(path=str(existing_path).replace("'", "''"))
+        "Resolve-UIForgeExistingPath '%s'"
+    ) % str(existing_path).replace("'", "''")
     try:
         completed = subprocess.run(
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
