@@ -810,6 +810,15 @@ def run_positive_commands(godot: str) -> tuple[int, int]:
     proc = spawn_serve(godot)
     assert proc.stdout is not None
     read_json_line(proc.stdout)
+
+    def ensure_persistent_server() -> None:
+        nonlocal proc
+        if proc.poll() is None:
+            return
+        proc = spawn_serve(godot)
+        assert proc.stdout is not None
+        read_json_line(proc.stdout)
+
     for fixture in fixtures:
         if fixture["id"] == "positive_shutdown":
             continue
@@ -823,6 +832,7 @@ def run_positive_commands(godot: str) -> tuple[int, int]:
                 assert_node_exists(godot, temp_path, str(expect["node_exists"]), f"positive_oneshot:{fixture['id']}")
             executions += 1
         if "native_persistent" in transports:
+            ensure_persistent_server()
             request, temp_path = prepare_fixture(fixture, suffix="persistent")
             response = send_request(proc, request)
             assert_response(response, expect, f"positive_persistent:{fixture['id']}")
@@ -834,8 +844,9 @@ def run_positive_commands(godot: str) -> tuple[int, int]:
             response = fallback_dispatch(request)
             assert_response(response, expect, f"positive_fallback:{fixture['id']}")
             executions += 1
-    proc.stdin.close()
-    proc.wait(timeout=60)
+    if proc.poll() is None:
+        proc.stdin.close()
+        proc.wait(timeout=60)
     return len(fixtures) - 1, executions
 
 

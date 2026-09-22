@@ -214,7 +214,7 @@
   },
   {
     "id": "positive_render",
-    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "transports": ["native_oneshot", "fallback"],
     "request": {
       "protocol": "uiforge.machine",
       "protocol_version": 1,
