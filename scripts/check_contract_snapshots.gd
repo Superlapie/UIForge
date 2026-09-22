@@ -52,10 +52,11 @@ func _run() -> void:
 	if failures.is_empty():
 		print(JSON.stringify({"success": true, "snapshots": expected.keys()}))
 		quit(0)
-	for failure in failures:
-		push_error(failure)
-	print(JSON.stringify({"success": false, "failures": failures}))
-	quit(1)
+	else:
+		for failure in failures:
+			push_error(failure)
+		print(JSON.stringify({"success": false, "failures": failures}))
+		quit(1)
 
 func _supported_node_types() -> Array[String]:
 	var supported: Array[String] = []

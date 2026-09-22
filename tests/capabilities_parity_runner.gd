@@ -22,10 +22,11 @@ func _run() -> void:
 	if failures.is_empty():
 		print(JSON.stringify({"success": true, "checks": 1}))
 		quit(0)
-	for failure in failures:
-		push_error(failure)
-	print(JSON.stringify({"success": false, "failures": failures}))
-	quit(1)
+	else:
+		for failure in failures:
+			push_error(failure)
+		print(JSON.stringify({"success": false, "failures": failures}))
+		quit(1)
 
 func _load_fallback_capabilities() -> Dictionary:
 	var output_path := ProjectSettings.globalize_path("user://capabilities_parity_fallback.json")
