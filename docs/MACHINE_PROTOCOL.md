@@ -3,7 +3,7 @@
 ## Protocol identifier
 
 - `protocol`: `uiforge.machine`
-- `protocol_version`: `1`
+- `protocol_version`: `1` (also accepts JSON `1.0`; must be a finite integer-valued JSON number matching a supported version)
 - `command_contract_version`: `1`
 
 Document schema version remains independent (`schema_version` in `.ui.json` files).

@@ -133,6 +133,16 @@ class Batch3FallbackParityTests(unittest.TestCase):
                 f"advertised command {command} returned UNKNOWN_METHOD",
             )
 
+    def test_fallback_accepts_whole_float_protocol_version(self) -> None:
+        response = dispatch_machine({
+            "protocol": "uiforge.machine",
+            "protocol_version": 1.0,
+            "request_id": "fb-float",
+            "method": "capabilities",
+            "params": {},
+        })
+        self.assertTrue(response.get("success"))
+
     def test_fallback_malformed_protocol_version(self) -> None:
         response = dispatch_machine({
             "protocol": "uiforge.machine",
@@ -144,16 +154,16 @@ class Batch3FallbackParityTests(unittest.TestCase):
         self.assertFalse(response.get("success"))
         self.assertEqual(response.get("error", {}).get("code"), "MALFORMED_REQUEST")
 
-    def test_fallback_rejects_float_protocol_version(self) -> None:
+    def test_fallback_rejects_fractional_protocol_version(self) -> None:
         response = dispatch_machine({
             "protocol": "uiforge.machine",
-            "protocol_version": 1.0,
-            "request_id": "fb-float",
+            "protocol_version": 1.5,
+            "request_id": "fb-fraction",
             "method": "capabilities",
             "params": {},
         })
         self.assertFalse(response.get("success"))
-        self.assertEqual(response.get("error", {}).get("code"), "MALFORMED_REQUEST")
+        self.assertEqual(response.get("error", {}).get("code"), "UNSUPPORTED_PROTOCOL_VERSION")
 
 
 if __name__ == "__main__":

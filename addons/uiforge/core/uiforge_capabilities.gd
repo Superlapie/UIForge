@@ -51,9 +51,9 @@ static func as_dict() -> Dictionary:
 		"dry_run": {"supported": true, "methods": ["batch"]},
 		"max_request_bytes": UIForgeMachineProtocol.MAX_REQUEST_BYTES,
 		"protocol_version_semantics": {
-			"python_requires_json_integer": true,
-			"godot_accepts_whole_number_float": true,
-			"note": "Python transports require protocol_version as a JSON integer. Godot JSON parsing represents numbers as float; native transport accepts whole-number floats equal to a supported version.",
+			"rule": "protocol_version must be a finite integer-valued JSON number matching a supported version.",
+			"accepted_examples": [1, 1.0],
+			"rejected_examples": [1.5, "1", true, null],
 		},
 		"supported_render_states": UIForgeTypes.STATES.duplicate(),
 		"supported_transports": ["human_cli", "machine_oneshot", "persistent_stdio"],

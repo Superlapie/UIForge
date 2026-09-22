@@ -1,12 +1,59 @@
 class_name UIForgeSerializer
 extends RefCounted
 
+const SOURCE_WRITE_WAIT_MS := 500
+const SOURCE_WRITE_WAIT_STEP_MS := 5
+
 static func load_document(path: String) -> Dictionary:
-	if not FileAccess.file_exists(UIForgePaths.normalize_requested(path)):
-		_recover_missing_source(path)
-	if not FileAccess.file_exists(UIForgePaths.normalize_requested(path)):
-		return {"document": null, "revision_hash": "", "errors": [{"code": "FILE_NOT_FOUND", "message": "Document not found: %s" % path}]}
 	var absolute := UIForgePaths.normalize_requested(path)
+	if absolute.is_empty():
+		return {"document": null, "revision_hash": "", "errors": [{"code": "OUTPUT_PATH_INVALID", "message": path}]}
+	if FileAccess.file_exists(absolute):
+		return _read_document_file(path, absolute)
+	var waited_ms := 0
+	while waited_ms < SOURCE_WRITE_WAIT_MS:
+		if FileAccess.file_exists(absolute):
+			return _read_document_file(path, absolute)
+		if UIForgeLock.live_lock_held(absolute):
+			OS.delay_msec(SOURCE_WRITE_WAIT_STEP_MS)
+			waited_ms += SOURCE_WRITE_WAIT_STEP_MS
+			continue
+		var recovery := UIForgeTransaction.try_recover_interrupted_source_for_path(path)
+		if str(recovery.get("status", "")) == "live_writer":
+			OS.delay_msec(SOURCE_WRITE_WAIT_STEP_MS)
+			waited_ms += SOURCE_WRITE_WAIT_STEP_MS
+			continue
+		if FileAccess.file_exists(absolute):
+			return _read_document_file(path, absolute)
+		break
+	if FileAccess.file_exists(absolute):
+		return _read_document_file(path, absolute)
+	if UIForgeLock.live_lock_held(absolute):
+		return {
+			"document": null,
+			"revision_hash": "",
+			"errors": [{
+				"code": "SOURCE_WRITE_IN_PROGRESS",
+				"message": "Document write is in progress for %s." % path,
+				"path": path,
+			}],
+		}
+	var recovery := UIForgeTransaction.try_recover_interrupted_source_for_path(path)
+	if str(recovery.get("status", "")) == "live_writer":
+		return {
+			"document": null,
+			"revision_hash": "",
+			"errors": [{
+				"code": "SOURCE_WRITE_IN_PROGRESS",
+				"message": "Document write is in progress for %s." % path,
+				"path": path,
+			}],
+		}
+	if FileAccess.file_exists(absolute):
+		return _read_document_file(path, absolute)
+	return {"document": null, "revision_hash": "", "errors": [{"code": "FILE_NOT_FOUND", "message": "Document not found: %s" % path}]}
+
+static func _read_document_file(path: String, absolute: String) -> Dictionary:
 	var file := FileAccess.open(absolute, FileAccess.READ)
 	if file == null:
 		return {"document": null, "revision_hash": "", "errors": [{"code": "FILE_OPEN_FAILED", "message": "Could not open: %s" % path}]}
@@ -44,6 +91,3 @@ static func create_default(document_name: String = "untitled") -> UIForgeDocumen
 			"children": []
 		}
 	})
-
-static func _recover_missing_source(path: String) -> void:
-	UIForgeTransaction.recover_interrupted_source_for_path(path)

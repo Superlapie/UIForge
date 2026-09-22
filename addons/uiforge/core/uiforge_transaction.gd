@@ -1,6 +1,7 @@
 class_name UIForgeTransaction
 extends RefCounted
 
+static var source_write_pause_hook: Callable = Callable()
 static var _replace_hash_pattern: RegEx
 static var _replace_transaction_id_pattern: RegEx
 
@@ -140,7 +141,7 @@ static func write_source_atomically(target_path: String, content: String, expect
 	var owner_nonce := str(lock.get("owner_nonce", ""))
 	var txn_paths := _transaction_paths(absolute)
 	var new_revision := _json_revision_from_text(content)
-	_recover_interrupted_source(absolute, txn_paths)
+	_recover_interrupted_source_locked(absolute, txn_paths)
 	if not expected_revision.is_empty() and FileAccess.file_exists(absolute):
 		var current := UIForgeHash.file_revision(target_path)
 		if not current.get("ok", false):
@@ -184,6 +185,7 @@ static func write_source_atomically(target_path: String, content: String, expect
 			DirAccess.remove_absolute(temp_path)
 			UIForgeLock.release(lock_path, owner_nonce)
 			return {"success": false, "committed": false, "errors": [{"code": "BACKUP_RENAME_FAILED", "message": "Could not protect %s" % target_path}]}
+	_maybe_pause("after_backup")
 	var pending_error := DirAccess.rename_absolute(temp_path, txn_paths.pending)
 	if pending_error != OK:
 		if FileAccess.file_exists(txn_paths.backup):
@@ -192,6 +194,7 @@ static func write_source_atomically(target_path: String, content: String, expect
 		DirAccess.remove_absolute(temp_path)
 		UIForgeLock.release(lock_path, owner_nonce)
 		return {"success": false, "committed": false, "errors": [{"code": "ATOMIC_RENAME_FAILED", "message": "Could not stage %s" % target_path}]}
+	_maybe_pause("after_pending")
 	_write_txn_meta(txn_paths.meta, {
 		"transaction_id": txn_id,
 		"target": absolute,
@@ -200,6 +203,7 @@ static func write_source_atomically(target_path: String, content: String, expect
 		"pending_hash": pending_hash,
 		"stage": "commit",
 	})
+	_maybe_pause("before_promotion")
 	var replace_result := replace_file(txn_paths.pending, absolute)
 	if not replace_result.get("ok", false):
 		if FileAccess.file_exists(txn_paths.backup):
@@ -424,14 +428,29 @@ static func _secure_transaction_id() -> String:
 	var crypto := Crypto.new()
 	return crypto.generate_random_bytes(16).hex_encode()
 
-static func recover_interrupted_source_for_path(target_path: String) -> void:
+static func recover_interrupted_source_for_path(target_path: String) -> Dictionary:
+	return try_recover_interrupted_source_for_path(target_path)
+
+static func try_recover_interrupted_source_for_path(target_path: String) -> Dictionary:
 	var absolute := UIForgePaths.normalize_requested(target_path)
 	if absolute.is_empty():
-		return
-	_recover_interrupted_source(absolute, _transaction_paths(absolute))
-	_cleanup_completed_transaction(absolute, _transaction_paths(absolute))
+		return {"ok": false, "status": "invalid", "errors": [{"code": "OUTPUT_PATH_INVALID", "message": target_path}]}
+	if UIForgeLock.live_lock_held(absolute):
+		return {"ok": false, "status": "live_writer", "errors": []}
+	var lock := UIForgeLock.acquire(absolute)
+	if not lock.get("ok", false):
+		if UIForgeLock.live_lock_held(absolute):
+			return {"ok": false, "status": "live_writer", "errors": []}
+		return {"ok": false, "status": "blocked", "errors": lock.get("errors", [])}
+	var lock_path := str(lock.get("lock_path", ""))
+	var owner_nonce := str(lock.get("owner_nonce", ""))
+	var paths := _transaction_paths(absolute)
+	_recover_interrupted_source_locked(absolute, paths)
+	_cleanup_completed_transaction(absolute, paths)
+	UIForgeLock.release(lock_path, owner_nonce)
+	return {"ok": true, "status": "recovered", "errors": []}
 
-static func _recover_interrupted_source(absolute: String, paths: TxnPaths) -> void:
+static func _recover_interrupted_source_locked(absolute: String, paths: TxnPaths) -> void:
 	var meta := _read_txn_meta(paths.meta)
 	if FileAccess.file_exists(paths.pending):
 		if _pending_may_promote(absolute, paths, meta):
@@ -515,3 +534,7 @@ static func _sha256_text(text: String) -> String:
 	context.start(HashingContext.HASH_SHA256)
 	context.update(text.to_utf8_buffer())
 	return context.finish().hex_encode()
+
+static func _maybe_pause(stage: String) -> void:
+	if source_write_pause_hook.is_valid():
+		source_write_pause_hook.call(stage)

@@ -28,7 +28,7 @@ static func validate_request(payload: Variant) -> Dictionary:
 	var version_value: Variant = payload.get("protocol_version")
 	if not _is_exact_protocol_version(version_value):
 		if typeof(version_value) == TYPE_BOOL or (typeof(version_value) != TYPE_INT and typeof(version_value) != TYPE_FLOAT):
-			return _invalid("MALFORMED_REQUEST", "protocol_version must be an integer.")
+			return _invalid("MALFORMED_REQUEST", "protocol_version must be a finite integer-valued JSON number.")
 		return _invalid("UNSUPPORTED_PROTOCOL_VERSION", "Unsupported protocol version %s." % str(version_value), ExitClass.CLI_USAGE)
 	var request_id_value: Variant = payload.get("request_id")
 	if typeof(request_id_value) != TYPE_STRING or str(request_id_value).is_empty():
@@ -100,7 +100,7 @@ static func exit_class_for_response(response: Dictionary) -> int:
 		return ExitClass.SUCCESS
 	var code := str(response.get("error", {}).get("code", ""))
 	match code:
-		"USAGE", "MALFORMED_REQUEST", "UNKNOWN_COMMAND", "UNKNOWN_METHOD", "UNSUPPORTED_PROTOCOL_VERSION", "PROTOCOL_MISMATCH", "REQUEST_TOO_LARGE":
+		"USAGE", "MALFORMED_REQUEST", "MALFORMED_PARAMS", "UNKNOWN_COMMAND", "UNKNOWN_METHOD", "UNSUPPORTED_PROTOCOL_VERSION", "PROTOCOL_MISMATCH", "REQUEST_TOO_LARGE":
 			return ExitClass.CLI_USAGE
 		"REVISION_CONFLICT", "WRITE_CONFLICT":
 			return ExitClass.CONFLICT

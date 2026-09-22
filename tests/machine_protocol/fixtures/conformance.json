@@ -91,36 +91,60 @@
     "transports": ["native_oneshot", "native_persistent", "fallback"],
     "request": {
       "protocol": "uiforge.machine",
-      "protocol_version": "banana",
-      "request_id": "fx-banana",
-      "method": "validate",
-      "params": {"document": "tests/conformance/fixtures/minimal.ui.json"}
-    },
-    "expect": {"success": false, "error_code": "MALFORMED_REQUEST"}
-  },
-  {
-    "id": "protocol_version_float_fallback",
-    "transports": ["fallback"],
-    "request": {
-      "protocol": "uiforge.machine",
-      "protocol_version": 1.0,
-      "request_id": "fx-float-fallback",
+      "protocol_version": "1",
+      "request_id": "fx-string-version",
       "method": "capabilities",
       "params": {}
     },
     "expect": {"success": false, "error_code": "MALFORMED_REQUEST"}
   },
   {
-    "id": "protocol_version_float_native",
-    "transports": ["native_oneshot"],
+    "id": "protocol_version_whole_float",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
     "request": {
       "protocol": "uiforge.machine",
       "protocol_version": 1.0,
-      "request_id": "fx-float-native",
+      "request_id": "fx-float-version",
       "method": "capabilities",
       "params": {}
     },
     "expect": {"success": true}
+  },
+  {
+    "id": "protocol_version_fractional",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": 1.5,
+      "request_id": "fx-fraction-version",
+      "method": "capabilities",
+      "params": {}
+    },
+    "expect": {"success": false, "error_code": "UNSUPPORTED_PROTOCOL_VERSION"}
+  },
+  {
+    "id": "protocol_version_boolean",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": true,
+      "request_id": "fx-bool-version",
+      "method": "capabilities",
+      "params": {}
+    },
+    "expect": {"success": false, "error_code": "MALFORMED_REQUEST"}
+  },
+  {
+    "id": "protocol_version_null",
+    "transports": ["native_oneshot", "native_persistent", "fallback"],
+    "request": {
+      "protocol": "uiforge.machine",
+      "protocol_version": null,
+      "request_id": "fx-null-version",
+      "method": "capabilities",
+      "params": {}
+    },
+    "expect": {"success": false, "error_code": "MALFORMED_REQUEST"}
   },
   {
     "id": "unsupported_protocol_version",
@@ -235,6 +259,6 @@
         "operations": ["not-an-object"]
       }
     },
-    "expect": {"success": false, "result_committed": false}
+    "expect": {"success": false, "error_code": "MALFORMED_PARAMS"}
   }
 ]

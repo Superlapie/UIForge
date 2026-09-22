@@ -7,7 +7,9 @@ import concurrent.futures
 import copy
 import json
 import os
+import secrets
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -27,7 +29,7 @@ from ui_godot import (  # noqa: E402
     project_needs_bootstrap,
     run_native_once,
 )
-from uiforge_machine import MAX_REQUEST_BYTES  # noqa: E402
+from uiforge_machine import CONNECT_PREFIX, INTERNAL_REQUEST_PREFIX, MAX_INTERNAL_LINE_BYTES, MAX_REQUEST_BYTES  # noqa: E402
 
 FIXTURE = "tests/conformance/fixtures/minimal.ui.json"
 CONFORMANCE_FIXTURES = ROOT / "tests/machine_protocol/fixtures/conformance.json"
@@ -209,6 +211,141 @@ def prepare_fixture(fixture: dict) -> tuple[dict, str | None]:
         )
         request = substitute_temp_paths(request, temp_path)
     return request, temp_path
+
+
+def read_native_framed_line(sock: socket.socket, *, timeout: float = 10.0) -> dict:
+    sock.settimeout(timeout)
+    chunks: list[bytes] = []
+    while True:
+        byte = sock.recv(1)
+        if not byte:
+            raise IntegrationFailure("Native server closed connection while reading response.")
+        if byte == b"\n":
+            break
+        chunks.append(byte)
+    line = b"".join(chunks).decode("utf-8", errors="replace")
+    if not line.startswith(FRAME_SENTINEL):
+        raise IntegrationFailure(f"Expected framed native response, got: {line[:120]!r}")
+    return json.loads(line[len(FRAME_SENTINEL):])
+
+
+def read_native_handshake(proc: subprocess.Popen[str], *, timeout_seconds: float = 30.0) -> dict:
+    assert proc.stdout is not None
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        line = proc.stdout.readline()
+        if not line:
+            break
+        trimmed = line.rstrip("\r\n")
+        if trimmed.startswith(FRAME_SENTINEL):
+            return json.loads(trimmed[len(FRAME_SENTINEL):])
+    raise IntegrationFailure("Native machine server handshake missing frame.")
+
+
+def spawn_native_machine_server(godot: str) -> tuple[subprocess.Popen[str], str, int]:
+    token = secrets.token_hex(16)
+    env = os.environ.copy()
+    env["UIFORGE_SERVER_TOKEN"] = token
+    proc = subprocess.Popen(
+        [godot, "--headless", "--path", str(project_dir()), "--script", "res://addons/uiforge/cli/machine_server.gd"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=env,
+    )
+    handshake = read_native_handshake(proc)
+    port = int(handshake.get("result", {}).get("port", 0))
+    if port <= 0:
+        raise IntegrationFailure(f"Native machine server did not publish a port: {handshake}")
+    return proc, token, port
+
+
+def build_internal_request_line(target_bytes: int) -> bytes:
+    def encode(pad_len: int) -> bytes:
+        request = {
+            "protocol": "uiforge.machine",
+            "protocol_version": 1,
+            "request_id": "native-internal-size",
+            "method": "capabilities",
+            "params": {"_pad": "a" * pad_len},
+        }
+        raw = json.dumps(request, separators=(",", ":")).encode("utf-8")
+        return INTERNAL_REQUEST_PREFIX.encode("utf-8") + raw
+
+    low = 0
+    high = target_bytes
+    while low < high:
+        mid = (low + high + 1) // 2
+        if len(encode(mid)) <= target_bytes:
+            low = mid
+        else:
+            high = mid - 1
+    exact = encode(low)
+    if len(exact) == target_bytes:
+        return exact
+    candidate = encode(low + 1)
+    if len(candidate) == target_bytes:
+        return candidate
+    raise IntegrationFailure(f"could not build internal line of exactly {target_bytes} bytes, nearest {len(exact)}")
+
+
+def build_valid_internal_capabilities_line(request_id: str = "native-valid") -> bytes:
+    request = {
+        "protocol": "uiforge.machine",
+        "protocol_version": 1,
+        "request_id": request_id,
+        "method": "capabilities",
+        "params": {},
+    }
+    return INTERNAL_REQUEST_PREFIX.encode("utf-8") + json.dumps(request, separators=(",", ":")).encode("utf-8") + b"\n"
+
+
+def run_native_oversized_state_machine(godot: str) -> dict[str, object]:
+    results: dict[str, object] = {}
+    proc, token, port = spawn_native_machine_server(godot)
+    try:
+        with socket.create_connection(("127.0.0.1", port), timeout=5) as sock:
+            sock.sendall((CONNECT_PREFIX + token + "\n").encode("utf-8"))
+
+            complete_oversized = build_internal_request_line(MAX_INTERNAL_LINE_BYTES + 1) + b"\n"
+            sock.sendall(complete_oversized)
+            complete_response = read_native_framed_line(sock)
+            if complete_response.get("success") or complete_response.get("error", {}).get("code") != "REQUEST_TOO_LARGE":
+                raise IntegrationFailure(f"complete oversized line should fail once: {complete_response}")
+            sock.sendall(build_valid_internal_capabilities_line("after-complete-oversized"))
+            valid_after_complete = read_native_framed_line(sock)
+            if not valid_after_complete.get("success"):
+                raise IntegrationFailure(f"valid request after complete oversized failed: {valid_after_complete}")
+            results["complete_oversized_recovery"] = True
+
+            split_oversized = build_internal_request_line(MAX_INTERNAL_LINE_BYTES + 1)
+            chunk_size = 64
+            for offset in range(0, len(split_oversized), chunk_size):
+                sock.sendall(split_oversized[offset:offset + chunk_size])
+                time.sleep(0.001)
+            sock.sendall(b"\n")
+            split_response = read_native_framed_line(sock)
+            if split_response.get("success") or split_response.get("error", {}).get("code") != "REQUEST_TOO_LARGE":
+                raise IntegrationFailure(f"split oversized line should fail once: {split_response}")
+            sock.sendall(build_valid_internal_capabilities_line("after-split-oversized"))
+            split_recovery = read_native_framed_line(sock)
+            if not split_recovery.get("success"):
+                raise IntegrationFailure(f"valid request after split oversized failed: {split_recovery}")
+            results["split_oversized_recovery"] = True
+
+            combined = build_internal_request_line(MAX_INTERNAL_LINE_BYTES + 1) + b"\n" + build_valid_internal_capabilities_line("combined-valid")
+            sock.sendall(combined)
+            combined_oversized = read_native_framed_line(sock)
+            if combined_oversized.get("success") or combined_oversized.get("error", {}).get("code") != "REQUEST_TOO_LARGE":
+                raise IntegrationFailure(f"combined buffer oversized should fail: {combined_oversized}")
+            combined_valid = read_native_framed_line(sock)
+            if not combined_valid.get("success"):
+                raise IntegrationFailure(f"combined buffer valid request failed: {combined_valid}")
+            results["combined_buffer_recovery"] = True
+    finally:
+        proc.kill()
+        proc.wait(timeout=10)
+    return results
 
 
 def run_persistent_handshake(godot: str) -> None:
@@ -687,6 +824,7 @@ def main() -> int:
         "eof_shutdown": False,
         "batch_persistent": {},
         "request_limits": {},
+        "native_oversized_state_machine": {},
         "warm_bootstrap": {},
         "concurrent_oneshot": False,
         "frame_noise": False,
@@ -707,6 +845,7 @@ def main() -> int:
     summary["eof_shutdown"] = True
     summary["batch_persistent"] = run_batch_persistent(godot)
     summary["request_limits"] = run_request_limits(godot)
+    summary["native_oversized_state_machine"] = run_native_oversized_state_machine(godot)
     summary["warm_bootstrap"] = run_warm_bootstrap(godot)
     run_concurrent_oneshot(godot)
     summary["concurrent_oneshot"] = True

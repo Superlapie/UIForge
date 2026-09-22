@@ -50,6 +50,7 @@ from uiforge_machine import (
     success_response,
     validate_request,
 )
+from uiforge_machine_params import validate_command_params
 
 ROOT = Path(__file__).resolve().parents[1]
 THEME_PATH = ROOT / "addons/uiforge/themes/dark_fantasy.theme.json"
@@ -1205,9 +1206,9 @@ def capabilities() -> dict[str, Any]:
         "dry_run": {"supported": True, "methods": ["batch"]},
         "max_request_bytes": MAX_REQUEST_BYTES,
         "protocol_version_semantics": {
-            "python_requires_json_integer": True,
-            "godot_accepts_whole_number_float": True,
-            "note": "Python transports require protocol_version as a JSON integer. Godot JSON parsing represents numbers as float; native transport accepts whole-number floats equal to a supported version.",
+            "rule": "protocol_version must be a finite integer-valued JSON number matching a supported version.",
+            "accepted_examples": [1, 1.0],
+            "rejected_examples": [1.5, "1", True, None],
         },
         "supported_render_states": ["normal", "hover", "pressed", "focused", "disabled", "selected"],
         "supported_transports": ["human_cli", "machine_oneshot"],
@@ -1346,6 +1347,14 @@ def dispatch_machine(request: dict[str, Any]) -> dict[str, Any]:
     method = str(payload.get("method", ""))
     params = payload.get("params", {}) if isinstance(payload.get("params", {}), dict) else {}
     request_id = str(payload.get("request_id", ""))
+    param_check = validate_command_params(method, params)
+    if not param_check.get("ok"):
+        return error_response(
+            request_id,
+            str(param_check.get("code", "MALFORMED_PARAMS")),
+            str(param_check.get("message", "Malformed params.")),
+            backend="python-fallback",
+        )
     legacy, _code = dispatch_legacy(method, params)
     return to_machine_response(request_id, legacy)
 

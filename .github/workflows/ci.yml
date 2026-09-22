@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
       - name: Run Windows filesystem and trust tests
         shell: bash
-        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security tests.test_batch2_5_security tests.test_batch2_5_1_security tests.test_batch2_5_2_security tests.test_batch2_5_3_security tests.test_batch3_fallback_parity -v
+        run: python3 -m unittest tests.test_batch2_1_security tests.test_batch2_2_security tests.test_batch2_3_security tests.test_batch2_4_security tests.test_batch2_5_security tests.test_batch2_5_1_security tests.test_batch2_5_2_security tests.test_batch2_5_3_security tests.test_batch3_fallback_parity tests.test_batch3_machine_params -v
 
   godot-linux:
     runs-on: ubuntu-latest
@@ -44,6 +44,7 @@ jobs:
       - name: Run native test suite
         env:
           GODOT_BIN: godot
+          UIFORGE_CROSS_PROCESS_ITERATIONS: "100"
         run: PATH="$HOME/.local/bin:$PATH" ./scripts/test
       - name: Run native persistent protocol integration
         env:
@@ -76,6 +77,7 @@ jobs:
         shell: bash
         env:
           GODOT_BIN: ./godot.exe
+          UIFORGE_CROSS_PROCESS_ITERATIONS: "100"
         run: ./scripts/test
       - name: Run native persistent protocol integration
         shell: bash

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any
 PROTOCOL_ID = "uiforge.machine"
 PROTOCOL_VERSION = 1
@@ -25,7 +26,11 @@ EXIT_INTERNAL = 70
 def _is_exact_protocol_version(value: Any) -> bool:
     if isinstance(value, bool):
         return False
-    return isinstance(value, int) and value == PROTOCOL_VERSION
+    if isinstance(value, int):
+        return value == PROTOCOL_VERSION
+    if isinstance(value, float):
+        return math.isfinite(value) and value == float(PROTOCOL_VERSION) and value == int(value)
+    return False
 
 
 def public_request_byte_length(raw: str) -> int:
@@ -46,8 +51,8 @@ def validate_request(payload: Any) -> dict[str, Any]:
         return {"ok": False, "code": "PROTOCOL_MISMATCH", "message": "Unsupported protocol identifier."}
     if not _is_exact_protocol_version(payload.get("protocol_version")):
         version = payload.get("protocol_version")
-        if isinstance(version, bool) or not isinstance(version, int):
-            return {"ok": False, "code": "MALFORMED_REQUEST", "message": "protocol_version must be an integer."}
+        if isinstance(version, bool) or not isinstance(version, (int, float)):
+            return {"ok": False, "code": "MALFORMED_REQUEST", "message": "protocol_version must be a finite integer-valued JSON number."}
         return {
             "ok": False,
             "code": "UNSUPPORTED_PROTOCOL_VERSION",
@@ -160,6 +165,7 @@ def exit_class_for_response(response: dict[str, Any]) -> int:
     if code in {
         "USAGE",
         "MALFORMED_REQUEST",
+        "MALFORMED_PARAMS",
         "UNKNOWN_COMMAND",
         "UNKNOWN_METHOD",
         "UNSUPPORTED_PROTOCOL_VERSION",

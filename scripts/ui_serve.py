@@ -202,8 +202,8 @@ def serve_stdio(godot_binary: str) -> int:
                     str(validated.get("message", "Malformed request.")),
                 )), flush=True)
                 continue
-            payload = REQUEST_PREFIX + json.dumps(validated["request"], separators=(",", ":"), ensure_ascii=False) + "\n"
-            _send_native_payload(sock, payload.encode("utf-8"))
+            payload = REQUEST_PREFIX.encode("utf-8") + line_bytes + b"\n"
+            _send_native_payload(sock, payload)
             response_line, socket_size_error = _read_line_from_socket(sock, max_bytes=None)
             while response_line and not response_line.startswith(FRAME_SENTINEL) and socket_size_error is None:
                 response_line, socket_size_error = _read_line_from_socket(sock, max_bytes=None)

@@ -10,7 +10,6 @@ var _running := true
 var _connected := false
 var _expected_token := ""
 var _discarding_oversized_line := false
-var _oversized_error_sent := false
 
 func _init() -> void:
 	_expected_token = OS.get_environment("UIFORGE_SERVER_TOKEN") if OS.has_environment("UIFORGE_SERVER_TOKEN") else ""
@@ -48,21 +47,21 @@ func _start() -> void:
 				if _discarding_oversized_line:
 					var discard_newline := _read_buffer.find(10)
 					if discard_newline < 0:
-						_read_buffer = PackedByteArray()
 						break
 					_read_buffer = _read_buffer.slice(discard_newline + 1)
 					_discarding_oversized_line = false
-					_oversized_error_sent = false
 					continue
 				var newline_index := _read_buffer.find(10)
 				if newline_index < 0:
 					if _read_buffer.size() > _max_partial_buffer_bytes():
-						_begin_oversized_discard(false)
+						if not _discarding_oversized_line:
+							_send_response(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
+						_discarding_oversized_line = true
 					break
 				var line_bytes: PackedByteArray = _read_buffer.slice(0, newline_index)
 				_read_buffer = _read_buffer.slice(newline_index + 1)
 				if _line_exceeds_limit(line_bytes):
-					_begin_oversized_discard(true)
+					_send_response(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
 					continue
 				var line := line_bytes.get_string_from_utf8().strip_edges()
 				if line.is_empty():
@@ -93,17 +92,6 @@ func _line_exceeds_limit(line_bytes: PackedByteArray) -> bool:
 		if line_bytes.slice(0, REQUEST_PREFIX.length()).get_string_from_utf8() == REQUEST_PREFIX:
 			return line_bytes.size() > MAX_INTERNAL_LINE_BYTES
 	return line_bytes.size() > UIForgeMachineProtocol.MAX_REQUEST_BYTES
-
-func _begin_oversized_discard(_complete_line: bool) -> void:
-	if not _oversized_error_sent:
-		_send_response(UIForgeMachineProtocol.error_response("", "REQUEST_TOO_LARGE", "Request exceeds max size."))
-		_oversized_error_sent = true
-	_discarding_oversized_line = true
-	var newline_index := _read_buffer.find(10)
-	if newline_index >= 0:
-		_read_buffer = _read_buffer.slice(newline_index + 1)
-		_discarding_oversized_line = false
-		_oversized_error_sent = false
 
 func _accept_connect_line(line: String) -> bool:
 	if _expected_token.is_empty():

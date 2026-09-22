@@ -6,6 +6,17 @@ const NEW_LOCK_GRACE_SECONDS: int = 5
 static var publication_recovery_interleave_hook: Callable = Callable()
 static var force_directory_mtime_fallback: bool = false
 
+static func live_lock_held(target_absolute: String) -> bool:
+	var lock_dir := "%s.uiforge_lock" % target_absolute
+	if not DirAccess.dir_exists_absolute(lock_dir):
+		return false
+	if _lock_is_stale(lock_dir):
+		return false
+	var meta := _read_owner_meta(lock_dir)
+	if not _owner_meta_valid(meta):
+		return _directory_age_seconds(lock_dir) < float(NEW_LOCK_GRACE_SECONDS)
+	return UIForgeProcess.pid_alive(meta) == UIForgeProcess.AliveStatus.ALIVE
+
 static func acquire(target_absolute: String) -> Dictionary:
 	var lock_dir := "%s.uiforge_lock" % target_absolute
 	var owner_nonce := _secure_nonce()

@@ -1,6 +1,8 @@
 class_name UIForgeCommandDispatcher
 extends RefCounted
 
+const _MachineParams = preload("res://addons/uiforge/cli/uiforge_machine_params.gd")
+
 static func dispatch(method: String, params: Dictionary = {}) -> Dictionary:
 	match method:
 		"capabilities":
@@ -48,6 +50,13 @@ static func dispatch_machine(request: Dictionary) -> Dictionary:
 	var method := str(payload.get("method", ""))
 	var params: Dictionary = payload.get("params", {}) if payload.get("params", {}) is Dictionary else {}
 	var request_id := str(payload.get("request_id", ""))
+	var param_check: Dictionary = _MachineParams.validate_command_params(method, params)
+	if not bool(param_check.get("ok", false)):
+		return UIForgeMachineProtocol.error_response(
+			request_id,
+			str(param_check.get("code", "MALFORMED_PARAMS")),
+			str(param_check.get("message", "Malformed params."))
+		)
 	var legacy := await dispatch(method, params)
 	return _to_machine_response(request_id, legacy)
 

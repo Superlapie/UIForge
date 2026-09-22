@@ -14,7 +14,8 @@ run_native() {
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/compiler_conformance_runner.gd
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/machine_protocol_runner.gd
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/trust_runner.gd
-	"$1" --headless --path "$PROJECT_DIR" --script res://tests/cross_process_lock_runner.gd
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/source_recovery_runner.gd
+	UIFORGE_CROSS_PROCESS_ITERATIONS="${UIFORGE_CROSS_PROCESS_ITERATIONS:-100}" "$1" --headless --path "$PROJECT_DIR" --script res://tests/cross_process_lock_runner.gd
 	"$PROJECT_DIR/scripts/ui" build-all examples/specs examples/scenes --force
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/scene_load_runner.gd
 	if [ "${RUNNER_OS:-}" = "Windows" ]; then
