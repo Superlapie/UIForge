@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -32,7 +33,20 @@ GRACE_PLUS = NEW_LOCK_GRACE_SECONDS + 2
 
 def _age_directory(path: Path, seconds: float) -> None:
     old = time.time() - seconds
-    os.utime(path, (old, old), follow_symlinks=False)
+    if os.name == "nt":
+        escaped = str(path).replace("'", "''")
+        ps = (
+            f"(Get-Item -LiteralPath '{escaped}').LastWriteTime = "
+            f"[DateTimeOffset]::FromUnixTimeSeconds({int(old)}).LocalDateTime"
+        )
+        subprocess.run(
+            ["powershell.exe", "-NoProfile", "-Command", ps],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return
+    os.utime(path, (old, old))
 
 
 class Batch252SecurityTests(unittest.TestCase):
