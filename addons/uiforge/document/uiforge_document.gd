@@ -115,25 +115,35 @@ func move_node(node_id: String, new_parent_id: String, index: int = -1) -> bool:
 	return true
 
 func duplicate_node(node_id: String, new_id: String) -> Dictionary:
-	var original := find_node(node_id)
-	if original.is_empty() or not find_parent(node_id):
+	var result := UIForgeSubtreeOps.duplicate_into_document(self, node_id, new_id)
+	if not result.get("ok", false):
 		return {}
-	var copy: Dictionary = original.duplicate(true)
-	_set_ids(copy, new_id)
-	var parent := find_parent(node_id)
-	var children: Array = parent.get("children", [])
-	for index in children.size():
-		if str(children[index].get("id", "")) == node_id:
-			children.insert(index + 1, copy)
-			return copy
-	return {}
+	return result.get("node", {})
 
-func _set_ids(node: Dictionary, base_id: String) -> void:
-	node["id"] = base_id
-	var children: Array = node.get("children", [])
-	for index in children.size():
-		var child: Dictionary = children[index]
-		_set_ids(child, "%s_%d" % [base_id, index + 1])
+func add_child_checked(parent_id: String, node: Dictionary, custom_components: Dictionary = {}, index: int = -1) -> Dictionary:
+	var parent := find_node(parent_id)
+	if parent.is_empty():
+		return {"ok": false, "errors": [{"code": "ADD_FAILED", "parent": parent_id}]}
+	var parent_error := UIForgeParentability.assert_can_accept_child(parent_id, parent, custom_components, str(node.get("id", "")))
+	if not parent_error.is_empty():
+		return {"ok": false, "errors": [parent_error]}
+	if not add_child(parent_id, node, index):
+		return {"ok": false, "errors": [{"code": "ADD_FAILED", "parent": parent_id}]}
+	return {"ok": true}
+
+func move_node_checked(node_id: String, new_parent_id: String, custom_components: Dictionary = {}, index: int = -1) -> Dictionary:
+	var moving := find_node(node_id)
+	if moving.is_empty():
+		return {"ok": false, "errors": [{"code": "MOVE_FAILED", "node": node_id}]}
+	var new_parent := find_node(new_parent_id)
+	if new_parent.is_empty():
+		return {"ok": false, "errors": [{"code": "MOVE_FAILED", "node": node_id, "parent": new_parent_id}]}
+	var parent_error := UIForgeParentability.assert_can_accept_child(new_parent_id, new_parent, custom_components, node_id)
+	if not parent_error.is_empty():
+		return {"ok": false, "errors": [parent_error]}
+	if not move_node(node_id, new_parent_id, index):
+		return {"ok": false, "errors": [{"code": "MOVE_FAILED", "node": node_id, "parent": new_parent_id}]}
+	return {"ok": true}
 
 func _walk(node: Dictionary, callback: Callable, parent: Dictionary = {}, index: int = -1) -> void:
 	if node.is_empty():

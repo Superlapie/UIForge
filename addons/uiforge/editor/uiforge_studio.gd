@@ -12,6 +12,7 @@ var editor_undo_redo: EditorUndoRedoManager
 var document: UIForgeDocument
 var document_path: String = ""
 var dirty: bool = false
+var editor_session: UIForgeEditorSession = UIForgeEditorSession.new()
 
 var toolbar: HBoxContainer
 var tree: UIForgeHierarchyTree
@@ -320,6 +321,36 @@ func _notify_document_changed() -> void:
 	if canvas != null:
 		canvas.invalidate_native_preview()
 
+func _custom_components() -> Dictionary:
+	if document == null:
+		return {}
+	var components_value: Variant = document.data.get("components", {})
+	return components_value if components_value is Dictionary else {}
+
+func _reconcile_editor_state() -> void:
+	dirty = editor_session.is_dirty(document)
+	_update_status()
+
+func _reconcile_document_view() -> void:
+	if canvas != null:
+		canvas.set_document(document)
+	_notify_document_changed()
+	_refresh_tree()
+	_update_inspector()
+	_reconcile_editor_state()
+
+func reconcile_document_snapshot(snapshot: Dictionary, session_id: int) -> void:
+	if session_id != editor_session.current_session_id():
+		return
+	document.data = snapshot.duplicate(true)
+	_reconcile_document_view()
+
+func reconcile_node_snapshot(node_id: String, value: Dictionary, session_id: int) -> void:
+	if session_id != editor_session.current_session_id():
+		return
+	_replace_node(node_id, value)
+	_reconcile_document_view()
+
 func _refresh_assets() -> void:
 	if asset_index_scanning:
 		return
@@ -409,11 +440,11 @@ func _on_asset_drop(path: String, target_node_id: String, design_position: Vecto
 	var root_id := str(document.root().get("id", "root"))
 	var placement_parent_id := root_id
 	var target_node := document.find_node(target_node_id)
-	if not target_node.is_empty() and target_node_id != root_id and str(target_node.get("type", "")) in UIForgeTypes.CONTAINER_TYPES:
+	if not target_node.is_empty() and target_node_id != root_id and UIForgeParentability.can_contain_children(target_node, _custom_components()):
 		placement_parent_id = target_node_id
 	elif (target_node_id.is_empty() or target_node_id == root_id) and not canvas.selected_ids.is_empty():
 		var selected_parent := document.find_node(canvas.selected_ids[0])
-		if not selected_parent.is_empty() and str(selected_parent.get("type", "")) in UIForgeTypes.CONTAINER_TYPES:
+		if not selected_parent.is_empty() and UIForgeParentability.can_contain_children(selected_parent, _custom_components()):
 			placement_parent_id = canvas.selected_ids[0]
 	var base_id := "texture_%s" % path.get_file().get_basename().to_snake_case()
 	var candidate := base_id
@@ -429,12 +460,12 @@ func _on_asset_drop(path: String, target_node_id: String, design_position: Vecto
 		size = source_size * scale
 	var node := {"id": candidate, "type": "Texture", "layout": {"position": [design_position.x, design_position.y], "size": [size.x, size.y]}, "properties": {"texture": path, "stretch_mode": 5}}
 	var before := document.data.duplicate(true)
-	if document.add_child(placement_parent_id, node):
+	var added := document.add_child_checked(placement_parent_id, node, _custom_components())
+	if added.get("ok", false):
 		_record_document_change("Place asset", before)
-		dirty = true
 		canvas.select_node(candidate)
 		_refresh_tree()
-		_update_status()
+		_reconcile_editor_state()
 
 func _selected_node() -> Dictionary:
 	if document == null or canvas == null or canvas.selected_ids.is_empty():
@@ -461,8 +492,13 @@ func _move_selected_by(delta: int) -> void:
 	if document == null or canvas.selected_ids.is_empty():
 		return
 	var node_id := canvas.selected_ids[0]
+	var node := document.find_node(node_id)
+	if UIForgeEditorLock.blocks_structural_mutation(node):
+		status_label.text = "Node is editor-locked"
+		return
 	var parent := document.find_parent(node_id)
-	if parent.is_empty():
+	if parent.is_empty() or UIForgeEditorLock.blocks_child_list_mutation(parent):
+		status_label.text = "Parent container is editor-locked"
 		return
 	var children: Array = parent.get("children", [])
 	var current_index := -1
@@ -476,9 +512,8 @@ func _move_selected_by(delta: int) -> void:
 	var before := document.data.duplicate(true)
 	if document.move_node(node_id, str(parent.get("id", "")), target_index):
 		_record_document_change("Reorder UI node", before)
-		dirty = true
 		_refresh_tree()
-		_update_status()
+		_reconcile_editor_state()
 
 func _toggle_selected_visibility() -> void:
 	var node := _selected_node()
@@ -489,10 +524,9 @@ func _toggle_selected_visibility() -> void:
 	properties["visible"] = not bool(properties.get("visible", true))
 	node["properties"] = properties
 	_record_document_change("Toggle UI visibility", before)
-	dirty = true
 	_refresh_tree()
 	canvas.queue_redraw()
-	_update_status()
+	_reconcile_editor_state()
 
 func _toggle_selected_lock() -> void:
 	var node := _selected_node()
@@ -503,9 +537,8 @@ func _toggle_selected_lock() -> void:
 	metadata["editor_locked"] = not bool(metadata.get("editor_locked", false))
 	node["metadata"] = metadata
 	_record_document_change("Toggle UI lock", before)
-	dirty = true
 	_refresh_tree()
-	_update_status()
+	_reconcile_editor_state()
 
 func _apply_asset_to_selection(path: String) -> void:
 	path = _normalize_asset_path(path)
@@ -535,10 +568,9 @@ func _apply_asset_to_node(path: String, node_id: String) -> bool:
 		return false
 	node["properties"] = properties
 	_record_document_change("Assign asset", before)
-	dirty = true
 	canvas.queue_redraw()
 	_update_inspector()
-	_update_status()
+	_reconcile_editor_state()
 	return true
 
 func _normalize_asset_path(path: String) -> String:
@@ -565,7 +597,7 @@ func _build_unsaved_dialog() -> void:
 	add_child(unsaved_dialog)
 
 func _request_discard(action: String, path: String = "") -> void:
-	if not dirty:
+	if not editor_session.is_dirty(document):
 		if action == "new":
 			_create_new_document()
 		elif action == "open_dialog":
@@ -583,8 +615,6 @@ func _on_discard_confirmed() -> void:
 	var path := pending_discard_path
 	pending_discard_action = ""
 	pending_discard_path = ""
-	if action != "new":
-		dirty = false
 	if action == "new":
 		_create_new_document()
 	elif action == "open_dialog":
@@ -604,15 +634,16 @@ func _load_document_path(path: String) -> void:
 	if loaded.get("document") == null:
 		_show_diagnostics(loaded.get("errors", []))
 		return
-	set_document(loaded["document"], path)
+	set_document(loaded["document"], path, str(loaded.get("revision_hash", "")))
 	status_label.text = "Opened %s" % path.get_file()
 
-func set_document(value: UIForgeDocument, path: String = "") -> void:
+func set_document(value: UIForgeDocument, path: String = "", loaded_disk_revision: String = "") -> void:
 	document = value
 	document_path = path
-	dirty = false
+	editor_session.reset_for_document(document, loaded_disk_revision, not path.is_empty())
 	if canvas != null:
 		canvas.set_document(document)
+		canvas.studio = self
 		canvas.set_editor_undo_redo(editor_undo_redo)
 		_set_preview_size(document.viewport_size())
 	if theme_select != null:
@@ -624,7 +655,7 @@ func set_document(value: UIForgeDocument, path: String = "") -> void:
 	_sync_reference_controls()
 	_refresh_tree()
 	_update_inspector()
-	_update_status()
+	_reconcile_editor_state()
 
 func _refresh_tree() -> void:
 	if tree == null or document == null:
@@ -671,37 +702,45 @@ func _on_tree_selected() -> void:
 func _on_tree_node_drop(node_id: String, parent_id: String) -> void:
 	if document == null or node_id.is_empty() or parent_id.is_empty() or node_id == parent_id:
 		return
+	var moving := document.find_node(node_id)
+	if UIForgeEditorLock.blocks_structural_mutation(moving):
+		status_label.text = "Node is editor-locked"
+		return
 	var parent := document.find_node(parent_id)
-	if parent.is_empty() or str(parent.get("type", "")) in ["Label", "RichText", "Button", "TextureButton", "CheckBox", "Slider", "ProgressBar", "LineEdit", "Separator", "Spacer"]:
-		_show_diagnostics([{"severity": "error", "code": "INVALID_PARENT_RELATIONSHIP", "message": "That node cannot contain children.", "node": parent_id}])
+	if parent.is_empty():
+		return
+	if UIForgeEditorLock.blocks_child_list_mutation(parent):
+		status_label.text = "Parent container is editor-locked"
+		return
+	var parent_error := UIForgeParentability.assert_can_accept_child(parent_id, parent, _custom_components(), node_id)
+	if not parent_error.is_empty():
+		_show_diagnostics([parent_error])
 		return
 	var before := document.data.duplicate(true)
 	if not document.move_node(node_id, parent_id):
 		return
 	_record_document_change("Reparent UI node", before)
-	dirty = true
 	canvas.select_node(node_id)
 	_refresh_tree()
-	_update_status()
+	_reconcile_editor_state()
 
 func _record_document_change(action_name: String, before: Dictionary) -> void:
 	var before_snapshot := before.duplicate(true)
 	var after_snapshot := document.data.duplicate(true)
+	var session_id := editor_session.current_session_id()
 	if editor_undo_redo == null:
 		_notify_document_changed()
+		_reconcile_editor_state()
 		return
 	editor_undo_redo.create_action(action_name)
-	editor_undo_redo.add_do_method(self, "_apply_document_snapshot", after_snapshot)
-	editor_undo_redo.add_undo_method(self, "_apply_document_snapshot", before_snapshot)
+	editor_undo_redo.add_do_method(self, "reconcile_document_snapshot", after_snapshot, session_id)
+	editor_undo_redo.add_undo_method(self, "reconcile_document_snapshot", before_snapshot, session_id)
 	editor_undo_redo.commit_action()
 	_notify_document_changed()
+	_reconcile_editor_state()
 
 func _apply_document_snapshot(snapshot: Dictionary) -> void:
-	document.data = snapshot.duplicate(true)
-	canvas.set_document(document)
-	_notify_document_changed()
-	_refresh_tree()
-	_update_inspector()
+	reconcile_document_snapshot(snapshot, editor_session.current_session_id())
 
 func _on_canvas_selected(_node_id: String) -> void:
 	if synchronizing_selection:
@@ -710,10 +749,9 @@ func _on_canvas_selected(_node_id: String) -> void:
 	_update_inspector()
 
 func _on_canvas_changed(_node_id: String) -> void:
-	dirty = true
 	_notify_document_changed()
-	_update_status()
 	_refresh_tree()
+	_reconcile_editor_state()
 
 func _update_inspector() -> void:
 	if property_inspector == null:
@@ -754,16 +792,15 @@ func _on_inspector_apply(changes: Dictionary) -> void:
 			document.set_property(node_id, str(path), value)
 	if editor_undo_redo != null:
 		var after := node.duplicate(true)
+		var session_id := editor_session.current_session_id()
 		editor_undo_redo.create_action("UIForge property change")
-		editor_undo_redo.add_do_method(self, "_apply_node_snapshot", node_id, after.duplicate(true))
-		editor_undo_redo.add_undo_method(self, "_apply_node_snapshot", node_id, before.duplicate(true))
+		editor_undo_redo.add_do_method(self, "reconcile_node_snapshot", node_id, after.duplicate(true), session_id)
+		editor_undo_redo.add_undo_method(self, "reconcile_node_snapshot", node_id, before.duplicate(true), session_id)
 		editor_undo_redo.commit_action()
-	dirty = true
-	_notify_document_changed()
 	_refresh_tree()
 	canvas.queue_redraw()
 	_update_inspector()
-	_update_status()
+	_reconcile_editor_state()
 
 func _replace_node(node_id: String, value: Dictionary) -> void:
 	var target := document.find_node(node_id)
@@ -775,7 +812,7 @@ func _replace_node(node_id: String, value: Dictionary) -> void:
 		_update_inspector()
 
 func _apply_node_snapshot(node_id: String, value: Dictionary) -> void:
-	_replace_node(node_id, value)
+	reconcile_node_snapshot(node_id, value, editor_session.current_session_id())
 
 func _on_new() -> void:
 	_request_discard("new")
@@ -805,8 +842,8 @@ func _create_selected_template() -> void:
 		_show_diagnostics(created.errors)
 		return
 	set_document(created.document, "")
-	dirty = true
 	status_label.text = "New %s document · choose Save to create the source file" % key
+	_reconcile_editor_state()
 
 func _on_open() -> void:
 	_request_discard("open_dialog")
@@ -817,12 +854,17 @@ func _on_save() -> void:
 		file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 		file_dialog.popup_centered_ratio(0.7)
 		return
-	var result := UIForgeSerializer.save_document(document, document_path)
-	if result.success:
-		dirty = false
-		_update_status()
+	var expected_revision := editor_session.disk_revision if not editor_session.disk_revision.is_empty() else ""
+	var result := UIForgeSerializer.save_document(document, document_path, expected_revision)
+	if result.get("success", false):
+		var saved_revision := UIForgeHash.file_revision(document_path)
+		editor_session.on_successful_save(document, str(saved_revision.get("hash", "")))
+		_reconcile_editor_state()
 	else:
-		_show_diagnostics(result.errors)
+		_show_diagnostics(result.get("errors", []))
+		if not expected_revision.is_empty():
+			status_label.text = "Save blocked: source changed externally · reload to continue on the newer revision"
+		_reconcile_editor_state()
 
 func _on_file_selected(path: String) -> void:
 	if dialog_mode == "reference":
@@ -830,21 +872,21 @@ func _on_file_selected(path: String) -> void:
 			var before := document.data.duplicate(true)
 			document.data["reference"] = {"path": path, "opacity": 0.28, "scale": 1.0, "position": [0, 0], "visible": true, "locked": true}
 			_record_document_change("Set UIForge reference", before)
-			dirty = true
 			canvas.set_document(document)
 			_sync_reference_controls()
-			_update_status()
+			_reconcile_editor_state()
 		return
 	if dialog_mode == "save":
 		var result := UIForgeSerializer.save_document(document, path)
-		if result.success:
+		if result.get("success", false):
 			document_path = path
-			dirty = false
-			_update_status()
+			var saved_revision := UIForgeHash.file_revision(path)
+			editor_session.on_successful_save(document, str(saved_revision.get("hash", "")))
+			_reconcile_editor_state()
 		else:
-			_show_diagnostics(result.errors)
+			_show_diagnostics(result.get("errors", []))
 		return
-	if dirty:
+	if editor_session.is_dirty(document):
 		_request_discard("open_path", path)
 		return
 	_load_document_path(path)
@@ -967,9 +1009,8 @@ func _on_reference_control_changed(_value: Variant = null) -> void:
 	reference["position"] = _parse_pair_text(reference_position.text, reference.get("position", [0, 0]))
 	document.data["reference"] = reference
 	_record_document_change("Edit UIForge reference", before)
-	dirty = true
 	canvas.refresh_reference()
-	_update_status()
+	_reconcile_editor_state()
 
 func _parse_pair_text(value: String, fallback: Array) -> Array:
 	var pieces := value.replace("[", "").replace("]", "").split(",")
@@ -1039,9 +1080,8 @@ func _on_theme_selected(index: int) -> void:
 	var before := document.data.duplicate(true)
 	document.data["theme"] = str(theme_select.get_item_text(index))
 	_record_document_change("Change UIForge theme", before)
-	dirty = true
 	canvas.set_document(document)
-	_update_status()
+	_reconcile_editor_state()
 
 func _on_nine_slice_style_save(style_name: String, payload: Dictionary) -> void:
 	if document == null:
@@ -1053,9 +1093,8 @@ func _on_nine_slice_style_save(style_name: String, payload: Dictionary) -> void:
 	overrides["styles"] = styles
 	document.data["theme_overrides"] = overrides
 	_record_document_change("Save nine-slice style", before)
-	dirty = true
 	canvas.set_document(document)
-	_update_status()
+	_reconcile_editor_state()
 
 func _add_selected_component() -> void:
 	if component_list == null or component_list.get_selected_items().is_empty():
@@ -1068,7 +1107,9 @@ func _on_component_activated(index: int) -> void:
 	var component_name := str(component_list.get_item_metadata(index))
 	var parent_id := str(document.root().get("id", ""))
 	if not canvas.selected_ids.is_empty() and not document.find_node(canvas.selected_ids[0]).is_empty():
-		parent_id = canvas.selected_ids[0]
+		var selected_parent := document.find_node(canvas.selected_ids[0])
+		if UIForgeParentability.can_contain_children(selected_parent, _custom_components()):
+			parent_id = canvas.selected_ids[0]
 	var base_id := component_name.to_snake_case()
 	var candidate := base_id
 	var suffix := 2
@@ -1080,36 +1121,40 @@ func _on_component_activated(index: int) -> void:
 		node["properties"]["text"] = component_name.replace("Button", "").replace("Entry", "")
 	if component_name == "SearchBox":
 		node["properties"]["placeholder"] = "Search"
+	var parent := document.find_node(parent_id)
+	var parent_error := UIForgeParentability.assert_can_accept_child(parent_id, parent, _custom_components(), candidate)
+	if not parent_error.is_empty():
+		_show_diagnostics([parent_error])
+		return
 	var before := document.data.duplicate(true)
-	if not document.add_child(parent_id, node):
+	var added := document.add_child_checked(parent_id, node, _custom_components())
+	if not added.get("ok", false):
 		return
 	_record_document_change("Add UIForge component", before)
 	canvas.select_node(candidate)
-	dirty = true
 	_refresh_tree()
-	_update_status()
+	_reconcile_editor_state()
 
 func _on_canvas_delete(node_id: String) -> void:
 	if document == null or node_id == str(document.root().get("id", "")):
 		return
 	var node := document.find_node(node_id)
-	if bool(node.get("metadata", {}).get("editor_locked", false)):
+	if UIForgeEditorLock.blocks_structural_mutation(node):
 		status_label.text = "Node is editor-locked"
 		return
 	var before := document.data.duplicate(true)
 	var removed := document.delete_node(node_id)
 	if not removed.is_empty():
 		_record_document_change("Delete UI node", before)
-		dirty = true
 		canvas.select_node("")
 		_refresh_tree()
-		_update_status()
+		_reconcile_editor_state()
 
 func _on_canvas_duplicate(node_id: String) -> void:
 	if document == null:
 		return
 	var original := document.find_node(node_id)
-	if bool(original.get("metadata", {}).get("editor_locked", false)):
+	if UIForgeEditorLock.blocks_structural_mutation(original):
 		status_label.text = "Node is editor-locked"
 		return
 	var before := document.data.duplicate(true)
@@ -1122,9 +1167,8 @@ func _on_canvas_duplicate(node_id: String) -> void:
 	if not copy.is_empty():
 		_record_document_change("Duplicate UI node", before)
 		canvas.select_node(candidate)
-		dirty = true
 		_refresh_tree()
-		_update_status()
+		_reconcile_editor_state()
 
 func _on_canvas_copy(node_ids: Array[String]) -> void:
 	clipboard_nodes.clear()
@@ -1152,38 +1196,41 @@ func _on_canvas_paste() -> void:
 	var parent_id := str(document.root().get("id", ""))
 	if not canvas.selected_ids.is_empty():
 		var selected_parent := document.find_node(canvas.selected_ids[0])
-		if not selected_parent.is_empty() and str(selected_parent.get("type", "")) in UIForgeTypes.CONTAINER_TYPES:
+		if not selected_parent.is_empty() and UIForgeParentability.can_contain_children(selected_parent, _custom_components()):
 			parent_id = canvas.selected_ids[0]
+	var parent := document.find_node(parent_id)
+	if UIForgeEditorLock.blocks_child_list_mutation(parent):
+		status_label.text = "Parent container is editor-locked"
+		return
+	var parent_error := UIForgeParentability.assert_can_accept_child(parent_id, parent, _custom_components())
+	if not parent_error.is_empty():
+		_show_diagnostics([parent_error])
+		return
 	var before := document.data.duplicate(true)
+	var reserved := UIForgeSubtreeOps.collect_document_ids(document)
 	var pasted_ids: Array[String] = []
 	for original in nodes:
 		if not original is Dictionary:
 			continue
-		var copy: Dictionary = original.duplicate(true)
-		var base_id := str(copy.get("id", "node")) + "_copy"
-		var candidate := base_id
-		var suffix := 2
-		while not document.find_node(candidate).is_empty():
-			candidate = "%s_%d" % [base_id, suffix]
-			suffix += 1
-		_remap_pasted_ids(copy, candidate)
-		if document.add_child(parent_id, copy):
-			pasted_ids.append(candidate)
+		var base_id := "%s_copy" % str(original.get("id", "node"))
+		var planned := UIForgeSubtreeOps.clone_subtree(original, base_id, reserved)
+		if not planned.get("ok", false):
+			_show_diagnostics(planned.get("errors", []))
+			return
+		var copy: Dictionary = planned["node"]
+		reserved[str(planned.get("root_id", ""))] = true
+		for mapped_id in planned.get("id_map", {}).values():
+			reserved[str(mapped_id)] = true
+		if not document.add_child(parent_id, copy):
+			return
+		pasted_ids.append(str(planned.get("root_id", "")))
 	if pasted_ids.is_empty():
 		return
 	_record_document_change("Paste UI nodes", before)
-	dirty = true
 	canvas.selected_ids = pasted_ids
 	_refresh_tree()
 	_update_inspector()
-	_update_status()
-
-func _remap_pasted_ids(node: Dictionary, new_id: String) -> void:
-	node["id"] = new_id
-	var children: Array = node.get("children", [])
-	for index in children.size():
-		if children[index] is Dictionary:
-			_remap_pasted_ids(children[index], "%s_%d" % [new_id, index + 1])
+	_reconcile_editor_state()
 
 func _show_diagnostics(items: Array) -> void:
 	if diagnostics_view == null:

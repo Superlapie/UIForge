@@ -142,14 +142,142 @@ def contains_id(node: dict[str, Any], target_id: str) -> bool:
     return False
 
 
-def remap_ids(node: dict[str, Any], base_id: str) -> None:
-    node["id"] = base_id
-    children = node.get("children", [])
-    if not isinstance(children, list):
-        return
-    for index, child in enumerate(children):
+def collect_subtree_ids(node: dict[str, Any]) -> set[str]:
+    ids: set[str] = set()
+    for current, _parent in walk(node):
+        node_id = str(current.get("id", ""))
+        if node_id:
+            ids.add(node_id)
+    return ids
+
+
+def scope_definition_owned_ids(node: dict[str, Any], instance_id: str, template_ids: set[str]) -> dict[str, Any]:
+    id_map: dict[str, str] = {}
+
+    def collect(current: dict[str, Any], is_root: bool) -> None:
+        node_id = str(current.get("id", ""))
+        if not is_root and node_id and node_id in template_ids:
+            id_map[node_id] = f"{instance_id}__{node_id}"
+        for child in current.get("children", []):
+            if isinstance(child, dict):
+                collect(child, False)
+
+    collect(node, True)
+
+    def apply_map(current: dict[str, Any]) -> None:
+        node_id = str(current.get("id", ""))
+        if node_id in id_map:
+            current["id"] = id_map[node_id]
+        for child in current.get("children", []):
+            if isinstance(child, dict):
+                apply_map(child)
+
+    if id_map:
+        apply_map(node)
+        rewrite_local_references(node, id_map)
+    return node
+
+
+def rewrite_local_references(node: dict[str, Any], id_map: dict[str, str]) -> None:
+    focus_keys = ["focus_neighbor_top", "focus_neighbor_bottom", "focus_neighbor_left", "focus_neighbor_right"]
+
+    def remap_path(path: str) -> str:
+        if path in id_map:
+            return id_map[path]
+        if path.startswith("../") and path[3:] in id_map:
+            return f"../{id_map[path[3:]]}"
+        if path.startswith("./") and path[2:] in id_map:
+            return f"./{id_map[path[2:]]}"
+        return path
+
+    def rewrite_value(value: Any) -> Any:
+        if isinstance(value, str):
+            return remap_path(value)
+        if isinstance(value, dict):
+            if "$node_path" in value:
+                remapped = copy.deepcopy(value)
+                remapped["$node_path"] = remap_path(str(remapped["$node_path"]))
+                return remapped
+            if value.get("$type") == "Array[NodePath]":
+                entries = value.get("value", [])
+                rewritten = []
+                for entry in entries:
+                    if isinstance(entry, dict) and "$node_path" in entry:
+                        rewritten.append({"$node_path": remap_path(str(entry["$node_path"]))})
+                    elif isinstance(entry, str):
+                        rewritten.append(remap_path(entry))
+                    else:
+                        rewritten.append(entry)
+                return {"$type": "Array[NodePath]", "value": rewritten}
+            return {key: rewrite_value(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [rewrite_value(item) for item in value]
+        return value
+
+    properties = node.get("properties", {})
+    if isinstance(properties, dict):
+        for key in focus_keys:
+            if key in properties:
+                properties[key] = rewrite_value(properties[key])
+        node["properties"] = properties
+    for key, value in list(node.items()):
+        if key in {"properties", "children"}:
+            continue
+        node[key] = rewrite_value(value)
+    for child in node.get("children", []):
         if isinstance(child, dict):
-            remap_ids(child, f"{base_id}_{index + 1}")
+            rewrite_local_references(child, id_map)
+
+
+def clone_subtree(original: dict[str, Any], proposed_root_id: str, reserved: set[str]) -> tuple[dict[str, Any] | None, dict[str, str], str]:
+    working = set(reserved)
+    candidate = proposed_root_id
+    suffix = 2
+    while candidate in working:
+        candidate = f"{proposed_root_id}_{suffix}"
+        suffix += 1
+    new_root_id = candidate
+    working.add(new_root_id)
+    id_map: dict[str, str] = {}
+
+    def build_map(current: dict[str, Any], mapped_id: str) -> None:
+        old_id = str(current.get("id", ""))
+        id_map[old_id] = mapped_id
+        children = current.get("children", [])
+        if not isinstance(children, list):
+            return
+        for index, child in enumerate(children):
+            if not isinstance(child, dict):
+                continue
+            child_candidate = f"{mapped_id}_{index + 1}"
+            child_suffix = 2
+            while child_candidate in working:
+                child_candidate = f"{mapped_id}_{index + 1}_{child_suffix}"
+                child_suffix += 1
+            working.add(child_candidate)
+            build_map(child, child_candidate)
+
+    build_map(original, new_root_id)
+
+    def apply_map(current: dict[str, Any]) -> None:
+        old_id = str(current.get("id", ""))
+        if old_id in id_map:
+            current["id"] = id_map[old_id]
+        for child in current.get("children", []):
+            if isinstance(child, dict):
+                apply_map(child)
+
+    duplicate = copy.deepcopy(original)
+    apply_map(duplicate)
+    rewrite_local_references(duplicate, id_map)
+    return duplicate, id_map, new_root_id
+
+
+def remap_ids(node: dict[str, Any], base_id: str) -> None:
+    duplicate, _id_map, _root = clone_subtree(node, base_id, set())
+    node.clear()
+    node.update(duplicate)
+
 
 
 def collect_ids(node: dict[str, Any]) -> set[str]:
@@ -670,10 +798,14 @@ def materialize(node: dict[str, Any], custom: dict[str, Any]) -> dict[str, Any]:
     base_definition = definition.get("node", definition)
     base_type = str(base_definition.get("type", component_name)) if isinstance(base_definition, dict) else component_name
     inferred_native = definition.get("native_type") or contract_native_type(base_type)
+    template_ids = collect_subtree_ids(base_definition if isinstance(base_definition, dict) else {})
+    instance_id = str(result.get("id", ""))
     result = merge_node(base_definition, result)
     if isinstance(result.get("overrides"), dict):
         result = merge_node(result, result["overrides"])
     result.pop("overrides", None)
+    if instance_id:
+        result = scope_definition_owned_ids(result, instance_id, template_ids)
     native_type = result.get("native_type") or inferred_native
     result["type"] = str(native_type)
     return result
@@ -1262,8 +1394,8 @@ def duplicate_node(data: dict[str, Any], node_id: str, new_id: str) -> dict[str,
     original, parent = find(data, node_id)
     if original is None or parent is None:
         return None
-    duplicate = copy.deepcopy(original)
-    remap_ids(duplicate, new_id)
+    reserved = collect_ids(data.get("root", {}))
+    duplicate, _id_map, _root = clone_subtree(original, new_id, reserved)
     siblings = parent.get("children", [])
     if not isinstance(siblings, list):
         return None

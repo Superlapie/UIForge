@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "name": "two_instance_custom_component",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "components": {
+    "CardPanel": {
+      "base": "SimplePanel",
+      "node": {
+        "type": "Panel",
+        "children": [
+          {"id": "title", "type": "Label", "layout": {"position": [8, 8], "size": [120, 24]}, "properties": {"text": "Title"}}
+        ]
+      }
+    }
+  },
+  "root": {
+    "id": "two_instance_root",
+    "type": "Panel",
+    "layout": {"position": [0, 0], "size": [640, 480]},
+    "children": [
+      {
+        "id": "card_a",
+        "type": "ComponentInstance",
+        "component": "CardPanel",
+        "layout": {"position": [20, 20], "size": [200, 120]}
+      },
+      {
+        "id": "card_b",
+        "type": "ComponentInstance",
+        "component": "CardPanel",
+        "layout": {"position": [240, 20], "size": [200, 120]}
+      }
+    ]
+  }
+}

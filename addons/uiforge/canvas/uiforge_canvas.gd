@@ -12,6 +12,7 @@ signal paste_requested
 
 var document: UIForgeDocument
 var undo_redo: EditorUndoRedoManager
+var studio: UIForgeStudio
 var zoom: float = 0.62
 var pan: Vector2 = Vector2(48, 42)
 var preview_state: String = "normal"
@@ -525,7 +526,7 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 	var root_id := str(document.root().get("id", "")) if document != null else ""
 	var parent_for_drop := root_id
 	var target_node := document.find_node(target_id) if document != null and not target_id.is_empty() else {}
-	if not target_node.is_empty() and str(target_node.get("type", "")) in UIForgeTypes.CONTAINER_TYPES:
+	if not target_node.is_empty() and UIForgeParentability.can_contain_children(target_node, _custom_components_for_drop()):
 		parent_for_drop = target_id
 	var design_position := (at_position - pan) / _display_zoom() - _design_origin_for_id(parent_for_drop)
 	asset_drop_requested.emit(path, target_id, design_position)
@@ -576,14 +577,14 @@ func _apply_drag(mouse: Vector2, resize: bool) -> void:
 		delta = Vector2(round(delta.x / snap_size) * snap_size, round(delta.y / snap_size) * snap_size)
 	if resize and selected_ids.size() == 1:
 		var node := document.find_node(selected_ids[0])
-		if node.is_empty() or bool(node.get("metadata", {}).get("editor_locked", false)):
+		if node.is_empty() or UIForgeEditorLock.blocks_structural_mutation(node):
 			return
 		document.set_property(selected_ids[0], "layout.size", [max(24.0, drag_start_size.x + delta.x), max(24.0, drag_start_size.y + delta.y)])
 	else:
 		for selected_id in selected_ids:
 			var start_position: Vector2 = drag_start_positions.get(selected_id, Vector2.ZERO)
 			var selected_node := document.find_node(selected_id)
-			if selected_node.is_empty() or bool(selected_node.get("metadata", {}).get("editor_locked", false)):
+			if selected_node.is_empty() or UIForgeEditorLock.blocks_structural_mutation(selected_node):
 				continue
 			document.set_property(selected_id, "layout.position", [start_position.x + delta.x, start_position.y + delta.y])
 	node_changed.emit(selected_ids[0])
@@ -592,7 +593,15 @@ func _apply_drag(mouse: Vector2, resize: bool) -> void:
 func _commit_drag() -> void:
 	if document == null or drag_start_document.is_empty():
 		return
-	if undo_redo != null:
+	if undo_redo != null and studio != null:
+		var before_snapshot := drag_start_document.duplicate(true)
+		var after_snapshot := document.data.duplicate(true)
+		var session_id := studio.editor_session.current_session_id()
+		undo_redo.create_action("UIForge %s" % ("Resize" if is_resizing else "Move"))
+		undo_redo.add_do_method(studio, "reconcile_document_snapshot", after_snapshot, session_id)
+		undo_redo.add_undo_method(studio, "reconcile_document_snapshot", before_snapshot, session_id)
+		undo_redo.commit_action()
+	elif undo_redo != null:
 		var before_snapshot := drag_start_document.duplicate(true)
 		var after_snapshot := document.data.duplicate(true)
 		undo_redo.create_action("UIForge %s" % ("Resize" if is_resizing else "Move"))
@@ -602,9 +611,18 @@ func _commit_drag() -> void:
 	invalidate_native_preview()
 	drag_start_document.clear()
 
+func _custom_components_for_drop() -> Dictionary:
+	if document == null:
+		return {}
+	var components_value: Variant = document.data.get("components", {})
+	return components_value if components_value is Dictionary else {}
+
 func _apply_drag_document_snapshot(snapshot: Dictionary) -> void:
 	document.data = snapshot.duplicate(true)
-	queue_redraw()
+	if studio != null:
+		studio._reconcile_document_view()
+	else:
+		queue_redraw()
 
 func _hit_test(point: Vector2) -> Dictionary:
 	if document == null:

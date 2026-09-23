@@ -22,6 +22,7 @@
     {"id": "resource_bar_fill", "source": "res://tests/compiler_conformance/fixtures/resource_bar_fill.ui.json", "compare_snapshot": false, "assertions": [{"node_id": "health_bar_root", "style_state": "fill", "style_class": "StyleBoxTexture"}]},
     {"id": "typed_literals", "source": "res://tests/compiler_conformance/fixtures/typed_literals.ui.json"},
     {"id": "plain_numeric_array", "source": "res://tests/compiler_conformance/fixtures/plain_numeric_array.ui.json"},
-    {"id": "godot_override_valid", "source": "res://tests/compiler_conformance/fixtures/godot_override_valid.ui.json"}
+    {"id": "godot_override_valid", "source": "res://tests/compiler_conformance/fixtures/godot_override_valid.ui.json"},
+    {"id": "two_instance_custom_component", "source": "res://tests/compiler_conformance/fixtures/two_instance_custom_component.ui.json", "assertions": [{"node_id": "card_a__title", "exists": true}, {"node_id": "card_b__title", "exists": true}]}
   ]
 }

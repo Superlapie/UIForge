@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "name": "focus_neighbor_remap",
+  "viewport": {"width": 640, "height": 480},
+  "theme": "dark_fantasy",
+  "root": {
+    "id": "focus_root",
+    "type": "Panel",
+    "layout": {"position": [0, 0], "size": [640, 480]},
+    "children": [
+      {
+        "id": "focus_group",
+        "type": "Panel",
+        "layout": {"position": [40, 40], "size": [320, 120]},
+        "children": [
+          {
+            "id": "left_button",
+            "type": "Button",
+            "layout": {"position": [8, 8], "size": [120, 40]},
+            "properties": {
+              "text": "Left",
+              "focus_neighbor_right": "right_button"
+            }
+          },
+          {
+            "id": "right_button",
+            "type": "Button",
+            "layout": {"position": [160, 8], "size": [120, 40]},
+            "properties": {
+              "text": "Right",
+              "focus_neighbor_left": "left_button"
+            }
+          }
+        ]
+      },
+      {
+        "id": "external_anchor",
+        "type": "Button",
+        "layout": {"position": [40, 200], "size": [120, 40]},
+        "properties": {
+          "text": "External",
+          "focus_neighbor_top": "left_button"
+        }
+      }
+    ]
+  }
+}

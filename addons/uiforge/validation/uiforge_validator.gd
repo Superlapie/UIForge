@@ -167,12 +167,23 @@ func _validate_node(node: Variant, parent_id: String, viewport: Dictionary) -> v
 	else:
 		children = node.get("children", [])
 	var parent_node := document.find_node(parent_id) if not parent_id.is_empty() else {}
-	var parent_type := str(parent_node.get("type", ""))
-	if parent_type in ["Label", "RichText", "Button", "TextureButton", "CheckBox", "CheckButton", "Slider", "HSlider", "VSlider", "SpinBox", "ProgressBar", "LineEdit", "TextEdit", "OptionButton", "MenuButton", "LinkButton", "ColorRect", "NinePatchRect", "Separator", "Spacer"]:
-		_add("error", "INVALID_PARENT_RELATIONSHIP", "Node '%s' is parented under leaf control '%s'." % [node_id, parent_id], node_id, "Reparent it under a container such as Panel, VBox, or Grid.")
+	if not parent_node.is_empty() and not parent_id.is_empty():
+		var custom_components: Dictionary = {}
+		var components_value: Variant = document.data.get("components", {})
+		if components_value is Dictionary:
+			custom_components = components_value
+		if not UIForgeParentability.can_contain_children(parent_node, custom_components):
+			_add("error", "INVALID_PARENT_RELATIONSHIP", "Node '%s' is parented under leaf control '%s'." % [node_id, parent_id], node_id, "Reparent it under a container such as Panel, VBox, or Grid.")
 	for child in children:
 		_validate_node(child, node_id, viewport)
-	_validate_sibling_overlaps(children, node_id, str(node.get("type", "")))
+	var custom_components: Dictionary = {}
+	var components_value: Variant = document.data.get("components", {})
+	if components_value is Dictionary:
+		custom_components = components_value
+	var overlap_parent_type := str(node.get("type", ""))
+	if UIForgeParentability.can_contain_children(node, custom_components):
+		overlap_parent_type = "container"
+	_validate_sibling_overlaps(children, node_id, overlap_parent_type)
 	_validate_node_tokens(node, node_id)
 	_validate_node_properties(node, node_id, properties, node_type)
 

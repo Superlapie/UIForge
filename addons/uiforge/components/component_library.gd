@@ -65,13 +65,60 @@ static func materialize(node: Dictionary, custom_definitions: Dictionary = {}) -
 		var component_name := str(result.get("component", ""))
 		var definition := _resolve_definition(component_name, custom_definitions, [])
 		var base: Dictionary = definition.get("node", definition) if definition is Dictionary else {}
+		var template_ids := _collect_subtree_ids(base)
+		var instance_id := str(result.get("id", ""))
 		result = _merge(base, result)
 		if result.get("overrides", {}) is Dictionary:
 			result = _merge(result, result.get("overrides", {}))
 		result.erase("overrides")
+		if not instance_id.is_empty():
+			result = _scope_definition_owned_ids(result, instance_id, template_ids)
 		result["type"] = str(result.get("base_type", definition.get("native_type", UIForgeComponentLibrary.native_type(str(definition.get("base", "Control"))))))
 		result["component"] = component_name
 	return result
+
+## Definition-owned internal ids are namespaced as `{instance_id}__{template_id}` so reusable
+## components with children can be instantiated multiple times without generated-id collisions.
+static func _scope_definition_owned_ids(node: Dictionary, instance_id: String, template_ids: Dictionary) -> Dictionary:
+	var id_map: Dictionary = {}
+	_collect_definition_id_map(node, instance_id, template_ids, id_map, true)
+	if id_map.is_empty():
+		return node
+	_apply_component_id_map(node, id_map)
+	UIForgeSubtreeOps.rewrite_local_references(node, id_map)
+	return node
+
+static func _collect_definition_id_map(node: Dictionary, instance_id: String, template_ids: Dictionary, id_map: Dictionary, is_root: bool) -> void:
+	var node_id := str(node.get("id", ""))
+	if not is_root and not node_id.is_empty() and template_ids.has(node_id):
+		id_map[node_id] = "%s__%s" % [instance_id, node_id]
+	for child in node.get("children", []):
+		if child is Dictionary:
+			_collect_definition_id_map(child, instance_id, template_ids, id_map, false)
+
+static func _apply_component_id_map(node: Dictionary, id_map: Dictionary) -> void:
+	var node_id := str(node.get("id", ""))
+	if id_map.has(node_id):
+		node["id"] = id_map[node_id]
+	for child in node.get("children", []):
+		if child is Dictionary:
+			_apply_component_id_map(child, id_map)
+
+static func _collect_subtree_ids(node: Dictionary) -> Dictionary:
+	var ids: Dictionary = {}
+	_collect_subtree_ids_recursive(node, ids)
+	return ids
+
+static func _collect_subtree_ids_recursive(node: Dictionary, ids: Dictionary) -> void:
+	var node_id := str(node.get("id", ""))
+	if not node_id.is_empty():
+		ids[node_id] = true
+	for child in node.get("children", []):
+		if child is Dictionary:
+			_collect_subtree_ids_recursive(child, ids)
+
+static func resolve_definition(component_name: String, custom_definitions: Dictionary = {}, chain: Array[String] = []) -> Dictionary:
+	return _resolve_definition(component_name, custom_definitions, chain)
 
 static func _resolve_definition(component_name: String, custom_definitions: Dictionary, chain: Array[String]) -> Dictionary:
 	if component_name in chain:

@@ -8,6 +8,7 @@ run_native() {
 	"$1" --headless --editor --path "$PROJECT_DIR" --quit
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/test_runner.gd
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/editor_workflow_runner.gd
+	"$1" --headless --path "$PROJECT_DIR" --script res://tests/editor_integrity_runner.gd
 	"$1" --headless --path "$PROJECT_DIR" --script res://tests/atlas_workflow_runner.gd
 	"$PROJECT_DIR/scripts/ui" validate examples/specs/inventory.ui.json
 	"$1" --headless --path "$PROJECT_DIR" --script res://scripts/check_contract_snapshots.gd

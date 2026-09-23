@@ -32,8 +32,10 @@ static func add_value(document: UIForgeDocument, parent_id: String, raw_node: St
 		return {"success": false, "error": id_error}
 	if not document.find_node(node_id).is_empty():
 		return {"success": false, "error": {"code": "DUPLICATE_ID", "message": "Node id '%s' already exists." % node_id, "node": node_id}}
-	if not document.add_child(parent_id, value):
-		return {"success": false, "error": {"code": "ADD_FAILED", "parent": parent_id}}
+	var custom_components := _custom_components(document)
+	var added := document.add_child_checked(parent_id, value, custom_components)
+	if not added.get("ok", false):
+		return {"success": false, "error": added.get("errors", [{"code": "ADD_FAILED", "parent": parent_id}])[0]}
 	return {"success": true, "node": value, "parent": parent_id}
 
 static func delete_value(document: UIForgeDocument, node_id: String) -> Dictionary:
@@ -43,8 +45,9 @@ static func delete_value(document: UIForgeDocument, node_id: String) -> Dictiona
 	return {"success": true, "deleted": removed}
 
 static func move_value(document: UIForgeDocument, node_id: String, parent_id: String, index: int = -1) -> Dictionary:
-	if not document.move_node(node_id, parent_id, index):
-		return {"success": false, "error": {"code": "MOVE_FAILED", "node": node_id, "parent": parent_id}}
+	var moved := document.move_node_checked(node_id, parent_id, _custom_components(document), index)
+	if not moved.get("ok", false):
+		return {"success": false, "error": moved.get("errors", [{"code": "MOVE_FAILED", "node": node_id, "parent": parent_id}])[0]}
 	return {"success": true, "node": node_id, "parent": parent_id, "index": index}
 
 static func duplicate_value(document: UIForgeDocument, node_id: String, new_id: String) -> Dictionary:
@@ -57,6 +60,10 @@ static func duplicate_value(document: UIForgeDocument, node_id: String, new_id: 
 	if copy.is_empty():
 		return {"success": false, "error": {"code": "DUPLICATE_FAILED", "node": node_id}}
 	return {"success": true, "node": copy}
+
+static func _custom_components(document: UIForgeDocument) -> Dictionary:
+	var components_value: Variant = document.data.get("components", {})
+	return components_value if components_value is Dictionary else {}
 
 static func _tree_node(node: Dictionary) -> Dictionary:
 	var result := {"id": node.get("id", ""), "type": node.get("type", "Control"), "name": node.get("name", node.get("id", "")), "children": []}

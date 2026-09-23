@@ -192,6 +192,8 @@ func _fixture_assertions(entry: Dictionary, native_root: Node, fallback_root: No
 		if native_node == null or fallback_node == null:
 			failures.append("%s missing node %s for assertion" % [fixture_id, node_id])
 			continue
+		if bool(item.get("exists", false)):
+			continue
 		if item.has("style_state"):
 			var style_state := str(item.get("style_state", "normal"))
 			var expected_class := str(item.get("style_class", ""))

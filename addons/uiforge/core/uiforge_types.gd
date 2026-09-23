@@ -31,7 +31,7 @@ const CONTAINER_TYPES: Array[String] = [
 	"ScrollContainer", "Grid", "HBox", "VBox", "MarginContainer", "CenterContainer",
 	"PanelContainer", "TabBar", "TabContainer", "AspectRatioContainer", "FlowContainer", "HSplitContainer", "VSplitContainer",
 	"ItemGrid", "EquipmentLayout", "InventoryPanel", "BankPanel", "QuestList",
-	"ScrollList", "SidebarNavigation", "GameplaySidebar", "EnemyTargetFrame", "CharacterPreviewFrame", "ModalDialog", "CombatHUD", "HUDMedallion"
+	"ScrollList", "SidebarNavigation", "GameplaySidebar", "GameplaySidebarTab", "GameplaySidebarToggle", "EnemyTargetFrame", "CharacterPreviewFrame", "ModalDialog", "CombatHUD", "HUDMedallion"
 ]
 const INTERACTIVE_TYPES: Array[String] = [
 	"Button", "TextureButton", "CheckBox", "CheckButton", "Slider", "HSlider", "VSlider", "SpinBox", "LineEdit", "TextEdit", "OptionButton", "MenuButton", "LinkButton", "PrimaryButton",
